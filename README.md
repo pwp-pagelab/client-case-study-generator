@@ -1,6 +1,6 @@
 # Case Study Generator
 
-Single-file, no-build HTML generator for anonymized performance marketing case studies.
+Single-file, no-build HTML generator for anonymized performance marketing case studies, styled with the Post With Passion green, gold, cream, and white brand system.
 
 ## Files
 
@@ -16,3 +16,4 @@ Single-file, no-build HTML generator for anonymized performance marketing case s
 - Outcome callout is the safe default; testimonials require client approval.
 - Engagement focus controls fields, metrics, copy, hero stats, and tables.
 - Outputs include a one-page A4 PDF, LinkedIn post copy, and a square LinkedIn carousel PDF.
+- The editor, PDF page, LinkedIn post preview, and carousel output should all keep the PWP look and feel.

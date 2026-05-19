@@ -6,136 +6,173 @@
 <title>Case Study Generator — Performance Marketing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  :root{
+    --green:#0a4c3e;
+    --yellow:#e7bd52;
+    --cream:#f7f2e7;
+    --ink:#15372f;
+    --muted:#6b746f;
+    --line:#e7dfcf;
+    --white:#ffffff;
+    --soft:#fbf8f0;
+    --shadow:0 24px 70px rgba(10,76,62,.14);
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #F5F5F2; color: #1A1A1A; line-height: 1.5; }
+  html, body {
+    font-family: "Baloo Bhaijaan 2", system-ui, sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(231,189,82,.28), transparent 32%),
+      linear-gradient(135deg,#fbf7ee,#f1eadb);
+    color: var(--ink);
+    line-height: 1.6;
+  }
   button { font-family: inherit; cursor: pointer; }
-  input, textarea, select { font-family: inherit; font-size: 13px; }
+  input, textarea, select { font-family: inherit; font-size: 15px; }
 
-  .topbar { background: white; border-bottom: 1px solid #ECECE7; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .topbar {
+    background: rgba(10,76,62,.96);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 12px 40px rgba(10,76,62,.2);
+    color: white;
+    padding: 16px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
   .brand { display: flex; align-items: center; gap: 10px; }
-  .brand-mark { width: 30px; height: 30px; background: #1A1A1A; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
-  .brand-name { font-size: 14px; font-weight: 600; }
-  .brand-sub { font-size: 11px; color: #888; }
-  .topbar-actions { display: flex; gap: 8px; }
-  .btn { background: white; color: #333; border: 1px solid #E0E0DC; padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
-  .btn:hover { border-color: #1A1A1A; }
-  .btn.active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
-  .btn-primary { background: #0F7A3D; color: white; border-color: #0F7A3D; font-weight: 600; }
-  .btn-primary:hover { background: #0c6432; border-color: #0c6432; }
-  .btn-dark { background: #1A1A1A; color: white; border-color: #1A1A1A; font-weight: 600; }
-  .btn-dark:hover { background: #0F7A3D; border-color: #0F7A3D; }
-  .btn-ai { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; border-color: transparent; font-weight: 600; }
-  .btn-ai:hover { opacity: 0.9; }
+  .brand-mark { width: 38px; height: 38px; background: var(--yellow); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--green); font-weight: 800; font-size: 18px; }
+  .brand-name { font-size: 18px; font-weight: 800; }
+  .brand-sub { font-size: 13px; color: rgba(255,255,255,.72); }
+  .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .btn { border: 0; border-radius: 999px; padding: 12px 18px; font-size: 15px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: .2s ease; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn.active { background: var(--yellow); color: var(--green); }
+  .btn-primary { background: var(--yellow); color: var(--green); font-weight: 800; }
+  .btn-primary:hover { background: #dbad36; }
+  .btn-dark { background: white; color: var(--green); font-weight: 800; }
+  .btn-dark:hover { background: var(--cream); }
+  .btn-ai { background: rgba(10,76,62,.11); color: var(--green); border: 1px solid rgba(10,76,62,.13); font-weight: 800; }
+  .btn-ai:hover { background: rgba(231,189,82,.24); }
 
-  .main { max-width: 1200px; margin: 0 auto; padding: 20px 24px; }
+  .main { max-width: 1440px; margin: 0 auto; padding: 24px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
   .grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
   .full { grid-column: 1 / -1; }
 
-  .card { background: white; border-radius: 10px; padding: 20px; border: 1px solid #ECECE7; margin-bottom: 14px; }
-  .card-dark { background: #1A1A1A; color: white; }
-  .card-title { font-size: 13px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .card { background: rgba(255,255,255,.86); border: 1px solid rgba(10,76,62,.12); border-radius: 26px; box-shadow: 0 16px 40px rgba(10,76,62,.08); margin-bottom: 16px; overflow: hidden; padding: 24px; }
+  .card-dark { background: var(--green); color: white; }
+  .card-title { color: var(--green); font-size: 15px; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 
-  .label { display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #666; margin-bottom: 5px; }
+  .label { display: block; font-size: 14px; font-weight: 800; color: var(--green); margin-bottom: 5px; }
   .field { margin-bottom: 10px; }
-  .input, textarea.input, select.input { width: 100%; padding: 9px 12px; border: 1px solid #E0E0DC; border-radius: 6px; background: white; transition: border-color 0.15s; }
-  .input:focus { outline: none; border-color: #1A1A1A; }
+  .input, textarea.input, select.input { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: #fffdf8; color: var(--ink); transition: border-color 0.15s; }
+  .input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(10,76,62,.08); }
   textarea.input { resize: vertical; min-height: 60px; }
 
   .numfield { display: grid; grid-template-columns: 1fr 130px; gap: 10px; align-items: center; margin-bottom: 8px; }
   .numfield > div:first-child { display: flex; flex-direction: column; }
-  .numfield label { font-size: 12px; color: #333; font-weight: 500; }
-  .numfield .currency { color: #999; margin-left: 6px; font-size: 11px; }
+  .numfield label { font-size: 14px; color: var(--green); font-weight: 800; }
+  .numfield .currency { color: var(--muted); margin-left: 6px; font-size: 12px; }
   .numfield input { text-align: right; font-variant-numeric: tabular-nums; }
   .numfield input::placeholder { color: #C5C5C0; font-style: italic; font-size: 11px; }
-  .field-hint { font-size: 10px; color: #999; margin-top: 2px; font-style: italic; }
+  .field-hint { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
   .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
-  .toggle-btn { padding: 8px 10px; border-radius: 6px; border: 1px solid #E0E0DC; background: white; font-size: 12px; font-weight: 500; transition: all 0.15s; flex: 1; min-width: 90px; }
-  .toggle-btn.active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
+  .toggle-btn { padding: 10px 12px; border-radius: 999px; border: 1px solid var(--line); background: #fffdf8; color: var(--green); font-size: 14px; font-weight: 800; transition: all 0.15s; flex: 1; min-width: 90px; }
+  .toggle-btn.active { background: var(--green); color: white; border-color: var(--green); }
 
-  .switch { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FAFAF7; border-radius: 7px; margin-bottom: 8px; }
+  .switch { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--soft); border-radius: 18px; margin-bottom: 8px; }
   .switch input { width: 36px; height: 20px; appearance: none; background: #D0D0CB; border-radius: 10px; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
-  .switch input:checked { background: #0F7A3D; }
+  .switch input:checked { background: var(--green); }
   .switch input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: left 0.2s; }
   .switch input:checked::after { left: 18px; }
-  .switch label { font-size: 12px; font-weight: 500; cursor: pointer; flex: 1; }
-  .switch .hint { font-size: 11px; color: #888; font-weight: 400; display: block; margin-top: 2px; }
+  .switch label { font-size: 14px; font-weight: 800; cursor: pointer; flex: 1; }
+  .switch .hint { font-size: 12px; color: var(--muted); font-weight: 500; display: block; margin-top: 2px; }
 
-  .metric-chip { background: #252525; padding: 10px 12px; border-radius: 7px; }
-  .metric-chip .l { font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 4px; }
-  .metric-chip .v { font-size: 16px; font-weight: 600; color: white; letter-spacing: -0.01em; }
-  .metric-chip .ch { font-size: 10px; margin-top: 3px; font-weight: 600; }
-  .ch-up { color: #7EFFA0; }
-  .ch-down { color: #FF8888; }
+  .metric-chip { background: rgba(255,255,255,.11); border: 1px solid rgba(255,255,255,.18); padding: 14px 16px; border-radius: 20px; }
+  .metric-chip .l { font-size: 11px; color: rgba(255,255,255,.64); font-weight: 800; margin-bottom: 4px; }
+  .metric-chip .v { font-size: 20px; font-weight: 800; color: white; letter-spacing: -0.01em; }
+  .metric-chip .ch { font-size: 12px; margin-top: 3px; font-weight: 800; }
+  .ch-up { color: #f7df98; }
+  .ch-down { color: #ffb0a4; }
 
   .ai-tab-bar { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
-  .ai-tab { padding: 5px 10px; font-size: 11px; border-radius: 5px; border: 1px solid #E0E0DC; background: white; color: #555; }
-  .ai-tab.active { background: #6366F1; color: white; border-color: #6366F1; }
+  .ai-tab { padding: 8px 12px; font-size: 13px; border-radius: 999px; border: 1px solid var(--line); background: #fffdf8; color: var(--green); font-weight: 800; }
+  .ai-tab.active { background: var(--green); color: white; border-color: var(--green); }
 
-  .hint-text { font-size: 11px; color: #888; margin: 4px 0 12px; line-height: 1.5; }
-  .warn-text { font-size: 11px; color: #B45309; background: #FEF3C7; padding: 8px; border-radius: 6px; margin: 6px 0; line-height: 1.5; }
-  .share-preview { background: #FAFAF7; border: 1px solid #ECECE7; border-radius: 8px; color: #333; font-size: 12px; line-height: 1.6; max-height: 240px; overflow: auto; padding: 12px; white-space: pre-wrap; }
+  .hint-text { font-size: 13px; color: var(--muted); margin: 4px 0 12px; line-height: 1.6; }
+  .warn-text { font-size: 12px; color: #6e4a08; background: rgba(231,189,82,.22); padding: 10px; border-radius: 16px; margin: 6px 0; line-height: 1.5; }
+  .share-preview { background: #fffdf8; border: 1px solid var(--line); border-radius: 20px; color: var(--ink); font-size: 14px; line-height: 1.6; max-height: 240px; overflow: auto; padding: 16px; white-space: pre-wrap; }
 
-  .detection-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #E0F2FE; color: #075985; border-radius: 12px; font-size: 11px; font-weight: 600; margin-left: 6px; }
+  .detection-pill { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: rgba(231,189,82,.24); color: var(--green); border-radius: 999px; font-size: 12px; font-weight: 800; margin-left: 6px; }
 
-  .preview-stage { display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
-  .case-page { width: 210mm; min-height: 297mm; background: white; padding: 14mm; box-shadow: 0 8px 32px rgba(0,0,0,0.08); position: relative; overflow: hidden; }
+  .preview-stage { display: flex; flex-direction: column; align-items: center; padding: 24px 0; }
+  .case-page {
+    width: 210mm; min-height: 297mm; background: white; border: 1px solid rgba(10,76,62,.08);
+    border-radius: 34px; padding: 14mm; box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .case-page:before { content:""; position:absolute; inset:0 auto 0 0; width:11px; background:linear-gradient(180deg,var(--yellow),var(--green)); }
+  .case-page:after { content:""; position:absolute; width:260px; height:260px; border-radius:50%; background:rgba(231,189,82,.13); left:-90px; top:-90px; z-index:0; }
+  .case-page > * { position: relative; z-index: 1; }
 
-  .s-editorial { background: #FAFAF7; color: #1A1A1A; font-family: 'Inter', sans-serif; }
-  .s-editorial .display { font-family: 'Fraunces', Georgia, serif; }
-  .s-editorial .muted { color: #666; }
+  .s-editorial { background: var(--white); color: var(--ink); font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; }
+  .s-editorial .display { font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; }
+  .s-editorial .muted { color: var(--muted); }
 
-  .s-bold { background: #0F0F0F; color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; }
-  .s-bold .display { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
-  .s-bold .accent-text { color: #D4FF3F; }
-  .s-bold .muted { color: #999; }
+  .s-bold { background: radial-gradient(circle at 18% 18%, rgba(231,189,82,.32), transparent 28%), linear-gradient(135deg,var(--green),#05372d 72%); color: #FFFFFF; font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; }
+  .s-bold .display { font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; font-weight: 800; }
+  .s-bold .accent-text { color: var(--yellow); }
+  .s-bold .muted { color: rgba(255,255,255,.7); }
 
-  .s-data { background: #FFFFFF; color: #0A1628; font-family: 'IBM Plex Sans', sans-serif; }
-  .s-data .display { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; }
-  .s-data .accent-text { color: #0066FF; }
-  .s-data .muted { color: #5A6B82; }
+  .s-data { background: var(--white); color: var(--ink); font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; }
+  .s-data .display { font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; font-weight: 800; }
+  .s-data .accent-text { color: var(--green); }
+  .s-data .muted { color: var(--muted); }
 
-  .page-h1 { font-size: 32px; line-height: 1.06; letter-spacing: -0.025em; margin: 0; font-weight: 500; }
-  .s-bold .page-h1 { font-weight: 700; }
-  .s-data .page-h1 { font-weight: 600; font-size: 26px; }
+  .page-h1 { font-size: 42px; line-height: 1.12; letter-spacing: 0; margin: 0; font-weight: 800; }
+  .s-bold .page-h1 { font-weight: 800; }
+  .s-data .page-h1 { font-weight: 800; font-size: 34px; }
 
-  .eyebrow { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; }
-  .stat-label { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; }
-  .stat-value { font-size: 28px; line-height: 1; letter-spacing: -0.02em; font-weight: 500; }
-  .s-bold .stat-value { font-weight: 700; }
-  .stat-lift { font-size: 10px; margin-top: 4px; font-weight: 600; }
+  .eyebrow { font-size: 14px; font-weight: 800; }
+  .stat-label { font-size: 12px; font-weight: 800; color: var(--green); }
+  .s-bold .stat-label { color: rgba(255,255,255,.72); }
+  .stat-value { font-size: 34px; line-height: 1; letter-spacing: 0; font-weight: 800; }
+  .s-bold .stat-value { font-weight: 800; }
+  .stat-lift { font-size: 12px; margin-top: 4px; font-weight: 800; }
 
   .results-table { width: 100%; border-collapse: collapse; font-size: 11px; }
   .results-table th { text-align: left; padding: 5px 6px; font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; }
   .results-table td { padding: 5px 6px; }
   .results-table .num { text-align: right; font-variant-numeric: tabular-nums; }
-  .results-table tr { border-top: 1px solid; }
-  .s-editorial .results-table tr { border-color: #E5E5E0; }
-  .s-bold .results-table tr { border-color: #2A2A2A; }
-  .s-data .results-table tr { border-color: #E1E5EC; }
+  .results-table { border:1px solid var(--line); border-collapse:separate; border-radius:24px; border-spacing:0; overflow:hidden; }
+  .results-table th, .results-table td { border-bottom:1px solid var(--line); padding:10px 12px; }
+  .results-table th { background:#f7f4eb; color:var(--green); font-weight:800; }
+  .results-table tr { border-top: 0; }
+  .s-bold .results-table { border-color: rgba(255,255,255,.18); }
+  .s-bold .results-table th { background: rgba(255,255,255,.08); color: var(--yellow); }
+  .s-bold .results-table th, .s-bold .results-table td { border-color: rgba(255,255,255,.16); }
   .results-table tr:first-child { border-top: none; }
 
-  .carousel-slide { width: 1080px; height: 1080px; background: #FAFAF7; color: #1A1A1A; padding: 74px; page-break-after: always; position: relative; overflow: hidden; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-  .carousel-slide.dark { background: #111; color: white; }
-  .carousel-slide .kicker { color: #0F7A3D; font-size: 18px; font-weight: 700; letter-spacing: 0.18em; margin-bottom: 24px; text-transform: uppercase; }
-  .carousel-slide.dark .kicker { color: #7EFFA0; }
-  .carousel-slide h1 { font-family: 'Fraunces', Georgia, serif; font-size: 78px; font-weight: 600; letter-spacing: -0.04em; line-height: 0.98; max-width: 900px; }
-  .carousel-slide h2 { font-family: 'Fraunces', Georgia, serif; font-size: 58px; font-weight: 600; letter-spacing: -0.035em; line-height: 1.04; margin-bottom: 28px; max-width: 860px; }
+  .carousel-slide { width: 1080px; height: 1080px; background: var(--cream); color: var(--ink); padding: 74px; page-break-after: always; position: relative; overflow: hidden; font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; }
+  .carousel-slide:before { content:""; position:absolute; inset:0 auto 0 0; width:18px; background:linear-gradient(180deg,var(--yellow),var(--green)); }
+  .carousel-slide.dark { background: radial-gradient(circle at 18% 18%, rgba(231,189,82,.32), transparent 28%), linear-gradient(135deg,var(--green),#05372d 72%); color: white; }
+  .carousel-slide .kicker { color: var(--green); font-size: 20px; font-weight: 800; margin-bottom: 24px; }
+  .carousel-slide.dark .kicker { color: var(--yellow); }
+  .carousel-slide h1 { font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; font-size: 82px; font-weight: 800; letter-spacing: 0; line-height: 1.02; max-width: 900px; }
+  .carousel-slide h2 { font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; font-size: 62px; font-weight: 800; letter-spacing: 0; line-height: 1.08; margin-bottom: 28px; max-width: 860px; }
   .carousel-slide p, .carousel-slide li { color: inherit; font-size: 30px; line-height: 1.35; }
   .carousel-slide ul { display: grid; gap: 18px; margin: 0; padding-left: 34px; }
   .carousel-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 42px; }
-  .carousel-stat { background: white; border: 1px solid rgba(26,26,26,.16); border-radius: 18px; padding: 28px; }
-  .carousel-slide.dark .carousel-stat { background: #1A1A1A; border-color: rgba(255,255,255,.16); }
-  .carousel-stat span { color: #666; display: block; font-size: 15px; font-weight: 700; letter-spacing: 0.14em; margin-bottom: 12px; text-transform: uppercase; }
-  .carousel-slide.dark .carousel-stat span { color: #AAA; }
-  .carousel-stat strong { display: block; font-size: 54px; letter-spacing: -0.03em; line-height: 1; }
-  .carousel-footer { align-items: center; border-top: 1px solid rgba(26,26,26,.12); bottom: 54px; color: #666; display: flex; font-size: 18px; justify-content: space-between; left: 74px; padding-top: 24px; position: absolute; right: 74px; }
-  .carousel-slide.dark .carousel-footer { border-color: rgba(255,255,255,.16); color: #AAA; }
+  .carousel-stat { background: #fffdf8; border: 1px solid var(--line); border-radius: 26px; padding: 28px; }
+  .carousel-slide.dark .carousel-stat { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.16); }
+  .carousel-stat span { color: var(--muted); display: block; font-size: 17px; font-weight: 800; margin-bottom: 12px; }
+  .carousel-slide.dark .carousel-stat span { color: rgba(255,255,255,.7); }
+  .carousel-stat strong { display: block; font-size: 58px; letter-spacing: 0; line-height: 1; }
+  .carousel-footer { align-items: center; border-top: 1px solid rgba(10,76,62,.18); bottom: 54px; color: var(--muted); display: flex; font-size: 20px; justify-content: space-between; left: 74px; padding-top: 24px; position: absolute; right: 74px; }
+  .carousel-slide.dark .carousel-footer { border-color: rgba(255,255,255,.16); color: rgba(255,255,255,.72); }
   .carousel-footer strong { color: inherit; }
 
   @media print {
@@ -153,8 +190,8 @@
   <div class="brand">
     <div class="brand-mark">⌬</div>
     <div>
-      <div class="brand-name">Case Study Generator</div>
-      <div class="brand-sub">Smart · Anonymized · 1-pager PDF</div>
+      <div class="brand-name">Post With Passion</div>
+      <div class="brand-sub">Case studies · PDF · LinkedIn · Carousel</div>
     </div>
   </div>
   <div class="topbar-actions">
@@ -182,7 +219,7 @@
             <option value="awareness">Awareness & reach</option>
             <option value="fullfunnel">Full-funnel</option>
           </select>
-          <div id="auto-detected" class="field-hint" style="display:none; color:#075985; font-weight:600; font-style:normal; margin-top:4px;"></div>
+          <div id="auto-detected" class="field-hint" style="display:none; color:var(--green); font-weight:700; font-style:normal; margin-top:4px;"></div>
         </div>
         <div>
           <label class="label">Style</label>
@@ -353,7 +390,7 @@ Connected creative learnings back to paid media reporting</textarea>
       </div>
 
       <div class="card card-dark full">
-        <div class="card-title" style="color:white;">⚡ Auto-calculated metrics <span style="font-weight:400; color:#999; margin-left:8px;">(only ones with usable data)</span></div>
+        <div class="card-title" style="color:white;">⚡ Auto-calculated metrics <span style="font-weight:500; color:rgba(255,255,255,.68); margin-left:8px;">(only ones with usable data)</span></div>
         <div class="grid-6" id="computed-chips"></div>
       </div>
 
@@ -849,7 +886,7 @@ function liftHTML(s) {
   const positive = s.inverted ? !isUp : isUp;
   const arrow = s.inverted ? '↓' : '↑';
   const text = s.inverted ? 'reduction' : 'lift';
-  const color = positive ? '#0F7A3D' : '#B33A3A';
+  const color = positive ? '#0a4c3e' : '#9b3b2f';
   return `<div class="stat-lift" style="color:${color};">${arrow} ${Math.abs(s.lift).toFixed(0)}% ${text}</div>`;
 }
 
@@ -904,7 +941,7 @@ function buildResultsTableHTML(d, c, showBaseline) {
       if (lf !== null && lf !== undefined && !isNaN(lf)) {
         const isUp = lf > 0;
         const positive = inverted ? !isUp : isUp;
-        chColor = positive ? 'color:#0F7A3D;' : 'color:#B33A3A;';
+        chColor = positive ? 'color:#0a4c3e;' : 'color:#9b3b2f;';
         const arrow = inverted ? (isUp ? '↓' : '↑') : (isUp ? '↑' : '↓');
         chText = `${arrow} ${Math.abs(lf).toFixed(0)}%`;
       }
@@ -924,30 +961,30 @@ function endorsementHTML(d, style) {
   if (d.endorsement === 'outcome') {
     if (!d.outcomeCallout.trim()) return '';
     if (style === 'editorial') {
-      return `<div style="border-top: 1px solid #E5E5E0; padding-top: 14px; margin-bottom: 14px;">
-        <p style="font-family: 'Fraunces', serif; font-size: 14px; line-height: 1.4; margin: 0;">${escapeHTML(d.outcomeCallout)}</p>
+      return `<div style="border-top: 1px solid #e7dfcf; padding-top: 14px; margin-bottom: 14px;">
+        <p style="font-family: 'Baloo Bhaijaan 2', system-ui, sans-serif; font-size: 14px; line-height: 1.4; margin: 0; font-weight:600;">${escapeHTML(d.outcomeCallout)}</p>
       </div>`;
     } else if (style === 'bold') {
-      return `<div style="border-left: 3px solid #D4FF3F; padding-left: 14px; margin-bottom: 14px;">
+      return `<div style="border-left: 3px solid #e7bd52; padding-left: 14px; margin-bottom: 14px;">
         <p style="font-size: 13px; line-height: 1.45; margin: 0; font-weight: 500;">${escapeHTML(d.outcomeCallout)}</p>
       </div>`;
     } else {
-      return `<div style="background:#F7F8FA; padding: 10px 14px; border-radius: 6px; font-size: 11px; line-height: 1.5;">${escapeHTML(d.outcomeCallout)}</div>`;
+      return `<div style="background:#fbf8f0; border-left:4px solid #e7bd52; padding: 10px 14px; border-radius: 14px; font-size: 11px; line-height: 1.5;">${escapeHTML(d.outcomeCallout)}</div>`;
     }
   }
   if (!d.testimonial.trim()) return '';
   if (style === 'editorial') {
-    return `<div style="border-top: 1px solid #E5E5E0; padding-top: 14px; margin-bottom: 14px;">
-      <p style="font-family: 'Fraunces', serif; font-size: 14px; font-style: italic; line-height: 1.4; margin: 0;">"${escapeHTML(d.testimonial)}"</p>
-      <div style="font-size: 10px; color: #666; margin-top: 8px; font-weight: 500;">— ${escapeHTML(d.testimonialAuthor)}</div>
+    return `<div style="border-top: 1px solid #e7dfcf; padding-top: 14px; margin-bottom: 14px;">
+      <p style="font-family: 'Baloo Bhaijaan 2', system-ui, sans-serif; font-size: 14px; font-style: italic; line-height: 1.4; margin: 0;">"${escapeHTML(d.testimonial)}"</p>
+      <div style="font-size: 10px; color: #6b746f; margin-top: 8px; font-weight: 600;">— ${escapeHTML(d.testimonialAuthor)}</div>
     </div>`;
   } else if (style === 'bold') {
-    return `<div style="border-left: 3px solid #D4FF3F; padding-left: 14px; margin-bottom: 14px;">
+    return `<div style="border-left: 3px solid #e7bd52; padding-left: 14px; margin-bottom: 14px;">
       <p style="font-size: 13px; line-height: 1.45; margin: 0; font-weight: 500;">"${escapeHTML(d.testimonial)}"</p>
-      <div style="font-size: 10px; color: #999; margin-top: 6px; font-weight: 600;">— ${escapeHTML(d.testimonialAuthor)}</div>
+      <div style="font-size: 10px; color: rgba(255,255,255,.68); margin-top: 6px; font-weight: 600;">— ${escapeHTML(d.testimonialAuthor)}</div>
     </div>`;
   } else {
-    return `<div style="background:#F7F8FA; padding: 10px 14px; border-radius: 6px; font-size: 11px;">
+    return `<div style="background:#fbf8f0; border-left:4px solid #e7bd52; padding: 10px 14px; border-radius: 14px; font-size: 11px;">
       <span style="font-style: italic;">"${escapeHTML(d.testimonial)}"</span>
       <span class="muted" style="margin-left: 8px; font-size: 9px;">— ${escapeHTML(d.testimonialAuthor)}</span>
     </div>`;
@@ -1038,7 +1075,7 @@ function buildCarouselSlidesHTML() {
     <section class="carousel-slide dark">
       <div class="kicker">Case Study</div>
       <h1>${escapeHTML(headline)}</h1>
-      <p style="bottom:170px; color:#DADADA; font-size:28px; left:74px; line-height:1.35; max-width:760px; position:absolute;">${escapeHTML(d.descriptor)}</p>
+      <p style="bottom:170px; color:rgba(255,255,255,.78); font-size:28px; left:74px; line-height:1.35; max-width:760px; position:absolute;">${escapeHTML(d.descriptor)}</p>
       ${footer(1)}
     </section>
     <section class="carousel-slide">
@@ -1069,7 +1106,7 @@ function buildCarouselSlidesHTML() {
     <section class="carousel-slide dark">
       <div class="kicker">${escapeHTML(d.agencyName)}</div>
       <h1>Turn messy campaign data into a clear growth story.</h1>
-      <p style="color:#DADADA; margin-top:36px; max-width:780px;">Anonymized, metric-led case studies for prospect-ready proof.</p>
+      <p style="color:rgba(255,255,255,.78); margin-top:36px; max-width:780px;">Anonymized, metric-led case studies for prospect-ready proof.</p>
       ${footer(6)}
     </section>
   `;
@@ -1083,7 +1120,7 @@ function exportCarousel() {
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
     <title>${escapeHTML(state.descriptor)} — LinkedIn Carousel</title>
     ${fonts}${styleTag}
-    <style>body { margin: 0; background: #F5F5F2; } @page { size: 1080px 1080px; margin: 0; }</style>
+    <style>body { margin: 0; background: #f7f2e7; } @page { size: 1080px 1080px; margin: 0; }</style>
   </head><body>${buildCarouselSlidesHTML()}
     <script>window.addEventListener('load', () => { setTimeout(() => window.print(), 600); });<\/script>
   </body></html>`);
@@ -1094,15 +1131,15 @@ function exportCarousel() {
 function editorialLayout(d, c, heroStats, strategyLines) {
   const headlineText = d.headline.trim() || draftHeadline();
   return `
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:12px; border-bottom: 1px solid #E5E5E0;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:12px; border-bottom: 1px solid #e7dfcf;">
       <div>
         <div class="eyebrow muted">Case Study · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
         <div class="display" style="font-size: 22px; font-weight: 500; margin-top: 4px; letter-spacing: -0.02em;">${escapeHTML(d.descriptor)}</div>
       </div>
       <div style="text-align:right;">
-        <div style="font-size: 11px; font-weight: 600;">${escapeHTML(d.agencyName)}</div>
-        <div style="font-size: 9px; color: #666; margin-top: 2px;">${escapeHTML(d.agencyTagline)}</div>
-        <div style="font-size: 9px; color: #666; margin-top: 4px;">${escapeHTML(d.period)}</div>
+        <div style="font-size: 11px; font-weight: 800; color:#0a4c3e;">${escapeHTML(d.agencyName)}</div>
+        <div style="font-size: 9px; color: #6b746f; margin-top: 2px;">${escapeHTML(d.agencyTagline)}</div>
+        <div style="font-size: 9px; color: #6b746f; margin-top: 4px;">${escapeHTML(d.period)}</div>
       </div>
     </div>
 
@@ -1111,9 +1148,9 @@ function editorialLayout(d, c, heroStats, strategyLines) {
     </div>
 
     ${heroStats.length > 0 ? `
-    <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:0; border-top:1px solid #E5E5E0; border-bottom:1px solid #E5E5E0; padding: 16px 0; margin-bottom: 18px;">
+    <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:0; border-top:1px solid #e7dfcf; border-bottom:1px solid #e7dfcf; padding: 16px 0; margin-bottom: 18px;">
       ${heroStats.map((h, i) => `
-        <div style="padding-left:${i === 0 ? 0 : 16}px; padding-right:${i < heroStats.length-1 ? 16 : 0}px; ${i < heroStats.length-1 ? 'border-right:1px solid #E5E5E0;' : ''}">
+        <div style="padding-left:${i === 0 ? 0 : 16}px; padding-right:${i < heroStats.length-1 ? 16 : 0}px; ${i < heroStats.length-1 ? 'border-right:1px solid #e7dfcf;' : ''}">
           <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.k)}</div>
           <div class="display stat-value">${h.v}</div>
           ${liftHTML(h)}
@@ -1143,7 +1180,7 @@ function editorialLayout(d, c, heroStats, strategyLines) {
 
     ${endorsementHTML(d, 'editorial')}
 
-    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#666; padding-top:8px; border-top:1px solid #E5E5E0;">
+    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#6b746f; padding-top:8px; border-top:1px solid #e7dfcf;">
       <div>${escapeHTML(d.agencyName)} · ${escapeHTML(d.agencyTagline)}</div>
       <div>Prepared ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
     </div>
@@ -1155,16 +1192,16 @@ function boldLayout(d, c, heroStats, strategyLines) {
   return `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
       <div style="display:flex; align-items:center; gap:10px;">
-        <div style="width:28px; height:28px; background:#D4FF3F; border-radius:6px;"></div>
+        <div style="width:28px; height:28px; background:#e7bd52; border-radius:999px;"></div>
         <div>
           <div style="font-size:13px; font-weight:700;">${escapeHTML(d.agencyName)}</div>
-          <div style="font-size:9px; color:#999; text-transform:uppercase; letter-spacing:0.12em;">${escapeHTML(d.agencyTagline)}</div>
+          <div style="font-size:9px; color:rgba(255,255,255,.68); text-transform:uppercase; letter-spacing:0.12em;">${escapeHTML(d.agencyTagline)}</div>
         </div>
       </div>
-      <div style="font-size:10px; color:#999; text-transform:uppercase; letter-spacing:0.14em;">${escapeHTML(d.period)}</div>
+      <div style="font-size:10px; color:rgba(255,255,255,.68); text-transform:uppercase; letter-spacing:0.14em;">${escapeHTML(d.period)}</div>
     </div>
 
-    <div style="padding:14px 0 18px; border-top:1px solid #2A2A2A; border-bottom:1px solid #2A2A2A;">
+    <div style="padding:14px 0 18px; border-top:1px solid rgba(255,255,255,.18); border-bottom:1px solid rgba(255,255,255,.18);">
       <div class="accent-text eyebrow" style="margin-bottom:8px;">${escapeHTML(d.descriptor)} · ${escapeHTML(d.industry)}</div>
       <h1 class="page-h1 display">${escapeHTML(headlineText)}</h1>
     </div>
@@ -1172,7 +1209,7 @@ function boldLayout(d, c, heroStats, strategyLines) {
     ${heroStats.length > 0 ? `
     <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:8px; margin:18px 0;">
       ${heroStats.map((h, i) => `
-        <div style="background: ${i === 0 ? '#D4FF3F' : '#1A1A1A'}; color: ${i === 0 ? '#0F0F0F' : '#FFFFFF'}; padding:14px; border-radius:8px;">
+        <div style="background: ${i === 0 ? '#e7bd52' : 'rgba(255,255,255,.1)'}; color: ${i === 0 ? '#15372f' : '#FFFFFF'}; padding:14px; border-radius:18px; border:1px solid rgba(255,255,255,.14);">
           <div class="stat-label" style="font-weight:700; opacity:0.7; margin-bottom:8px;">${escapeHTML(h.k)}</div>
           <div class="display" style="font-size:28px; font-weight:700; line-height:1; letter-spacing:-0.02em;">${h.v}</div>
           ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:9px; font-weight:600; margin-top:6px; opacity:0.85;">${h.inverted ? '↓' : '↑'} ${Math.abs(h.lift).toFixed(0)}% ${h.inverted ? 'reduction' : 'lift'}</div>` : ''}
@@ -1181,24 +1218,24 @@ function boldLayout(d, c, heroStats, strategyLines) {
     </div>` : ''}
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:14px;">
-      <div style="background:#1A1A1A; padding:16px; border-radius:8px;">
+      <div style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.14); padding:16px; border-radius:18px;">
         <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">Challenge</div>
         <p style="font-size:11px; line-height:1.5; margin:0;">${escapeHTML(d.challenge)}</p>
       </div>
-      <div style="background:#1A1A1A; padding:16px; border-radius:8px;">
+      <div style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.14); padding:16px; border-radius:18px;">
         <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">What we did</div>
         <ul style="margin:0; padding-left:16px; font-size:11px; line-height:1.5;">${strategyLines.map(l => `<li style="margin-bottom:4px;">${escapeHTML(l)}</li>`).join('')}</ul>
       </div>
     </div>
 
-    <div style="background:#1A1A1A; border-radius:8px; padding:12px 14px; margin-bottom:14px;">
+    <div style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.14); border-radius:18px; padding:12px 14px; margin-bottom:14px;">
       <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">Channel metrics</div>
       ${buildResultsTableHTML(d, c, false)}
     </div>
 
     ${endorsementHTML(d, 'bold')}
 
-    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#999; padding-top:10px; border-top:1px solid #2A2A2A;">
+    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:rgba(255,255,255,.68); padding-top:10px; border-top:1px solid rgba(255,255,255,.18);">
       <div>Channels: ${escapeHTML(d.channels)}</div>
       <div>${escapeHTML(d.agencyName)}</div>
     </div>
@@ -1208,20 +1245,20 @@ function boldLayout(d, c, heroStats, strategyLines) {
 function dataLayout(d, c, heroStats, strategyLines) {
   const headlineText = d.headline.trim() || draftHeadline();
   return `
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #0066FF;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #e7bd52;">
       <div>
         <div class="stat-label muted">Performance Marketing Report</div>
         <div style="font-size:18px; font-weight:600; margin-top:4px; letter-spacing:-0.01em;">${escapeHTML(d.descriptor)}</div>
-        <div style="font-size:10px; color:#5A6B82; margin-top:2px;">Reporting period: ${escapeHTML(d.period)} · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
-        <div style="font-size:10px; color:#5A6B82;">Channels: ${escapeHTML(d.channels)}</div>
+        <div style="font-size:10px; color:#6b746f; margin-top:2px;">Reporting period: ${escapeHTML(d.period)} · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
+        <div style="font-size:10px; color:#6b746f;">Channels: ${escapeHTML(d.channels)}</div>
       </div>
       <div style="text-align:right;">
         <div style="font-size:12px; font-weight:600;">${escapeHTML(d.agencyName)}</div>
-        <div style="font-size:9px; color:#5A6B82;">${escapeHTML(d.agencyTagline)}</div>
+        <div style="font-size:9px; color:#6b746f;">${escapeHTML(d.agencyTagline)}</div>
       </div>
     </div>
 
-    <div style="background:#F7F8FA; border-left:4px solid #0066FF; padding:12px 14px; margin-bottom:14px; border-radius:4px;">
+    <div style="background:#fbf8f0; border-left:4px solid #e7bd52; padding:12px 14px; margin-bottom:14px; border-radius:16px;">
       <div class="stat-label muted" style="margin-bottom:4px;">Executive summary</div>
       <div style="font-size:16px; font-weight:600; line-height:1.3;">${escapeHTML(headlineText)}</div>
     </div>
@@ -1229,10 +1266,10 @@ function dataLayout(d, c, heroStats, strategyLines) {
     ${heroStats.length > 0 ? `
     <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:6px; margin-bottom:14px;">
       ${heroStats.map(h => `
-        <div style="background:#F7F8FA; padding:12px; border-radius:6px; border-top:2px solid #0066FF;">
+        <div style="background:#fbf8f0; padding:12px; border-radius:16px; border-top:2px solid #e7bd52;">
           <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.k)}</div>
           <div style="font-size:22px; font-weight:600; line-height:1; letter-spacing:-0.02em;">${h.v}</div>
-          ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:10px; color:#0F7A3D; margin-top:6px; font-weight:600;">${h.inverted ? '▼' : '▲'} ${Math.abs(h.lift).toFixed(1)}% ${h.inverted ? 'reduction' : 'lift'}</div>` : ''}
+          ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:10px; color:#0a4c3e; margin-top:6px; font-weight:700;">${h.inverted ? '▼' : '▲'} ${Math.abs(h.lift).toFixed(1)}% ${h.inverted ? 'reduction' : 'lift'}</div>` : ''}
         </div>
       `).join('')}
     </div>` : ''}
@@ -1255,7 +1292,7 @@ function dataLayout(d, c, heroStats, strategyLines) {
 
     ${endorsementHTML(d, 'data')}
 
-    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#5A6B82; padding-top:8px; border-top:1px solid #E1E5EC;">
+    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#6b746f; padding-top:8px; border-top:1px solid #e7dfcf;">
       <div>${escapeHTML(d.agencyName)} · ${escapeHTML(d.agencyTagline)}</div>
       <div>Generated ${new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
     </div>
