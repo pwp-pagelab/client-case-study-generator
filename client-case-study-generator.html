@@ -1,376 +1,572 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Client Case Study Generator</title>
-  <style>
-    :root {
-      --navy: #07182d;
-      --navy-2: #0b2343;
-      --blue: #2f6df2;
-      --green: #34c85a;
-      --orange: #f09a2c;
-      --teal: #16a9c7;
-      --violet: #6653db;
-      --ink: #11223b;
-      --muted: #657184;
-      --line: #dce4ee;
-      --paper: #f4f7fb;
-      --white: #ffffff;
-      --shadow: 0 24px 70px rgba(9, 27, 51, .16);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study Generator — Performance Marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     RESET + BASE
+     ============================================ */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #F5F5F2; color: #1A1A1A; line-height: 1.5; }
+  button { font-family: inherit; cursor: pointer; }
+  input, textarea, select { font-family: inherit; font-size: 13px; }
 
-    * {
-      box-sizing: border-box;
-    }
+  /* ============================================
+     APP CHROME
+     ============================================ */
+  .topbar {
+    background: white; border-bottom: 1px solid #ECECE7;
+    padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark { width: 30px; height: 30px; background: #1A1A1A; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
+  .brand-name { font-size: 14px; font-weight: 600; }
+  .brand-sub { font-size: 11px; color: #888; }
+  .topbar-actions { display: flex; gap: 8px; }
+  .btn {
+    background: white; color: #333; border: 1px solid #E0E0DC;
+    padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;
+  }
+  .btn:hover { border-color: #1A1A1A; }
+  .btn.active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
+  .btn-primary { background: #0F7A3D; color: white; border-color: #0F7A3D; font-weight: 600; }
+  .btn-primary:hover { background: #0c6432; border-color: #0c6432; }
+  .btn-pwp { background: #1A1A1A; color: white; border-color: #1A1A1A; font-weight: 600; }
+  .btn-pwp:hover { background: #0F7A3D; border-color: #0F7A3D; }
+  .btn-ai { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; border-color: transparent; font-weight: 600; }
+  .btn-ai:hover { opacity: 0.9; }
 
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      color: var(--ink);
-      background: linear-gradient(135deg, #eef3f8 0%, #f9fbfd 52%, #edf6f8 100%);
-    }
+  .main { max-width: 1200px; margin: 0 auto; padding: 20px 24px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .full { grid-column: 1 / -1; }
 
-    button,
-    input,
-    textarea,
-    select {
-      font: inherit;
-    }
+  .card { background: white; border-radius: 10px; padding: 20px; border: 1px solid #ECECE7; margin-bottom: 14px; }
+  .card-dark { background: #1A1A1A; color: white; }
+  .card-title { font-size: 13px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .card-title svg { width: 14px; height: 14px; }
 
-    .app-shell {
-      display: grid;
-      grid-template-columns: minmax(320px, 440px) minmax(520px, 1fr);
-      gap: 24px;
-      width: min(1500px, calc(100% - 32px));
-      margin: 24px auto;
-      align-items: start;
-    }
+  .label { display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #666; margin-bottom: 5px; }
+  .field { margin-bottom: 10px; }
+  .input, textarea.input, select.input {
+    width: 100%; padding: 9px 12px; border: 1px solid #E0E0DC; border-radius: 6px;
+    background: white; transition: border-color 0.15s;
+  }
+  .input:focus { outline: none; border-color: #1A1A1A; }
+  textarea.input { resize: vertical; min-height: 60px; }
 
-    .panel {
-      background: rgba(255, 255, 255, .92);
-      border: 1px solid rgba(204, 215, 228, .9);
-      border-radius: 8px;
-      box-shadow: 0 18px 48px rgba(20, 37, 59, .12);
-      overflow: hidden;
-    }
+  .numfield { display: grid; grid-template-columns: 1fr 130px; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .numfield label { font-size: 12px; color: #333; font-weight: 500; }
+  .numfield .currency { color: #999; margin-left: 6px; font-size: 11px; }
+  .numfield input { text-align: right; font-variant-numeric: tabular-nums; }
 
-    .form-panel {
-      position: sticky;
-      top: 18px;
-      max-height: calc(100vh - 36px);
-      overflow: auto;
-    }
+  .toggle-group { display: flex; gap: 6px; }
+  .toggle-btn { flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid #E0E0DC; background: white; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+  .toggle-btn.active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
 
-    .panel-header {
-      padding: 18px 20px;
-      background: var(--navy);
-      color: var(--white);
-    }
+  .switch { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FAFAF7; border-radius: 7px; margin-bottom: 8px; }
+  .switch input { width: 36px; height: 20px; appearance: none; background: #D0D0CB; border-radius: 10px; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+  .switch input:checked { background: #0F7A3D; }
+  .switch input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: left 0.2s; }
+  .switch input:checked::after { left: 18px; }
+  .switch label { font-size: 12px; font-weight: 500; cursor: pointer; flex: 1; }
+  .switch .hint { font-size: 11px; color: #888; font-weight: 400; display: block; margin-top: 2px; }
 
-    .panel-header h1 {
-      margin: 0;
-      font-size: 20px;
-      line-height: 1.2;
-      letter-spacing: .02em;
-    }
+  .metric-chip { background: #252525; padding: 10px 12px; border-radius: 7px; }
+  .metric-chip .l { font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 4px; }
+  .metric-chip .v { font-size: 16px; font-weight: 600; color: white; letter-spacing: -0.01em; }
+  .metric-chip .ch { font-size: 10px; margin-top: 3px; font-weight: 600; }
+  .ch-up { color: #7EFFA0; }
+  .ch-down { color: #FF8888; }
 
-    .panel-header p {
-      margin: 8px 0 0;
-      color: #bdd0e8;
-      font-size: 13px;
-      line-height: 1.45;
-    }
+  .ai-output-box { background: #F5F3FF; border: 1px solid #DDD6FE; border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 12px; line-height: 1.5; color: #4C1D95; }
+  .ai-output-box .label-pill { display: inline-block; background: #6366F1; color: white; font-size: 9px; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 6px; }
+  .ai-tab-bar { display: flex; gap: 4px; margin-bottom: 10px; }
+  .ai-tab-bar button { padding: 5px 10px; font-size: 11px; border-radius: 5px; border: 1px solid #E0E0DC; background: white; color: #555; }
+  .ai-tab-bar button.active { background: #6366F1; color: white; border-color: #6366F1; }
 
-    .field-group {
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--line);
-    }
+  .hint-text { font-size: 11px; color: #888; margin: 4px 0 12px; line-height: 1.5; }
 
-    .field-group h2 {
-      margin: 0 0 12px;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: #18345a;
-    }
+  .share-preview { background: #FAFAF7; border: 1px solid #ECECE7; border-radius: 8px; padding: 12px; font-size: 12px; line-height: 1.6; white-space: pre-wrap; color: #333; max-height: 280px; overflow: auto; }
+  .pwp-note { border-left: 3px solid #0F7A3D; background: #F6FBF7; padding: 10px 12px; border-radius: 6px; font-size: 12px; color: #234B31; line-height: 1.5; }
 
-    .help-list {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
+  /* ============================================
+     1-PAGER PREVIEW (A4)
+     ============================================ */
+  .preview-stage { display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+  .case-page {
+    width: 210mm; min-height: 297mm; background: white; padding: 14mm 14mm;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08); position: relative; overflow: hidden;
+  }
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+  /* === Style: Editorial === */
+  .s-editorial { background: #FAFAF7; color: #1A1A1A; font-family: 'Inter', sans-serif; }
+  .s-editorial .display { font-family: 'Fraunces', Georgia, serif; }
+  .s-editorial .accent { color: #1A1A1A; }
+  .s-editorial .border-c { border-color: #E5E5E0; }
+  .s-editorial .muted { color: #666; }
+  .s-editorial .surface { background: #FFFFFF; }
 
-    label {
-      display: grid;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #34445d;
-    }
+  /* === Style: Bold === */
+  .s-bold { background: #0F0F0F; color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; }
+  .s-bold .display { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+  .s-bold .accent-fill { background: #D4FF3F; color: #0F0F0F; }
+  .s-bold .accent-text { color: #D4FF3F; }
+  .s-bold .border-c { border-color: #2A2A2A; }
+  .s-bold .muted { color: #999; }
+  .s-bold .surface { background: #1A1A1A; }
 
-    input,
-    textarea,
-    select {
-      width: 100%;
-      border: 1px solid #cbd7e5;
-      border-radius: 6px;
-      background: #fff;
-      color: var(--ink);
-      padding: 10px 11px;
-      outline: none;
-    }
+  /* === Style: Data === */
+  .s-data { background: #FFFFFF; color: #0A1628; font-family: 'IBM Plex Sans', sans-serif; }
+  .s-data .display { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; }
+  .s-data .accent-fill { background: #0066FF; color: #FFFFFF; }
+  .s-data .accent-text { color: #0066FF; }
+  .s-data .accent-border { border-color: #0066FF; }
+  .s-data .border-c { border-color: #E1E5EC; }
+  .s-data .muted { color: #5A6B82; }
+  .s-data .surface { background: #F7F8FA; }
 
-    textarea {
-      min-height: 92px;
-      resize: vertical;
-      line-height: 1.35;
-    }
+  /* shared page elements */
+  .page-h1 { font-size: 32px; line-height: 1.06; letter-spacing: -0.025em; margin: 0; font-weight: 500; }
+  .s-bold .page-h1 { font-weight: 700; }
+  .s-data .page-h1 { font-weight: 600; font-size: 26px; }
 
-    input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(47, 109, 242, .13);
-    }
+  .eyebrow { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; }
+  .stat-label { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; }
+  .stat-value { font-size: 28px; line-height: 1; letter-spacing: -0.02em; font-weight: 500; }
+  .s-bold .stat-value { font-weight: 700; }
+  .stat-lift { font-size: 10px; margin-top: 4px; font-weight: 600; color: #0F7A3D; }
+  .s-bold .stat-lift { color: inherit; opacity: 0.85; }
 
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 18px 20px 20px;
-      background: #f7f9fc;
-    }
+  .results-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .results-table th { text-align: left; padding: 5px 6px; font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .results-table td { padding: 5px 6px; }
+  .results-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .results-table tr { border-top: 1px solid currentColor; border-color: inherit; }
+  .results-table tr:first-child { border-top: none; }
 
-    .btn {
-      border: 0;
-      border-radius: 6px;
-      padding: 11px 12px;
-      color: #fff;
-      background: var(--blue);
-      cursor: pointer;
-      font-weight: 800;
-      text-align: center;
-    }
+  .pwp-signature { letter-spacing: 0.12em; text-transform: uppercase; font-size: 8px; font-weight: 700; }
 
-    .btn.secondary {
-      background: var(--navy-2);
-    }
+  /* ============================================
+     LINKEDIN CAROUSEL
+     ============================================ */
+  .carousel-export { background: #F5F5F2; padding: 0; }
+  .carousel-slide {
+    width: 1080px; height: 1080px; background: #FAFAF7; color: #1A1A1A;
+    padding: 74px; page-break-after: always; position: relative; overflow: hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  .carousel-slide.dark { background: #111; color: white; }
+  .carousel-slide .kicker { font-size: 18px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: #0F7A3D; margin-bottom: 24px; }
+  .carousel-slide.dark .kicker { color: #7EFFA0; }
+  .carousel-slide h1 { font-family: 'Fraunces', Georgia, serif; font-size: 78px; line-height: 0.98; letter-spacing: -0.04em; max-width: 880px; font-weight: 600; }
+  .carousel-slide h2 { font-family: 'Fraunces', Georgia, serif; font-size: 58px; line-height: 1.04; letter-spacing: -0.035em; max-width: 860px; font-weight: 600; margin-bottom: 28px; }
+  .carousel-slide p, .carousel-slide li { font-size: 30px; line-height: 1.35; color: inherit; }
+  .carousel-slide ul { margin: 0; padding-left: 34px; display: grid; gap: 18px; }
+  .carousel-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 42px; }
+  .carousel-stat { border: 1px solid rgba(26,26,26,.16); border-radius: 18px; padding: 28px; background: white; }
+  .carousel-slide.dark .carousel-stat { border-color: rgba(255,255,255,.16); background: #1A1A1A; }
+  .carousel-stat span { display: block; font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; color: #666; font-weight: 700; margin-bottom: 12px; }
+  .carousel-slide.dark .carousel-stat span { color: #AAA; }
+  .carousel-stat strong { display: block; font-size: 54px; line-height: 1; letter-spacing: -0.03em; }
+  .carousel-footer { position: absolute; left: 74px; right: 74px; bottom: 54px; display: flex; justify-content: space-between; align-items: center; font-size: 18px; color: #666; border-top: 1px solid rgba(26,26,26,.12); padding-top: 24px; }
+  .carousel-slide.dark .carousel-footer { color: #AAA; border-color: rgba(255,255,255,.16); }
+  .pwp-mark { font-weight: 800; color: inherit; }
 
-    .btn.light {
-      color: var(--navy);
-      background: #dce8fb;
-    }
+  /* ============================================
+     PRINT
+     ============================================ */
+  @media print {
+    body { background: white; margin: 0; padding: 0; }
+    .no-print { display: none !important; }
+    .case-page { box-shadow: none; width: 210mm; min-height: 297mm; padding: 14mm; page-break-after: avoid; }
+    .carousel-slide { width: 1080px; height: 1080px; box-shadow: none; }
+    @page { size: A4; margin: 0; }
+  }
+</style>
+</head>
+<body>
 
-    .btn:hover {
-      filter: brightness(.96);
-    }
+<!-- ========== TOP BAR ========== -->
+<div class="topbar no-print">
+  <div class="brand">
+    <div class="brand-mark">⌬</div>
+    <div>
+      <div class="brand-name">Case Study Generator</div>
+      <div class="brand-sub">Post With Passion · Real voices · PDF + LinkedIn</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn active" id="tab-input">Inputs</button>
+    <button class="btn" id="tab-preview">Preview</button>
+    <button class="btn btn-primary" id="export-btn">↓ Export PDF</button>
+    <button class="btn btn-pwp" id="linkedin-post-btn">Copy LinkedIn Post</button>
+    <button class="btn btn-pwp" id="carousel-btn">Export Carousel</button>
+  </div>
+</div>
 
-    .preview-wrap {
-      padding: 16px;
-      background: #d7e2ee;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-    }
+<div class="main">
 
-    .case-study {
-      width: min(100%, 820px);
-      margin: 0 auto;
-      background: var(--white);
-      overflow: hidden;
-      box-shadow: 0 20px 55px rgba(0, 18, 45, .22);
-    }
+  <!-- ============================================
+       INPUT VIEW
+       ============================================ -->
+  <div id="view-input">
 
-    .hero {
-      position: relative;
-      display: grid;
-      grid-template-columns: 1.05fr .95fr;
-      min-height: 410px;
-      padding: 24px 28px 30px;
-      color: #fff;
-      background:
-        radial-gradient(circle at 72% 36%, rgba(37, 108, 255, .34), transparent 30%),
-        linear-gradient(135deg, #08182c 0%, #071629 55%, #031020 100%);
-      overflow: hidden;
-    }
+    <!-- SETUP -->
+    <div class="card">
+      <div class="card-title">⚙️ Setup</div>
+      <div class="grid-4">
+        <div>
+          <label class="label">Client Type</label>
+          <div class="toggle-group">
+            <button class="toggle-btn active" data-type="ecommerce">Ecommerce</button>
+            <button class="toggle-btn" data-type="leadgen">Lead-gen</button>
+          </div>
+        </div>
+        <div>
+          <label class="label">Style</label>
+          <select class="input" id="f-style">
+            <option value="editorial">Editorial (clean)</option>
+            <option value="bold">Bold (dark, punchy)</option>
+            <option value="data">Data-heavy</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Currency</label>
+          <select class="input" id="f-currency">
+            <option>SAR</option><option>USD</option><option>EUR</option><option>GBP</option><option>AED</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Reset</label>
+          <button class="btn" id="reset-btn" style="width:100%;">↺ Reset all</button>
+        </div>
+      </div>
+    </div>
 
-    .hero:before {
-      content: "";
-      position: absolute;
-      right: 20px;
-      bottom: 54px;
-      width: 390px;
-      height: 210px;
-      background: repeating-linear-gradient(90deg, transparent 0 18px, rgba(43, 108, 209, .23) 18px 35px);
-      clip-path: polygon(0 80%, 100% 0, 100% 100%, 0 100%);
-      opacity: .58;
-    }
+    <div class="card">
+      <div class="card-title">✦ Post With Passion output</div>
+      <p class="pwp-note">The final assets are designed to be shareable as a polished PDF case study, a ready LinkedIn caption, and a square LinkedIn carousel. The voice uses PWP themes: real people, local Saudi context, story-led creative, and performance numbers that still feel human.</p>
+      <div class="grid-3" style="margin-top: 14px;">
+        <button class="btn btn-primary" id="export-btn-inline" style="justify-content:center;">Export 1-page PDF</button>
+        <button class="btn btn-pwp" id="linkedin-post-btn-inline" style="justify-content:center;">Copy LinkedIn Post</button>
+        <button class="btn btn-pwp" id="carousel-btn-inline" style="justify-content:center;">Export Carousel PDF</button>
+      </div>
+      <div class="field" style="margin-top:14px;">
+        <label class="label">LinkedIn post preview</label>
+        <div class="share-preview" id="linkedin-post-preview"></div>
+      </div>
+    </div>
 
-    .hero-copy,
-    .hero-chart {
-      position: relative;
-      z-index: 1;
-    }
+    <!-- PRIVACY TOGGLES -->
+    <div class="card">
+      <div class="card-title">🔒 Privacy & data availability</div>
+      <p class="hint-text">These flags change how the case study presents the client and which numbers it features.</p>
+      <div class="grid-3">
+        <div class="switch">
+          <input type="checkbox" id="t-hideName" checked>
+          <label for="t-hideName">Hide client name
+            <span class="hint">Show as anonymous descriptor (e.g. "US DTC skincare brand")</span>
+          </label>
+        </div>
+        <div class="switch">
+          <input type="checkbox" id="t-hideRevenue">
+          <label for="t-hideRevenue">Hide absolute revenue
+            <span class="hint">Keep ROAS, lifts, ratios — hide dollar amounts</span>
+          </label>
+        </div>
+        <div class="switch">
+          <input type="checkbox" id="t-noBaseline">
+          <label for="t-noBaseline">Built from scratch (no baseline)
+            <span class="hint">Frame as "0 → achieved" instead of "before → after"</span>
+          </label>
+        </div>
+      </div>
+    </div>
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 38px;
-      padding: 8px 16px;
-      border-radius: 7px;
-      background: linear-gradient(135deg, #1d5fe7, #2c72ff);
-      color: #fff;
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: .02em;
-      text-transform: uppercase;
-    }
+    <div class="grid-2">
 
-    .hero h2 {
-      margin: 22px 0 0;
-      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-      font-size: clamp(44px, 6.4vw, 72px);
-      line-height: .94;
-      letter-spacing: .03em;
-      text-transform: uppercase;
-      max-width: 430px;
-      text-wrap: balance;
-    }
+      <!-- ANONYMIZED CLIENT -->
+      <div class="card">
+        <div class="card-title">👤 Anonymized client profile</div>
+        <p class="hint-text">No client names anywhere. Build a descriptor sharp enough that prospects in similar situations recognize themselves.</p>
 
-    .hero h2 span {
-      color: var(--green);
-    }
+        <div class="field">
+          <label class="label">Your Agency Name</label>
+          <input class="input" id="f-agencyName" value="Post With Passion">
+        </div>
+        <div class="field">
+          <label class="label">Agency Tagline</label>
+          <input class="input" id="f-agencyTagline" value="UGC · Real Voices · Riyadh">
+        </div>
 
-    .accent-line {
-      width: 74px;
-      height: 4px;
-      margin: 24px 0 20px;
-      background: #4f91ff;
-    }
+        <div class="field">
+          <label class="label">Anonymous Descriptor (replaces client name)</label>
+          <input class="input" id="f-descriptor" value="A Saudi ecommerce brand built around community trust">
+          <p class="hint-text" style="margin: 4px 0 0;">Format: "[geography] [model] [vertical]" — e.g. "A UK B2B SaaS company in HR tech"</p>
+        </div>
 
-    .hero p {
-      margin: 0;
-      max-width: 360px;
-      color: #d6e1ef;
-      font-size: 17px;
-      line-height: 1.45;
-    }
+        <div class="grid-2" style="gap: 10px;">
+          <div class="field">
+            <label class="label">Industry / Vertical</label>
+            <input class="input" id="f-industry" value="Saudi Ecommerce">
+          </div>
+          <div class="field">
+            <label class="label">Company Size</label>
+            <select class="input" id="f-size">
+              <option>Pre-launch / startup</option>
+              <option>Under $1M revenue</option>
+              <option selected>$1M – $10M revenue</option>
+              <option>$10M – $50M revenue</option>
+              <option>$50M+ revenue</option>
+              <option>SMB (1-50 employees)</option>
+              <option>Mid-market (50-500 employees)</option>
+              <option>Enterprise (500+ employees)</option>
+            </select>
+          </div>
+        </div>
 
-    .hero-chart {
-      display: grid;
-      align-content: end;
-      min-height: 330px;
-      padding-top: 42px;
-    }
+        <div class="field">
+          <label class="label">Engagement Period</label>
+          <input class="input" id="f-period" value="Jan – Jun 2026">
+        </div>
+        <div class="field">
+          <label class="label">Channels Used</label>
+          <input class="input" id="f-channels" value="Meta Ads, TikTok, UGC Creators, Google Ads">
+        </div>
+      </div>
 
-    .chart-stage {
-      position: relative;
-      height: 286px;
-    }
+      <!-- NARRATIVE + AI -->
+      <div class="card">
+        <div class="card-title">✨ Narrative</div>
 
-    .platform {
-      position: absolute;
-      left: 22px;
-      right: 0;
-      bottom: 20px;
-      height: 54px;
-      background: linear-gradient(135deg, #173969, #0d274e);
-      clip-path: polygon(10% 0, 86% 0, 100% 45%, 4% 45%);
-      opacity: .95;
-    }
+        <div class="field">
+          <label class="label">Headline Result</label>
+          <input class="input" id="f-headline" value="Turned real voices into a performance engine with stronger ROAS and lower CPA">
+          <button class="btn btn-ai" id="ai-headline" style="margin-top: 6px; width: 100%;">🤖 Generate headline from metrics</button>
+        </div>
 
-    .cylinder {
-      position: absolute;
-      bottom: 64px;
-      width: 104px;
-      border-radius: 52px / 17px;
-      box-shadow: inset -22px 0 28px rgba(0, 0, 0, .16), inset 18px 0 22px rgba(255, 255, 255, .17);
-    }
+        <div class="field">
+          <label class="label">The Challenge (1–2 sentences)</label>
+          <textarea class="input" id="f-challenge" rows="3">The brand had attention, but the message felt too polished to move local audiences. They needed creative that sounded like people, not ads, while keeping performance accountable.</textarea>
+        </div>
 
-    .cylinder:before {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: -16px;
-      height: 34px;
-      border-radius: 52px / 17px;
-      background: rgba(255, 255, 255, .18);
-    }
+        <div class="field">
+          <label class="label">What We Did (one line per bullet)</label>
+          <textarea class="input" id="f-strategy" rows="4">Mapped audience moments around Saudi buying behavior
+Produced UGC scripts built on real customer language
+Tested creator-led hooks across Meta and TikTok
+Reallocated budget toward the stories that converted
+Connected creative learnings back to paid media reporting</textarea>
+        </div>
 
-    .before-bar {
-      left: 92px;
-      height: var(--before-height, 220px);
-      background: linear-gradient(90deg, #2569df, #4a8cff);
-    }
+        <!-- ENDORSEMENT MODE -->
+        <div class="field">
+          <label class="label">Endorsement Style</label>
+          <div class="ai-tab-bar">
+            <button class="ai-tab active" data-endorsement="outcome">Outcome callout (recommended)</button>
+            <button class="ai-tab" data-endorsement="testimonial">Quote (needs client approval)</button>
+            <button class="ai-tab" data-endorsement="none">None</button>
+          </div>
 
-    .after-bar {
-      left: 255px;
-      height: var(--after-height, 118px);
-      background: linear-gradient(90deg, #2ab84d, #69e36f);
-    }
+          <div id="endorsement-outcome">
+            <textarea class="input" id="f-outcomeCallout" rows="2">We turned local insight and real creator voices into a measurable acquisition system — content that felt close to the audience, with numbers strong enough for the boardroom.</textarea>
+            <button class="btn btn-ai" id="ai-outcome" style="margin-top: 6px; width: 100%;">🤖 Draft outcome callout from inputs</button>
+            <p class="hint-text">Spoken in your agency's voice. No fake quotes, no attribution. Always safe to publish.</p>
+          </div>
 
-    .metric-label {
-      position: absolute;
-      min-width: 98px;
-      font-weight: 900;
-      text-transform: uppercase;
-      text-align: center;
-      line-height: 1.15;
-      text-shadow: 0 3px 12px rgba(0, 0, 0, .34);
-    }
+          <div id="endorsement-testimonial" style="display:none;">
+            <textarea class="input" id="f-testimonial" rows="2">The work felt like our audience was finally speaking for the brand, not just watching another ad.</textarea>
+            <input class="input" id="f-testimonialAuthor" style="margin-top: 6px;" placeholder="Attribution (e.g. 'Head of Growth, anonymous client')" value="Marketing Lead, anonymous client">
+            <button class="btn btn-ai" id="ai-testimonial" style="margin-top: 6px; width: 100%;">🤖 Draft testimonial (for client to approve)</button>
+            <p class="hint-text" style="color: #B45309; background: #FEF3C7; padding: 8px; border-radius: 6px;">
+              ⚠️ <strong>Important:</strong> AI generates a draft only. You must send it to your client for explicit written approval before publishing. Fabricating attributed quotes is false advertising in most jurisdictions.
+            </p>
+          </div>
+        </div>
+      </div>
 
-    .metric-label small {
-      display: block;
-      font-size: 11px;
-      color: #d7e4f4;
-    }
+      <!-- PERFORMANCE INPUTS -->
+      <div class="card">
+        <div class="card-title">🎯 Performance (engagement period)</div>
+        <div id="perf-fields"></div>
+      </div>
 
-    .metric-label b {
-      display: block;
-      margin-top: 3px;
-      font-size: 22px;
-      color: #5d91ff;
-    }
+      <!-- BASELINE -->
+      <div class="card" id="baseline-card">
+        <div class="card-title">📈 Baseline (pre-engagement)</div>
+        <p class="hint-text">Used to auto-calculate % lift. Leave blank if a baseline doesn't apply — lift figures will simply hide. (If you toggled "Built from scratch" above, this section is bypassed.)</p>
+        <div id="baseline-fields"></div>
+      </div>
 
-    .metric-label.after b {
-      color: #5be16e;
-    }
+      <!-- COMPUTED METRICS -->
+      <div class="card card-dark full">
+        <div class="card-title" style="color:white;">⚡ Auto-calculated metrics</div>
+        <div class="grid-6" id="computed-chips"></div>
+      </div>
 
-    .metric-label.before {
-      left: 95px;
-      top: 8px;
-    }
+    </div>
+  </div>
 
-    .metric-label.after {
-      left: 238px;
-      top: 132px;
-    }
+  <!-- ============================================
+       PREVIEW VIEW
+       ============================================ -->
+  <div id="view-preview" style="display:none;">
+    <div class="preview-stage">
+      <div id="case-page-mount"></div>
+    </div>
+  </div>
 
-    .reduction-badge {
-      position: absolute;
-      right: 6px;
-      top: 0;
-      display: grid;
-      place-items: center;
-      width: 108px;
-      min-height: 118px;
-      padding: 12px;
-      color: #fff;
-      text-align: center;
-      background: linear-gradient(145deg, #37b94b, #1f933b);
-      border-radius: 15px 15px 28px 28px;
-      box-shadow: 0 12px 30px rgba(25, 176, 70, .3);
-      clip-path: polygon(0 0, 100% 0, 100% 74%, 50% 100%, 0 74%);
+</div>
+
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  type: 'ecommerce',          // 'ecommerce' | 'leadgen'
+  style: 'editorial',         // 'editorial' | 'bold' | 'data'
+  currency: 'SAR',
+  hideName: true,
+  hideRevenue: false,
+  noBaseline: false,
+  endorsement: 'outcome',     // 'outcome' | 'testimonial' | 'none'
+  agencyName: 'Post With Passion',
+  agencyTagline: 'UGC · Real Voices · Riyadh',
+  descriptor: 'A Saudi ecommerce brand built around community trust',
+  industry: 'Saudi Ecommerce',
+  size: '$1M – $10M revenue',
+  period: 'Jan – Jun 2026',
+  channels: 'Meta Ads, TikTok, UGC Creators, Google Ads',
+  headline: 'Turned real voices into a performance engine with stronger ROAS and lower CPA',
+  challenge: 'The brand had attention, but the message felt too polished to move local audiences. They needed creative that sounded like people, not ads, while keeping performance accountable.',
+  strategy: 'Mapped audience moments around Saudi buying behavior\nProduced UGC scripts built on real customer language\nTested creator-led hooks across Meta and TikTok\nReallocated budget toward the stories that converted\nConnected creative learnings back to paid media reporting',
+  outcomeCallout: 'We turned local insight and real creator voices into a measurable acquisition system — content that felt close to the audience, with numbers strong enough for the boardroom.',
+  testimonial: 'The work felt like our audience was finally speaking for the brand, not just watching another ad.',
+  testimonialAuthor: 'Marketing Lead, anonymous client',
+  // perf
+  spend: 180000, revenue: 612000, impressions: 14200000, clicks: 198000, conversions: 4250, aov: 144,
+  leads: 1850, sql: 410, closedDeals: 62, avgDealValue: 8400,
+  // baseline
+  baseSpend: 90000, baseRevenue: 162000, baseImpressions: 8500000, baseClicks: 71000, baseConversions: 1280,
+  baseLeads: 540, baseSql: 95, baseClosedDeals: 14,
+};
+
+/* ============================================================
+   FORMATTERS
+   ============================================================ */
+const fmtCurrency = (n, c = 'USD') => {
+  if (n === '' || n === null || n === undefined || isNaN(n)) return '—';
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(Number(n));
+};
+const fmtNumber = (n, d = 0) => {
+  if (n === '' || n === null || n === undefined || isNaN(n)) return '—';
+  return Number(n).toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+};
+const fmtPct = (n, d = 1) => {
+  if (n === '' || n === null || n === undefined || isNaN(n)) return '—';
+  return Number(n).toFixed(d) + '%';
+};
+const fmtROAS = (n) => {
+  if (n === '' || n === null || n === undefined || isNaN(n) || !isFinite(n)) return '—';
+  return Number(n).toFixed(2) + 'x';
+};
+const lift = (current, baseline) => {
+  const c = Number(current), b = Number(baseline);
+  if (!b || isNaN(c) || isNaN(b)) return null;
+  return ((c - b) / b) * 100;
+};
+const liftInverse = (current, baseline) => {
+  const c = Number(current), b = Number(baseline);
+  if (!b || isNaN(c) || isNaN(b)) return null;
+  return ((b - c) / b) * 100;
+};
+
+/* ============================================================
+   CALCULATIONS
+   ============================================================ */
+function calc() {
+  const d = state;
+  const num = (k) => Number(d[k]) || 0;
+
+  const spend = num('spend'), revenue = num('revenue'),
+        impressions = num('impressions'), clicks = num('clicks'),
+        conversions = num('conversions'),
+        leads = num('leads'), sql = num('sql'),
+        closedDeals = num('closedDeals'), avgDealValue = num('avgDealValue');
+
+  const pipelineRevenue = closedDeals * avgDealValue;
+
+  const out = {
+    spend, revenue, impressions, clicks, conversions, leads, sql, closedDeals, pipelineRevenue, avgDealValue,
+    ctr: impressions ? (clicks / impressions) * 100 : 0,
+    cpc: clicks ? spend / clicks : 0,
+    cpm: impressions ? (spend / impressions) * 1000 : 0,
+    cvr: clicks ? (conversions / clicks) * 100 : 0,
+    cpa: conversions ? spend / conversions : 0,
+    roas: spend ? revenue / spend : 0,
+    netROI: spend ? ((revenue - spend) / spend) * 100 : 0,
+    cpl: leads ? spend / leads : 0,
+    leadToSQL: leads ? (sql / leads) * 100 : 0,
+    sqlToClose: sql ? (closedDeals / sql) * 100 : 0,
+    cac: closedDeals ? spend / closedDeals : 0,
+    pipelineROAS: spend ? pipelineRevenue / spend : 0,
+  };
+
+  if (!d.noBaseline) {
+    const baseSpend = num('baseSpend'), baseRevenue = num('baseRevenue'),
+          baseClicks = num('baseClicks'), baseImpressions = num('baseImpressions'),
+          baseConversions = num('baseConversions'),
+          baseLeads = num('baseLeads'), baseClosedDeals = num('baseClosedDeals');
+
+    out.baseROAS = baseSpend ? baseRevenue / baseSpend : 0;
+    out.baseCTR = baseImpressions ? (baseClicks / baseImpressions) * 100 : 0;
+    out.baseCVR = baseClicks ? (baseConversions / baseClicks) * 100 : 0;
+    out.baseCPA = baseConversions ? baseSpend / baseConversions : 0;
+    out.baseCPL = baseLeads ? baseSpend / baseLeads : 0;
+    out.baseCAC = baseClosedDeals ? baseSpend / baseClosedDeals : 0;
+
+    out.revenueLift = lift(revenue, baseRevenue);
+    out.roasLift = lift(out.roas, out.baseROAS);
+    out.ctrLift = lift(out.ctr, out.baseCTR);
+    out.cvrLift = lift(out.cvr, out.baseCVR);
+    out.cpaLift = liftInverse(out.cpa, out.baseCPA);
+    out.cplLift = liftInverse(out.cpl, out.baseCPL);
+    out.cacLift = liftInverse(out.cac, out.baseCAC);
+    out.leadsLift = lift(leads, num('baseLeads'));
+    out.dealsLift = lift(closedDeals, num('baseClosedDeals'));
+    out.conversionsLift = lift(conversions, num('baseConversions'));
+  }
+
+  return out;
+}
+
+/* ============================================================
+   AI-LIKE DRAFTERS (deterministic, template-based; can be swapped for real LLM call later)
+   ============================================================ */
+function draftHeadline() {
+  const c = calc();
+  const d = state;
+  const pieces = [];
+
+  if (d.noBaseline) {
+    if (d.type === 'ecommerce' && c.roas > 0 && !d.hideRevenue) {
+      pieces.push(`Built ${d.descriptor.toLowerCase()} from zero to ${fmtROAS(c.roas)} ROAS in ${d.period}`);
+    } else if (d.type === 'ecommerce' && c.conversions > 0) {
+      pieces.push(`Generated ${fmtNumber(c.conversions)} conversions at ${fmtROAS(c.roas)} ROAS from a standing start`);
+    } else if (d.type === 'leadgen' && c.closedDeals > 0) {
+      pieces.push(`Built a pipeline of ${fmtNumber(c.closedDeals)} closed deals from scratch in ${d.period}`);
+    } else if (d.type === 'leadgen' && c.leads > 0) {
+      pieces.push(`Generated ${fmtNumber(c.leads)} qualified leads from zero in ${d.period}`);
     }
   } else {
     if (d.type === 'ecommerce') {
@@ -540,6 +736,7 @@ function renderComputed() {
     chips.push(chip('CTR', fmtPct(c.ctr, 2), c.ctrLift));
   }
   container.innerHTML = chips.join('');
+  renderLinkedInPostPreview();
 }
 
 /* ============================================================
@@ -559,6 +756,11 @@ function renderPreview() {
                    : dataLayout(d, c, heroStats, strategyLines, clientLabel);
 
   mount.innerHTML = `<div class="case-page s-${d.style}">${layoutHTML}</div>`;
+}
+
+function renderLinkedInPostPreview() {
+  const box = document.getElementById('linkedin-post-preview');
+  if (box) box.textContent = buildLinkedInPost();
 }
 
 function buildHeroStats(c, d) {
@@ -631,470 +833,544 @@ function buildResultsTableHTML(d, c, showBaseline) {
         const arrow = inverted ? (isUp ? '↓' : '↑') : (isUp ? '↑' : '↓');
         chText = `${arrow} ${Math.abs(lf).toFixed(0)}%`;
       }
+      return `<tr>
+        <td style="font-weight: 500;">${label}</td>
+        ${showBaseline && !d.noBaseline ? `<td class="num muted">${base}</td>` : ''}
+        <td class="num" style="font-weight: 600;">${val}</td>
+        ${!d.noBaseline ? `<td class="num" ${chClass} style="font-weight:600;${chClass.replace('style="','').replace('"','')}">${chText}</td>` : ''}
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
 
-      .form-panel {
-        position: static;
-        max-height: none;
-      }
+function endorsementHTML(d, style) {
+  if (d.endorsement === 'none') return '';
+  if (d.endorsement === 'outcome') {
+    if (style === 'editorial') {
+      return `<div style="border-top: 1px solid #E5E5E0; padding-top: 14px; margin-bottom: 14px;">
+        <p style="font-family: 'Fraunces', serif; font-size: 14px; line-height: 1.4; margin: 0; color: inherit;">${escapeHTML(d.outcomeCallout)}</p>
+      </div>`;
+    } else if (style === 'bold') {
+      return `<div style="border-left: 3px solid #D4FF3F; padding-left: 14px; margin-bottom: 14px;">
+        <p style="font-size: 13px; line-height: 1.45; margin: 0; font-weight: 500;">${escapeHTML(d.outcomeCallout)}</p>
+      </div>`;
+    } else {
+      return `<div class="surface" style="padding: 10px 14px; border-radius: 6px; font-size: 11px; line-height: 1.5;">${escapeHTML(d.outcomeCallout)}</div>`;
     }
+  }
+  // testimonial
+  if (style === 'editorial') {
+    return `<div style="border-top: 1px solid #E5E5E0; padding-top: 14px; margin-bottom: 14px;">
+      <p style="font-family: 'Fraunces', serif; font-size: 14px; font-style: italic; line-height: 1.4; margin: 0;">"${escapeHTML(d.testimonial)}"</p>
+      <div style="font-size: 10px; color: #666; margin-top: 8px; font-weight: 500;">— ${escapeHTML(d.testimonialAuthor)}</div>
+    </div>`;
+  } else if (style === 'bold') {
+    return `<div style="border-left: 3px solid #D4FF3F; padding-left: 14px; margin-bottom: 14px;">
+      <p style="font-size: 13px; line-height: 1.45; margin: 0; font-weight: 500;">"${escapeHTML(d.testimonial)}"</p>
+      <div style="font-size: 10px; color: #999; margin-top: 6px; font-weight: 600;">— ${escapeHTML(d.testimonialAuthor)}</div>
+    </div>`;
+  } else {
+    return `<div class="surface" style="padding: 10px 14px; border-radius: 6px; font-size: 11px;">
+      <span style="font-style: italic;">"${escapeHTML(d.testimonial)}"</span>
+      <span class="muted" style="margin-left: 8px; font-size: 9px;">— ${escapeHTML(d.testimonialAuthor)}</span>
+    </div>`;
+  }
+}
 
-    @media (max-width: 760px) {
-      .app-shell {
-        width: 100%;
-        margin: 0;
-      }
+function pwpSignatureHTML(color = '#666') {
+  return `<div class="pwp-signature" style="color:${color};">Post With Passion · UGC · Real Voices · Riyadh</div>`;
+}
 
-      .preview-wrap,
-      .panel {
-        border-radius: 0;
-      }
+function escapeHTML(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
-      .grid-2,
-      .hero,
-      .strategy-grid,
-      .result-grid,
-      .takeaway {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        gap: 16px;
-        padding: 22px 18px;
-      }
-
-      .hero h2 {
-        font-size: 43px;
-      }
-
-      .hero-chart {
-        min-height: 280px;
-        padding-top: 0;
-      }
-
-      .chart-stage {
-        transform: scale(.88);
-        transform-origin: left bottom;
-      }
-
-      .strategy-card,
-      .result-card {
-        border-right: 0;
-        border-bottom: 1px solid #d7dfeb;
-      }
-
-      .takeaway {
-        text-align: center;
-      }
-
-      .target {
-        margin: 0 auto;
-      }
-
-      .timeframe {
-        padding-left: 0;
-        border-left: 0;
-        border-top: 1px solid rgba(255, 255, 255, .34);
-        padding-top: 14px;
-      }
-    }
-
-    @media print {
-      body {
-        background: #fff;
-      }
-
-      .form-panel,
-      .no-print {
-        display: none !important;
-      }
-
-      .app-shell,
-      .preview-wrap {
-        display: block;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        background: #fff;
-        box-shadow: none;
-      }
-
-      .case-study {
-        width: 100%;
-        box-shadow: none;
-      }
-
-      @page {
-        size: A4;
-        margin: 0;
-      }
-    }
-  </style>
-</head>
-<body>
-  <main class="app-shell">
-    <aside class="panel form-panel">
-      <div class="panel-header">
-        <h1>Client Case Study Generator</h1>
-        <p>Enter the client numbers once, then download a case-study document for sharing.</p>
-      </div>
-
-      <section class="field-group">
-        <h2>Numbers to collect</h2>
-        <ul class="help-list">
-          <li>Before CPA and after CPA, plus the number of days measured.</li>
-          <li>Before and after conversion rate.</li>
-          <li>Before and after ROAS.</li>
-          <li>Before and after cost per qualified lead.</li>
-          <li>Qualified leads before and after.</li>
-          <li>Optional: spend, impressions, CTR, landing-page conversion rate, and ad relevance score.</li>
-        </ul>
-      </section>
-
-      <section class="field-group">
-        <h2>Client details</h2>
-        <div class="grid-2">
-          <label>Client name
-            <input data-field="clientName" value="Client Name">
-          </label>
-          <label>Campaign type
-            <input data-field="campaignType" value="Lead Generation">
-          </label>
-          <label>Currency
-            <select data-field="currency">
-              <option value="$">$</option>
-              <option value="SAR">SAR</option>
-              <option value="AED">AED</option>
-              <option value="QAR">QAR</option>
-              <option value="KWD">KWD</option>
-              <option value="BHD">BHD</option>
-              <option value="OMR">OMR</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
-            </select>
-          </label>
-          <label>Timeframe days
-            <input type="number" min="1" data-field="days" value="7">
-          </label>
+function comparisonBarsHTML(d, c) {
+  if (d.noBaseline) return '<p style="font-size:11px; color:#5A6B82;">Built from scratch — no baseline to compare against.</p>';
+  const items = d.type === 'ecommerce'
+    ? [
+        !d.hideRevenue && { label: 'Revenue', baseline: Number(d.baseRevenue), current: c.revenue, fmt: v => fmtCurrency(v, d.currency) },
+        !d.hideRevenue && { label: 'ROAS', baseline: c.baseROAS, current: c.roas, fmt: v => fmtROAS(v) },
+        { label: 'Conversions', baseline: Number(d.baseConversions), current: c.conversions, fmt: v => fmtNumber(v) },
+      ].filter(Boolean)
+    : [
+        { label: 'Leads', baseline: Number(d.baseLeads), current: c.leads, fmt: v => fmtNumber(v) },
+        { label: 'Closed deals', baseline: Number(d.baseClosedDeals), current: c.closedDeals, fmt: v => fmtNumber(v) },
+        !d.hideRevenue && { label: 'Pipeline', baseline: 0, current: c.pipelineRevenue, fmt: v => fmtCurrency(v, d.currency) },
+      ].filter(Boolean);
+  return `<div style="display:flex; flex-direction:column; gap:10px;">${
+    items.map(item => {
+      const max = Math.max(item.baseline, item.current, 1);
+      const bP = (item.baseline / max) * 100;
+      const cP = (item.current / max) * 100;
+      return `<div>
+        <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px;">
+          <span class="muted" style="font-weight:600;">${item.label}</span>
+          <span style="font-weight:600;">${item.fmt(item.current)}</span>
         </div>
-      </section>
-
-      <section class="field-group">
-        <h2>Core performance</h2>
-        <div class="grid-2">
-          <label>Before CPA
-            <input type="number" min="0" step="0.01" data-field="beforeCpa" value="50">
-          </label>
-          <label>After CPA
-            <input type="number" min="0" step="0.01" data-field="afterCpa" value="30">
-          </label>
-          <label>Before conversion rate %
-            <input type="number" min="0" step="0.01" data-field="beforeConversion" value="2.4">
-          </label>
-          <label>After conversion rate %
-            <input type="number" min="0" step="0.01" data-field="afterConversion" value="3.8">
-          </label>
-          <label>Before ROAS
-            <input type="number" min="0" step="0.01" data-field="beforeRoas" value="2.1">
-          </label>
-          <label>After ROAS
-            <input type="number" min="0" step="0.01" data-field="afterRoas" value="3.4">
-          </label>
-          <label>Before qualified leads
-            <input type="number" min="0" step="1" data-field="beforeLeads" value="82">
-          </label>
-          <label>After qualified leads
-            <input type="number" min="0" step="1" data-field="afterLeads" value="131">
-          </label>
-          <label>Before cost per qualified lead
-            <input type="number" min="0" step="0.01" data-field="beforeCpl" value="74">
-          </label>
-          <label>After cost per qualified lead
-            <input type="number" min="0" step="0.01" data-field="afterCpl" value="46">
-          </label>
+        <div style="display:flex; flex-direction:column; gap:3px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:8px; width:38px;" class="muted">BEFORE</span>
+            <div style="flex:1; height:8px; background:#E0E5EC; border-radius:2px; overflow:hidden;"><div style="width:${bP}%; height:100%; background:#9CA3AF;"></div></div>
+            <span style="font-size:9px; width:70px; text-align:right;" class="muted">${item.fmt(item.baseline)}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:8px; width:38px;" class="muted">AFTER</span>
+            <div style="flex:1; height:8px; background:#E0E5EC; border-radius:2px; overflow:hidden;"><div style="width:${cP}%; height:100%; background:#0066FF;"></div></div>
+            <span style="font-size:9px; width:70px; text-align:right; font-weight:600;">${item.fmt(item.current)}</span>
+          </div>
         </div>
-      </section>
+      </div>`;
+    }).join('')
+  }</div>`;
+}
 
-      <section class="field-group">
-        <h2>Optional support metrics</h2>
-        <div class="grid-2">
-          <label>Ad spend
-            <input type="number" min="0" step="0.01" data-field="adSpend" value="4200">
-          </label>
-          <label>CTR %
-            <input type="number" min="0" step="0.01" data-field="ctr" value="2.9">
-          </label>
-          <label>Landing page CVR %
-            <input type="number" min="0" step="0.01" data-field="landingCvr" value="18">
-          </label>
-          <label>Ad relevance score
-            <input type="number" min="0" step="0.1" data-field="relevanceScore" value="8.6">
-          </label>
-        </div>
-      </section>
+/* ============================================================
+   SHARE OUTPUTS: LINKEDIN POST + CAROUSEL
+   ============================================================ */
+function mainMetricLine() {
+  const c = calc();
+  const d = state;
+  if (d.type === 'ecommerce') {
+    if (!d.hideRevenue && c.roas) return `${fmtROAS(c.roas)} ROAS`;
+    if (c.cpa) return `${fmtCurrency(c.cpa, d.currency)} CPA`;
+    return `${fmtNumber(c.conversions)} conversions`;
+  }
+  if (c.cac) return `${fmtCurrency(c.cac, d.currency)} CAC`;
+  if (c.cpl) return `${fmtCurrency(c.cpl, d.currency)} CPL`;
+  return `${fmtNumber(c.leads)} qualified leads`;
+}
 
-      <section class="field-group">
-        <h2>Copy</h2>
-        <label>Short intro
-          <textarea data-field="intro">A data-driven strategy, creative testing, and smart optimization helped us deliver exceptional results in just one week.</textarea>
-        </label>
-        <br>
-        <label>Key takeaway
-          <textarea data-field="takeaway">Lowering CPA is not about spending more money. It is about making smarter marketing decisions. With the right targeting, creative strategy, and optimization process, businesses can scale profitably and achieve sustainable growth.</textarea>
-        </label>
-      </section>
+function buildLinkedInPost() {
+  const c = calc();
+  const d = state;
+  const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
+  const metricLines = d.type === 'ecommerce'
+    ? [
+        !d.hideRevenue && `ROAS: ${fmtROAS(c.roas)}${c.roasLift ? ` (${Math.abs(c.roasLift).toFixed(0)}% lift)` : ''}`,
+        `CPA: ${fmtCurrency(c.cpa, d.currency)}${c.cpaLift ? ` (${Math.abs(c.cpaLift).toFixed(0)}% reduction)` : ''}`,
+        `CTR: ${fmtPct(c.ctr, 2)}`,
+        `Conversions: ${fmtNumber(c.conversions)}${c.conversionsLift ? ` (${Math.abs(c.conversionsLift).toFixed(0)}% lift)` : ''}`,
+      ].filter(Boolean)
+    : [
+        `Qualified leads: ${fmtNumber(c.leads)}${c.leadsLift ? ` (${Math.abs(c.leadsLift).toFixed(0)}% lift)` : ''}`,
+        `CAC: ${fmtCurrency(c.cac, d.currency)}${c.cacLift ? ` (${Math.abs(c.cacLift).toFixed(0)}% reduction)` : ''}`,
+        `Lead to SQL: ${fmtPct(c.leadToSQL, 1)}`,
+        !d.hideRevenue && `Pipeline value: ${fmtCurrency(c.pipelineRevenue, d.currency)}`,
+      ].filter(Boolean);
 
-      <section class="field-group">
-        <h2>Strategy bullets</h2>
-        <label>Audience optimization
-          <textarea data-field="strategyAudience">Removed low-performing audience segments
-Focused on high-intent users
-Created lookalike audiences based on past converters
-Retargeted website visitors and engaged users</textarea>
-        </label>
-        <br>
-        <label>Creative testing
-          <textarea data-field="strategyCreative">Launched multiple ad creatives
-Tested different hooks, headlines, CTA styles, and visual formats
-Identified top-performing ads with highest engagement and lowest CPA</textarea>
-        </label>
-        <br>
-        <label>Landing page improvements
-          <textarea data-field="strategyLanding">Improved loading speed
-Simplified call-to-action
-Added social proof and testimonials
-Created a mobile-friendly experience</textarea>
-        </label>
-        <br>
-        <label>Budget reallocation
-          <textarea data-field="strategyBudget">Shifted budget toward high-performing ads
-Paused underperforming campaigns
-Optimized placements based on conversion data</textarea>
-        </label>
-      </section>
+  return [
+    `${d.headline}`,
+    '',
+    `For ${d.descriptor.toLowerCase()}, the goal was bigger than better ads. It was to make the brand feel closer to the people it wanted to reach.`,
+    '',
+    'What shifted:',
+    ...strategyLines.map(line => `• ${line}`),
+    '',
+    'What changed:',
+    ...metricLines.map(line => `• ${line}`),
+    '',
+    `${d.outcomeCallout}`,
+    '',
+    'Real voices. Local context. Performance that can be measured.',
+    '',
+    '— Post With Passion',
+    'Made in Riyadh · بشغف',
+    '',
+    '#PostWithPassion #UGC #PerformanceMarketing #SaudiMarketing #DigitalMarketing'
+  ].join('\n');
+}
 
-      <div class="actions">
-        <button class="btn" id="downloadDoc" type="button">Download Word</button>
-        <button class="btn secondary" id="downloadHtml" type="button">Download HTML</button>
-        <button class="btn light" id="printPdf" type="button">Print PDF</button>
-        <button class="btn light" id="resetDemo" type="button">Reset Demo</button>
-      </div>
-    </aside>
+async function exportLinkedInPost() {
+  const post = buildLinkedInPost();
+  try {
+    await navigator.clipboard.writeText(post);
+    alert('LinkedIn post copied. Paste it into LinkedIn when you are ready.');
+  } catch (e) {
+    const blob = new Blob([post], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'linkedin-post.txt';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  }
+}
 
-    <section class="preview-wrap">
-      <article class="case-study" id="caseStudy">
-        <section class="hero">
-          <div class="hero-copy">
-            <div class="badge">Case Study</div>
-            <h2>How we reduced CPA by <span data-out="reduction">40%</span> in <span data-out="daysText">7 days</span></h2>
-            <div class="accent-line"></div>
-            <p data-out="intro">A data-driven strategy, creative testing, and smart optimization helped us deliver exceptional results in just one week.</p>
-          </div>
-          <div class="hero-chart">
-            <div class="chart-stage" id="chartStage">
-              <div class="reduction-badge"><span><b data-out="reductionBadge">40%</b>Reduction</span></div>
-              <div class="arrow-line"></div>
-              <div class="metric-label before"><small>Before</small><b data-out="beforeCpa">$50.00</b><small>CPA</small></div>
-              <div class="metric-label after"><small>After <span data-out="daysShort">7</span> days</small><b data-out="afterCpa">$30.00</b><small>CPA</small></div>
-              <div class="platform"></div>
-              <div class="cylinder before-bar"></div>
-              <div class="cylinder after-bar"></div>
-            </div>
-          </div>
-        </section>
+function carouselSlidesHTML() {
+  const c = calc();
+  const d = state;
+  const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
+  const stats = buildHeroStats(c, d).slice(0, 4);
+  const brandFooter = (n) => `<div class="carousel-footer"><span class="pwp-mark">Post With Passion</span><span>${n}/6 · Made in Riyadh · بشغف</span></div>`;
 
-        <section class="strategy">
-          <h2 class="section-title">Our Strategy</h2>
-          <div class="strategy-grid">
-            <div class="strategy-card">
-              <div class="icon-disc blue">01</div>
-              <h3>1. Audience Optimization</h3>
-              <ul data-list="strategyAudience"></ul>
-            </div>
-            <div class="strategy-card">
-              <div class="icon-disc green">02</div>
-              <h3>2. Creative Testing</h3>
-              <ul data-list="strategyCreative"></ul>
-            </div>
-            <div class="strategy-card">
-              <div class="icon-disc violet">03</div>
-              <h3>3. Landing Page Improvements</h3>
-              <ul data-list="strategyLanding"></ul>
-            </div>
-            <div class="strategy-card">
-              <div class="icon-disc orange">04</div>
-              <h3>4. Budget Reallocation</h3>
-              <ul data-list="strategyBudget"></ul>
-            </div>
-          </div>
-        </section>
-
-        <section class="results">
-          <h2 class="section-title">The Results <span>(within <span data-out="daysLower">7 days</span>)</span></h2>
-          <div class="result-grid">
-            <div class="result-card">
-              <div class="icon-disc green">CPA</div>
-              <h3>CPA reduced by<strong data-out="resultReduction">40%</strong></h3>
-            </div>
-            <div class="result-card">
-              <div class="icon-disc blue">CVR</div>
-              <h3>Higher conversion rate<strong data-out="conversionLift">58%</strong></h3>
-            </div>
-            <div class="result-card">
-              <div class="icon-disc violet">ADS</div>
-              <h3>Better ad relevance score<strong data-out="relevanceScore">8.6</strong></h3>
-            </div>
-            <div class="result-card">
-              <div class="icon-disc orange">ROAS</div>
-              <h3>Increased ROAS<strong data-out="roasLift">62%</strong></h3>
-            </div>
-            <div class="result-card">
-              <div class="icon-disc teal">LEADS</div>
-              <h3>More qualified leads at lower cost<strong data-out="leadSummary">60%</strong></h3>
-            </div>
-          </div>
-        </section>
-
-        <section class="takeaway">
-          <div class="target">OK</div>
-          <div>
-            <h3>Key Takeaway</h3>
-            <p data-out="takeaway">Lowering CPA is not about spending more money. It is about making smarter marketing decisions. With the right targeting, creative strategy, and optimization process, businesses can scale profitably and achieve sustainable growth.</p>
-          </div>
-          <div class="timeframe">
-            <span>Timeframe</span>
-            <b data-out="timeframe">7 days</b>
-          </div>
-        </section>
-      </article>
+  return `
+    <section class="carousel-slide dark">
+      <div class="kicker">Case Study · Real voices</div>
+      <h1>${escapeHTML(d.headline)}</h1>
+      <div style="position:absolute; left:74px; bottom:170px; max-width:760px; font-size:28px; line-height:1.35; color:#DADADA;">${escapeHTML(d.descriptor)} · ${escapeHTML(d.period)}</div>
+      ${brandFooter(1)}
     </section>
-  </main>
+    <section class="carousel-slide">
+      <div class="kicker">The challenge</div>
+      <h2>Attention was there. Trust needed a more human voice.</h2>
+      <p>${escapeHTML(d.challenge)}</p>
+      ${brandFooter(2)}
+    </section>
+    <section class="carousel-slide">
+      <div class="kicker">The shift</div>
+      <h2>We built the campaign around audience language, not agency language.</h2>
+      <ul>${strategyLines.map(line => `<li>${escapeHTML(line)}</li>`).join('')}</ul>
+      ${brandFooter(3)}
+    </section>
+    <section class="carousel-slide dark">
+      <div class="kicker">The numbers</div>
+      <h2>Creative with feeling. Performance with proof.</h2>
+      <div class="carousel-stats">
+        ${stats.map(stat => `<div class="carousel-stat"><span>${escapeHTML(stat.label)}</span><strong>${stat.value}</strong></div>`).join('')}
+      </div>
+      ${brandFooter(4)}
+    </section>
+    <section class="carousel-slide">
+      <div class="kicker">The takeaway</div>
+      <h2>When the content sounds real, the media works harder.</h2>
+      <p>${escapeHTML(d.outcomeCallout)}</p>
+      ${brandFooter(5)}
+    </section>
+    <section class="carousel-slide dark">
+      <div class="kicker">Post With Passion</div>
+      <h1>Turn local stories into measurable growth.</h1>
+      <p style="margin-top:36px; max-width:780px; color:#DADADA;">UGC, paid media, social, and brand strategy built for Saudi audiences.</p>
+      ${brandFooter(6)}
+    </section>
+  `;
+}
 
-  <script>
-    const defaults = {};
-    const fields = Array.from(document.querySelectorAll("[data-field]"));
+function exportCarouselPDF() {
+  const slides = carouselSlidesHTML();
+  const win = window.open('', '_blank');
+  if (!win) { alert('Please allow pop-ups to export the carousel.'); return; }
+  const styleTag = document.querySelector('style').outerHTML;
+  const fonts = document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>${escapeHTML(state.descriptor)} — LinkedIn Carousel</title>
+    ${fonts}
+    ${styleTag}
+    <style>
+      body { margin: 0; background: #F5F5F2; }
+      @page { size: 1080px 1080px; margin: 0; }
+    </style>
+  </head><body class="carousel-export">${slides}
+    <script>window.addEventListener('load', () => { setTimeout(() => window.print(), 600); });<\/script>
+  </body></html>`);
+  win.document.close();
+}
 
-    fields.forEach((field) => {
-      defaults[field.dataset.field] = field.value;
-      field.addEventListener("input", render);
-      field.addEventListener("change", render);
+/* ---------- LAYOUTS ---------- */
+function editorialLayout(d, c, heroStats, strategyLines, clientLabel) {
+  return `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:12px; border-bottom: 1px solid #E5E5E0;">
+      <div>
+        <div class="eyebrow muted">Case Study · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
+        <div class="display" style="font-size: 22px; font-weight: 500; margin-top: 4px; letter-spacing: -0.02em;">${escapeHTML(clientLabel)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size: 11px; font-weight: 600;">${escapeHTML(d.agencyName)}</div>
+        <div style="font-size: 9px; color: #666; margin-top: 2px;">${escapeHTML(d.agencyTagline)}</div>
+        <div style="font-size: 9px; color: #666; margin-top: 4px;">${escapeHTML(d.period)}</div>
+        <div style="margin-top:8px;">${pwpSignatureHTML('#666')}</div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 0 18px;">
+      <h1 class="display page-h1" style="max-width: 95%;">${escapeHTML(d.headline)}</h1>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:0; border-top:1px solid #E5E5E0; border-bottom:1px solid #E5E5E0; padding: 16px 0; margin-bottom: 18px;">
+      ${heroStats.map((h, i) => `
+        <div style="padding-left:${i === 0 ? 0 : 16}px; padding-right:${i < heroStats.length-1 ? 16 : 0}px; ${i < heroStats.length-1 ? 'border-right:1px solid #E5E5E0;' : ''}">
+          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.label)}</div>
+          <div class="display stat-value">${h.value}</div>
+          ${liftHTML(h)}
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:18px;">
+      <div>
+        <div class="stat-label muted" style="margin-bottom:8px;">The challenge</div>
+        <p style="font-size:11px; line-height:1.6; margin:0;">${escapeHTML(d.challenge)}</p>
+        <div class="stat-label muted" style="margin-bottom:8px; margin-top:16px;">Channels</div>
+        <p style="font-size:11px; line-height:1.6; margin:0;">${escapeHTML(d.channels)}</p>
+      </div>
+      <div>
+        <div class="stat-label muted" style="margin-bottom:8px;">What we did</div>
+        <ul style="margin:0; padding-left:16px; font-size:11px; line-height:1.6;">
+          ${strategyLines.map(l => `<li style="margin-bottom:4px;">${escapeHTML(l)}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-bottom:18px;">
+      <div class="stat-label muted" style="margin-bottom:10px;">Detailed results</div>
+      ${buildResultsTableHTML(d, c, true)}
+    </div>
+
+    ${endorsementHTML(d, 'editorial')}
+
+    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#666; padding-top:8px; border-top:1px solid #E5E5E0;">
+      <div>${escapeHTML(d.agencyName)} · Real voices · Local context</div>
+      <div>Prepared ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+    </div>
+  `;
+}
+
+function boldLayout(d, c, heroStats, strategyLines, clientLabel) {
+  return `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:28px; height:28px; background:#D4FF3F; border-radius:6px;"></div>
+        <div>
+          <div style="font-size:13px; font-weight:700;">${escapeHTML(d.agencyName)}</div>
+          <div style="font-size:9px; color:#999; text-transform:uppercase; letter-spacing:0.12em;">Real voices · Riyadh</div>
+        </div>
+      </div>
+      <div style="font-size:10px; color:#999; text-transform:uppercase; letter-spacing:0.14em;">${escapeHTML(d.period)}</div>
+    </div>
+
+    <div style="padding:14px 0 18px; border-top:1px solid #2A2A2A; border-bottom:1px solid #2A2A2A;">
+      <div class="accent-text eyebrow" style="margin-bottom:8px;">${escapeHTML(clientLabel)} · ${escapeHTML(d.industry)}</div>
+      <h1 class="page-h1 display">${escapeHTML(d.headline)}</h1>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:8px; margin:18px 0;">
+      ${heroStats.map((h, i) => `
+        <div style="background: ${i === 0 ? '#D4FF3F' : '#1A1A1A'}; color: ${i === 0 ? '#0F0F0F' : '#FFFFFF'}; padding:14px; border-radius:8px;">
+          <div class="stat-label" style="font-weight:700; opacity:0.7; margin-bottom:8px;">${escapeHTML(h.label)}</div>
+          <div class="display" style="font-size:28px; font-weight:700; line-height:1; letter-spacing:-0.02em;">${h.value}</div>
+          ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:9px; font-weight:600; margin-top:6px; opacity:0.85;">${h.inverted ? '↓' : '↑'} ${Math.abs(h.lift).toFixed(0)}% ${escapeHTML(h.liftLabel)}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:14px;">
+      <div style="background:#1A1A1A; padding:16px; border-radius:8px;">
+        <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">Challenge</div>
+        <p style="font-size:11px; line-height:1.5; margin:0;">${escapeHTML(d.challenge)}</p>
+      </div>
+      <div style="background:#1A1A1A; padding:16px; border-radius:8px;">
+        <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">What we did</div>
+        <ul style="margin:0; padding-left:16px; font-size:11px; line-height:1.5;">${strategyLines.map(l => `<li style="margin-bottom:4px;">${escapeHTML(l)}</li>`).join('')}</ul>
+      </div>
+    </div>
+
+    <div style="background:#1A1A1A; border-radius:8px; padding:12px 14px; margin-bottom:14px;">
+      <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">Channel metrics</div>
+      ${buildResultsTableHTML(d, c, false)}
+    </div>
+
+    ${endorsementHTML(d, 'bold')}
+
+    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#999; padding-top:10px; border-top:1px solid #2A2A2A;">
+      <div>Channels: ${escapeHTML(d.channels)}</div>
+      <div>${escapeHTML(d.agencyName)} · بشغف</div>
+    </div>
+  `;
+}
+
+function dataLayout(d, c, heroStats, strategyLines, clientLabel) {
+  return `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #0066FF;">
+      <div>
+        <div class="stat-label muted">Performance Marketing Report</div>
+        <div style="font-size:18px; font-weight:600; margin-top:4px; letter-spacing:-0.01em;">${escapeHTML(clientLabel)} · ${escapeHTML(d.industry)}</div>
+        <div style="font-size:10px; color:#5A6B82; margin-top:2px;">Reporting period: ${escapeHTML(d.period)} · Size: ${escapeHTML(d.size)} · Channels: ${escapeHTML(d.channels)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:12px; font-weight:600;">${escapeHTML(d.agencyName)}</div>
+        <div style="font-size:9px; color:#5A6B82;">Real voices · Local insight · Performance</div>
+      </div>
+    </div>
+
+    <div style="background:#F7F8FA; border-left:4px solid #0066FF; padding:12px 14px; margin-bottom:14px; border-radius:4px;">
+      <div class="stat-label muted" style="margin-bottom:4px;">Executive summary</div>
+      <div style="font-size:16px; font-weight:600; line-height:1.3;">${escapeHTML(d.headline)}</div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:6px; margin-bottom:14px;">
+      ${heroStats.map(h => `
+        <div style="background:#F7F8FA; padding:12px; border-radius:6px; border-top:2px solid #0066FF;">
+          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.label)}</div>
+          <div style="font-size:22px; font-weight:600; line-height:1; letter-spacing:-0.02em;">${h.value}</div>
+          ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:10px; color:#0F7A3D; margin-top:6px; font-weight:600;">${h.inverted ? '▼' : '▲'} ${Math.abs(h.lift).toFixed(1)}% ${escapeHTML(h.liftLabel)}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <div class="stat-label muted" style="margin-bottom:8px;">Detailed performance${d.noBaseline ? '' : ' — baseline vs achieved'}</div>
+      ${buildResultsTableHTML(d, c, true)}
+    </div>
+
+    <div style="margin-bottom:14px; background:#F7F8FA; padding:12px; border-radius:6px;">
+      <div class="stat-label muted" style="margin-bottom:10px;">${d.noBaseline ? 'Achieved metrics' : 'Key metric lift'}</div>
+      ${comparisonBarsHTML(d, c)}
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;">
+      <div>
+        <div class="stat-label muted" style="margin-bottom:6px;">Challenge</div>
+        <p style="font-size:10.5px; line-height:1.5; margin:0;">${escapeHTML(d.challenge)}</p>
+      </div>
+      <div>
+        <div class="stat-label muted" style="margin-bottom:6px;">Approach</div>
+        <ul style="margin:0; padding-left:14px; font-size:10.5px; line-height:1.5;">${strategyLines.map(l => `<li style="margin-bottom:2px;">${escapeHTML(l)}</li>`).join('')}</ul>
+      </div>
+    </div>
+
+    ${endorsementHTML(d, 'data')}
+
+    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#5A6B82; padding-top:8px; border-top:1px solid #E1E5EC;">
+      <div>${escapeHTML(d.agencyName)} · Made in Riyadh · بشغف</div>
+      <div>Generated ${new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   EVENT WIRING
+   ============================================================ */
+function bindAllInputs() {
+  // Type toggle
+  document.querySelectorAll('[data-type]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.type = btn.dataset.type;
+      renderPerfFields();
+      renderBaselineFields();
+      renderComputed();
     });
-
-    document.getElementById("downloadDoc").addEventListener("click", () => downloadCaseStudy("doc"));
-    document.getElementById("downloadHtml").addEventListener("click", () => downloadCaseStudy("html"));
-    document.getElementById("printPdf").addEventListener("click", () => window.print());
-    document.getElementById("resetDemo").addEventListener("click", () => {
-      fields.forEach((field) => {
-        field.value = defaults[field.dataset.field];
-      });
-      render();
+  });
+  // Style + currency
+  document.getElementById('f-style').addEventListener('change', e => { state.style = e.target.value; });
+  document.getElementById('f-currency').addEventListener('change', e => {
+    state.currency = e.target.value;
+    renderPerfFields(); renderBaselineFields(); renderComputed();
+  });
+  // Privacy switches
+  document.getElementById('t-hideName').addEventListener('change', e => { state.hideName = e.target.checked; });
+  document.getElementById('t-hideRevenue').addEventListener('change', e => {
+    state.hideRevenue = e.target.checked;
+    renderPerfFields(); renderBaselineFields(); renderComputed();
+  });
+  document.getElementById('t-noBaseline').addEventListener('change', e => {
+    state.noBaseline = e.target.checked;
+    renderBaselineFields(); renderComputed();
+  });
+  // Endorsement tabs
+  document.querySelectorAll('.ai-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ai-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.endorsement = btn.dataset.endorsement;
+      document.getElementById('endorsement-outcome').style.display = state.endorsement === 'outcome' ? 'block' : 'none';
+      document.getElementById('endorsement-testimonial').style.display = state.endorsement === 'testimonial' ? 'block' : 'none';
     });
+  });
+  // Text inputs (sync to state)
+  const textFields = [
+    'agencyName','agencyTagline','descriptor','industry','size','period','channels',
+    'headline','challenge','strategy','outcomeCallout','testimonial','testimonialAuthor'
+  ];
+  textFields.forEach(k => {
+    const el = document.getElementById('f-' + k);
+    if (el) el.addEventListener('input', e => { state[k] = e.target.value; renderLinkedInPostPreview(); });
+  });
 
-    function getData() {
-      return fields.reduce((data, field) => {
-        data[field.dataset.field] = field.value;
-        return data;
-      }, {});
-    }
+  // AI drafters
+  document.getElementById('ai-headline').addEventListener('click', () => {
+    const h = draftHeadline();
+    state.headline = h;
+    document.getElementById('f-headline').value = h;
+    renderLinkedInPostPreview();
+  });
+  document.getElementById('ai-outcome').addEventListener('click', () => {
+    const o = draftOutcomeCallout();
+    state.outcomeCallout = o;
+    document.getElementById('f-outcomeCallout').value = o;
+    renderLinkedInPostPreview();
+  });
+  document.getElementById('ai-testimonial').addEventListener('click', () => {
+    const t = draftTestimonial();
+    state.testimonial = t;
+    document.getElementById('f-testimonial').value = t;
+    renderLinkedInPostPreview();
+  });
 
-    function num(value) {
-      const clean = Number.parseFloat(value);
-      return Number.isFinite(clean) ? clean : 0;
-    }
+  // Tabs
+  document.getElementById('tab-input').addEventListener('click', () => switchView('input'));
+  document.getElementById('tab-preview').addEventListener('click', () => switchView('preview'));
 
-    function pctChange(before, after, inverted = false) {
-      if (!before) return 0;
-      const raw = inverted ? ((before - after) / before) * 100 : ((after - before) / before) * 100;
-      return Math.round(raw);
-    }
+  // Export
+  document.getElementById('export-btn').addEventListener('click', exportPDF);
+  document.getElementById('export-btn-inline').addEventListener('click', exportPDF);
+  document.getElementById('linkedin-post-btn').addEventListener('click', exportLinkedInPost);
+  document.getElementById('linkedin-post-btn-inline').addEventListener('click', exportLinkedInPost);
+  document.getElementById('carousel-btn').addEventListener('click', exportCarouselPDF);
+  document.getElementById('carousel-btn-inline').addEventListener('click', exportCarouselPDF);
 
-    function money(value, currency) {
-      const amount = num(value).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-      return currency === "$" ? `$${amount}` : `${amount} ${currency}`;
-    }
+  // Reset
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    if (confirm('Reset all fields to defaults?')) location.reload();
+  });
+}
 
-    function setText(key, value) {
-      document.querySelectorAll(`[data-out="${key}"]`).forEach((node) => {
-        node.textContent = value;
-      });
-    }
+function switchView(v) {
+  document.getElementById('view-input').style.display = v === 'input' ? 'block' : 'none';
+  document.getElementById('view-preview').style.display = v === 'preview' ? 'block' : 'none';
+  document.getElementById('tab-input').classList.toggle('active', v === 'input');
+  document.getElementById('tab-preview').classList.toggle('active', v === 'preview');
+  if (v === 'preview') renderPreview();
+}
 
-    function setList(key, value) {
-      const lines = value.split("\n").map((line) => line.trim()).filter(Boolean);
-      document.querySelectorAll(`[data-list="${key}"]`).forEach((list) => {
-        list.innerHTML = "";
-        lines.forEach((line) => {
-          const item = document.createElement("li");
-          item.textContent = line;
-          list.appendChild(item);
-        });
-      });
-    }
+/* ============================================================
+   EXPORT PDF (opens print dialog in new window with just the page)
+   ============================================================ */
+function exportPDF() {
+  renderPreview();
+  const pageHTML = document.getElementById('case-page-mount').innerHTML;
+  const win = window.open('', '_blank');
+  if (!win) { alert('Please allow pop-ups to export the PDF.'); return; }
 
-    function render() {
-      const data = getData();
-      const reduction = Math.max(0, pctChange(num(data.beforeCpa), num(data.afterCpa), true));
-      const conversionLift = pctChange(num(data.beforeConversion), num(data.afterConversion));
-      const roasLift = pctChange(num(data.beforeRoas), num(data.afterRoas));
-      const leadLift = pctChange(num(data.beforeLeads), num(data.afterLeads));
-      const cplReduction = Math.max(0, pctChange(num(data.beforeCpl), num(data.afterCpl), true));
-      const days = Math.max(1, Math.round(num(data.days) || 1));
-      const beforeCpa = num(data.beforeCpa);
-      const afterCpa = num(data.afterCpa);
-      const ratio = beforeCpa ? Math.max(.25, Math.min(1, afterCpa / beforeCpa)) : .6;
-      const beforeHeight = 210;
-      const afterHeight = Math.round(beforeHeight * ratio);
+  const styleTag = document.querySelector('style').outerHTML;
+  const fonts = document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
 
-      setText("reduction", `${reduction}%`);
-      setText("reductionBadge", `${reduction}%`);
-      setText("resultReduction", `${reduction}%`);
-      setText("daysText", `${days} days`);
-      setText("daysShort", days);
-      setText("daysLower", `${days} days`);
-      setText("timeframe", `${days} days`);
-      setText("beforeCpa", money(data.beforeCpa, data.currency));
-      setText("afterCpa", money(data.afterCpa, data.currency));
-      setText("intro", data.intro);
-      setText("takeaway", data.takeaway);
-      setText("conversionLift", `${Math.max(0, conversionLift)}%`);
-      setText("roasLift", `${Math.max(0, roasLift)}%`);
-      setText("relevanceScore", num(data.relevanceScore).toFixed(1));
-      setText("leadSummary", `${Math.max(leadLift, cplReduction)}%`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>${escapeHTML(state.descriptor)} — Case Study</title>
+    ${fonts}
+    ${styleTag}
+    <style>
+      body { background: white; }
+      @page { size: A4; margin: 0; }
+      .case-page { box-shadow: none; margin: 0; }
+    </style>
+  </head><body>${pageHTML}
+    <script>window.addEventListener('load', () => { setTimeout(() => window.print(), 600); });<\/script>
+  </body></html>`);
+  win.document.close();
+}
 
-      document.getElementById("chartStage").style.setProperty("--before-height", `${beforeHeight}px`);
-      document.getElementById("chartStage").style.setProperty("--after-height", `${afterHeight}px`);
-
-      setList("strategyAudience", data.strategyAudience);
-      setList("strategyCreative", data.strategyCreative);
-      setList("strategyLanding", data.strategyLanding);
-      setList("strategyBudget", data.strategyBudget);
-    }
-
-    function filename(extension) {
-      const data = getData();
-      const client = (data.clientName || "client").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-      return `${client || "client"}-case-study.${extension}`;
-    }
-
-    function downloadCaseStudy(type) {
-      const caseStudy = document.getElementById("caseStudy").cloneNode(true);
-      const styles = Array.from(document.querySelectorAll("style")).map((style) => style.textContent).join("\n");
-      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Case Study</title><style>${styles}</style></head><body><main class="preview-wrap">${caseStudy.outerHTML}</main></body></html>`;
-      const blob = new Blob([html], {
-        type: type === "doc" ? "application/msword;charset=utf-8" : "text/html;charset=utf-8"
-      });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = filename(type === "doc" ? "doc" : "html");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(link.href);
-    }
-
-    render();
-  </script>
+/* ============================================================
+   INIT
+   ============================================================ */
+bindAllInputs();
+renderPerfFields();
+renderBaselineFields();
+renderComputed();
+</script>
 </body>
 </html>

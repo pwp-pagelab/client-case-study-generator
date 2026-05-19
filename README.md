@@ -1,28 +1,23 @@
-# Client Case Study Generator
+# Post With Passion Case Study Generator
 
-A one-page HTML generator for creating client marketing case studies from campaign numbers.
+Single-file HTML generator for anonymized performance marketing case studies.
 
-## What it does
+## Outputs
 
-- Calculates CPA reduction from before and after CPA.
-- Shows a polished case-study preview inspired by the provided template.
-- Lets you edit strategy bullets and key takeaway copy.
-- Downloads the final case study as Word-compatible `.doc`, standalone `.html`, or print/save as PDF.
+- One-page PDF case study
+- Ready-to-copy LinkedIn post
+- Six-slide LinkedIn carousel PDF
 
-## Numbers to collect for each client
+## Brand Direction
 
-- Before CPA and after CPA
-- Timeframe in days
-- Before and after conversion rate
-- Before and after ROAS
-- Before and after qualified leads
-- Before and after cost per qualified lead
-- Optional: ad spend, CTR, landing-page conversion rate, and ad relevance score
+The default copy and styling are tuned for Post With Passion:
+
+- Saudi market context
+- UGC and real creator voices
+- Local audience language
+- Story-led creative tied to performance metrics
+- Anonymous client protection
 
 ## Use
 
-Open `index.html` in a browser, enter the client's numbers, then download the document.
-
-## GitHub Pages
-
-This is a static site. After pushing to GitHub, enable GitHub Pages from the repository settings and publish from the `main` branch root.
+Open `index.html` or `case-study-generator.html` in a browser, enter the raw campaign numbers, review the generated copy, then export the format you need.

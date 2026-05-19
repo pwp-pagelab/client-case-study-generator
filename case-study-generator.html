@@ -38,6 +38,8 @@
   .btn.active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
   .btn-primary { background: #0F7A3D; color: white; border-color: #0F7A3D; font-weight: 600; }
   .btn-primary:hover { background: #0c6432; border-color: #0c6432; }
+  .btn-pwp { background: #1A1A1A; color: white; border-color: #1A1A1A; font-weight: 600; }
+  .btn-pwp:hover { background: #0F7A3D; border-color: #0F7A3D; }
   .btn-ai { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; border-color: transparent; font-weight: 600; }
   .btn-ai:hover { opacity: 0.9; }
 
@@ -94,6 +96,9 @@
 
   .hint-text { font-size: 11px; color: #888; margin: 4px 0 12px; line-height: 1.5; }
 
+  .share-preview { background: #FAFAF7; border: 1px solid #ECECE7; border-radius: 8px; padding: 12px; font-size: 12px; line-height: 1.6; white-space: pre-wrap; color: #333; max-height: 280px; overflow: auto; }
+  .pwp-note { border-left: 3px solid #0F7A3D; background: #F6FBF7; padding: 10px 12px; border-radius: 6px; font-size: 12px; color: #234B31; line-height: 1.5; }
+
   /* ============================================
      1-PAGER PREVIEW (A4)
      ============================================ */
@@ -149,6 +154,34 @@
   .results-table tr { border-top: 1px solid currentColor; border-color: inherit; }
   .results-table tr:first-child { border-top: none; }
 
+  .pwp-signature { letter-spacing: 0.12em; text-transform: uppercase; font-size: 8px; font-weight: 700; }
+
+  /* ============================================
+     LINKEDIN CAROUSEL
+     ============================================ */
+  .carousel-export { background: #F5F5F2; padding: 0; }
+  .carousel-slide {
+    width: 1080px; height: 1080px; background: #FAFAF7; color: #1A1A1A;
+    padding: 74px; page-break-after: always; position: relative; overflow: hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  .carousel-slide.dark { background: #111; color: white; }
+  .carousel-slide .kicker { font-size: 18px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: #0F7A3D; margin-bottom: 24px; }
+  .carousel-slide.dark .kicker { color: #7EFFA0; }
+  .carousel-slide h1 { font-family: 'Fraunces', Georgia, serif; font-size: 78px; line-height: 0.98; letter-spacing: -0.04em; max-width: 880px; font-weight: 600; }
+  .carousel-slide h2 { font-family: 'Fraunces', Georgia, serif; font-size: 58px; line-height: 1.04; letter-spacing: -0.035em; max-width: 860px; font-weight: 600; margin-bottom: 28px; }
+  .carousel-slide p, .carousel-slide li { font-size: 30px; line-height: 1.35; color: inherit; }
+  .carousel-slide ul { margin: 0; padding-left: 34px; display: grid; gap: 18px; }
+  .carousel-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 42px; }
+  .carousel-stat { border: 1px solid rgba(26,26,26,.16); border-radius: 18px; padding: 28px; background: white; }
+  .carousel-slide.dark .carousel-stat { border-color: rgba(255,255,255,.16); background: #1A1A1A; }
+  .carousel-stat span { display: block; font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; color: #666; font-weight: 700; margin-bottom: 12px; }
+  .carousel-slide.dark .carousel-stat span { color: #AAA; }
+  .carousel-stat strong { display: block; font-size: 54px; line-height: 1; letter-spacing: -0.03em; }
+  .carousel-footer { position: absolute; left: 74px; right: 74px; bottom: 54px; display: flex; justify-content: space-between; align-items: center; font-size: 18px; color: #666; border-top: 1px solid rgba(26,26,26,.12); padding-top: 24px; }
+  .carousel-slide.dark .carousel-footer { color: #AAA; border-color: rgba(255,255,255,.16); }
+  .pwp-mark { font-weight: 800; color: inherit; }
+
   /* ============================================
      PRINT
      ============================================ */
@@ -156,6 +189,7 @@
     body { background: white; margin: 0; padding: 0; }
     .no-print { display: none !important; }
     .case-page { box-shadow: none; width: 210mm; min-height: 297mm; padding: 14mm; page-break-after: avoid; }
+    .carousel-slide { width: 1080px; height: 1080px; box-shadow: none; }
     @page { size: A4; margin: 0; }
   }
 </style>
@@ -168,13 +202,15 @@
     <div class="brand-mark">⌬</div>
     <div>
       <div class="brand-name">Case Study Generator</div>
-      <div class="brand-sub">Performance Marketing · Anonymized · 1-pager PDF</div>
+      <div class="brand-sub">Post With Passion · Real voices · PDF + LinkedIn</div>
     </div>
   </div>
   <div class="topbar-actions">
     <button class="btn active" id="tab-input">Inputs</button>
     <button class="btn" id="tab-preview">Preview</button>
     <button class="btn btn-primary" id="export-btn">↓ Export PDF</button>
+    <button class="btn btn-pwp" id="linkedin-post-btn">Copy LinkedIn Post</button>
+    <button class="btn btn-pwp" id="carousel-btn">Export Carousel</button>
   </div>
 </div>
 
@@ -207,13 +243,27 @@
         <div>
           <label class="label">Currency</label>
           <select class="input" id="f-currency">
-            <option>USD</option><option>EUR</option><option>GBP</option><option>SAR</option><option>AED</option>
+            <option>SAR</option><option>USD</option><option>EUR</option><option>GBP</option><option>AED</option>
           </select>
         </div>
         <div>
           <label class="label">Reset</label>
           <button class="btn" id="reset-btn" style="width:100%;">↺ Reset all</button>
         </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✦ Post With Passion output</div>
+      <p class="pwp-note">The final assets are designed to be shareable as a polished PDF case study, a ready LinkedIn caption, and a square LinkedIn carousel. The voice uses PWP themes: real people, local Saudi context, story-led creative, and performance numbers that still feel human.</p>
+      <div class="grid-3" style="margin-top: 14px;">
+        <button class="btn btn-primary" id="export-btn-inline" style="justify-content:center;">Export 1-page PDF</button>
+        <button class="btn btn-pwp" id="linkedin-post-btn-inline" style="justify-content:center;">Copy LinkedIn Post</button>
+        <button class="btn btn-pwp" id="carousel-btn-inline" style="justify-content:center;">Export Carousel PDF</button>
+      </div>
+      <div class="field" style="margin-top:14px;">
+        <label class="label">LinkedIn post preview</label>
+        <div class="share-preview" id="linkedin-post-preview"></div>
       </div>
     </div>
 
@@ -252,23 +302,23 @@
 
         <div class="field">
           <label class="label">Your Agency Name</label>
-          <input class="input" id="f-agencyName" value="Your Agency">
+          <input class="input" id="f-agencyName" value="Post With Passion">
         </div>
         <div class="field">
           <label class="label">Agency Tagline</label>
-          <input class="input" id="f-agencyTagline" value="Performance Marketing">
+          <input class="input" id="f-agencyTagline" value="UGC · Real Voices · Riyadh">
         </div>
 
         <div class="field">
           <label class="label">Anonymous Descriptor (replaces client name)</label>
-          <input class="input" id="f-descriptor" value="A US-based DTC skincare brand">
+          <input class="input" id="f-descriptor" value="A Saudi ecommerce brand built around community trust">
           <p class="hint-text" style="margin: 4px 0 0;">Format: "[geography] [model] [vertical]" — e.g. "A UK B2B SaaS company in HR tech"</p>
         </div>
 
         <div class="grid-2" style="gap: 10px;">
           <div class="field">
             <label class="label">Industry / Vertical</label>
-            <input class="input" id="f-industry" value="DTC Skincare">
+            <input class="input" id="f-industry" value="Saudi Ecommerce">
           </div>
           <div class="field">
             <label class="label">Company Size</label>
@@ -291,7 +341,7 @@
         </div>
         <div class="field">
           <label class="label">Channels Used</label>
-          <input class="input" id="f-channels" value="Meta Ads, Google Ads">
+          <input class="input" id="f-channels" value="Meta Ads, TikTok, UGC Creators, Google Ads">
         </div>
       </div>
 
@@ -301,21 +351,22 @@
 
         <div class="field">
           <label class="label">Headline Result</label>
-          <input class="input" id="f-headline" value="Scaled paid acquisition 3.2x while cutting CAC by 41%">
+          <input class="input" id="f-headline" value="Turned real voices into a performance engine with stronger ROAS and lower CPA">
           <button class="btn btn-ai" id="ai-headline" style="margin-top: 6px; width: 100%;">🤖 Generate headline from metrics</button>
         </div>
 
         <div class="field">
           <label class="label">The Challenge (1–2 sentences)</label>
-          <textarea class="input" id="f-challenge" rows="3">Plateaued growth with rising CAC and falling ROAS. Brand needed a new acquisition motion without sacrificing margin.</textarea>
+          <textarea class="input" id="f-challenge" rows="3">The brand had attention, but the message felt too polished to move local audiences. They needed creative that sounded like people, not ads, while keeping performance accountable.</textarea>
         </div>
 
         <div class="field">
           <label class="label">What We Did (one line per bullet)</label>
-          <textarea class="input" id="f-strategy" rows="4">Rebuilt account structure around audience-first creative testing
-Launched broad + lookalike split with rapid creative iteration
-Implemented PMax with feed optimization for assisted lift
-Introduced server-side conversion tracking for cleaner signal</textarea>
+          <textarea class="input" id="f-strategy" rows="4">Mapped audience moments around Saudi buying behavior
+Produced UGC scripts built on real customer language
+Tested creator-led hooks across Meta and TikTok
+Reallocated budget toward the stories that converted
+Connected creative learnings back to paid media reporting</textarea>
         </div>
 
         <!-- ENDORSEMENT MODE -->
@@ -328,14 +379,14 @@ Introduced server-side conversion tracking for cleaner signal</textarea>
           </div>
 
           <div id="endorsement-outcome">
-            <textarea class="input" id="f-outcomeCallout" rows="2">The team rebuilt their acquisition motion from a single-channel dependency into a diversified, predictable system that compounds month over month.</textarea>
+            <textarea class="input" id="f-outcomeCallout" rows="2">We turned local insight and real creator voices into a measurable acquisition system — content that felt close to the audience, with numbers strong enough for the boardroom.</textarea>
             <button class="btn btn-ai" id="ai-outcome" style="margin-top: 6px; width: 100%;">🤖 Draft outcome callout from inputs</button>
             <p class="hint-text">Spoken in your agency's voice. No fake quotes, no attribution. Always safe to publish.</p>
           </div>
 
           <div id="endorsement-testimonial" style="display:none;">
-            <textarea class="input" id="f-testimonial" rows="2">They turned our paid channels from a cost center into our biggest growth engine.</textarea>
-            <input class="input" id="f-testimonialAuthor" style="margin-top: 6px;" placeholder="Attribution (e.g. 'Head of Growth, anonymous client')" value="Head of Growth, client">
+            <textarea class="input" id="f-testimonial" rows="2">The work felt like our audience was finally speaking for the brand, not just watching another ad.</textarea>
+            <input class="input" id="f-testimonialAuthor" style="margin-top: 6px;" placeholder="Attribution (e.g. 'Head of Growth, anonymous client')" value="Marketing Lead, anonymous client">
             <button class="btn btn-ai" id="ai-testimonial" style="margin-top: 6px; width: 100%;">🤖 Draft testimonial (for client to approve)</button>
             <p class="hint-text" style="color: #B45309; background: #FEF3C7; padding: 8px; border-radius: 6px;">
               ⚠️ <strong>Important:</strong> AI generates a draft only. You must send it to your client for explicit written approval before publishing. Fabricating attributed quotes is false advertising in most jurisdictions.
@@ -384,24 +435,24 @@ Introduced server-side conversion tracking for cleaner signal</textarea>
 const state = {
   type: 'ecommerce',          // 'ecommerce' | 'leadgen'
   style: 'editorial',         // 'editorial' | 'bold' | 'data'
-  currency: 'USD',
+  currency: 'SAR',
   hideName: true,
   hideRevenue: false,
   noBaseline: false,
   endorsement: 'outcome',     // 'outcome' | 'testimonial' | 'none'
-  agencyName: 'Your Agency',
-  agencyTagline: 'Performance Marketing',
-  descriptor: 'A US-based DTC skincare brand',
-  industry: 'DTC Skincare',
+  agencyName: 'Post With Passion',
+  agencyTagline: 'UGC · Real Voices · Riyadh',
+  descriptor: 'A Saudi ecommerce brand built around community trust',
+  industry: 'Saudi Ecommerce',
   size: '$1M – $10M revenue',
   period: 'Jan – Jun 2026',
-  channels: 'Meta Ads, Google Ads',
-  headline: 'Scaled paid acquisition 3.2x while cutting CAC by 41%',
-  challenge: 'Plateaued growth with rising CAC and falling ROAS. Brand needed a new acquisition motion without sacrificing margin.',
-  strategy: 'Rebuilt account structure around audience-first creative testing\nLaunched broad + lookalike split with rapid creative iteration\nImplemented PMax with feed optimization for assisted lift\nIntroduced server-side conversion tracking for cleaner signal',
-  outcomeCallout: 'The team rebuilt their acquisition motion from a single-channel dependency into a diversified, predictable system that compounds month over month.',
-  testimonial: 'They turned our paid channels from a cost center into our biggest growth engine.',
-  testimonialAuthor: 'Head of Growth, client',
+  channels: 'Meta Ads, TikTok, UGC Creators, Google Ads',
+  headline: 'Turned real voices into a performance engine with stronger ROAS and lower CPA',
+  challenge: 'The brand had attention, but the message felt too polished to move local audiences. They needed creative that sounded like people, not ads, while keeping performance accountable.',
+  strategy: 'Mapped audience moments around Saudi buying behavior\nProduced UGC scripts built on real customer language\nTested creator-led hooks across Meta and TikTok\nReallocated budget toward the stories that converted\nConnected creative learnings back to paid media reporting',
+  outcomeCallout: 'We turned local insight and real creator voices into a measurable acquisition system — content that felt close to the audience, with numbers strong enough for the boardroom.',
+  testimonial: 'The work felt like our audience was finally speaking for the brand, not just watching another ad.',
+  testimonialAuthor: 'Marketing Lead, anonymous client',
   // perf
   spend: 180000, revenue: 612000, impressions: 14200000, clicks: 198000, conversions: 4250, aov: 144,
   leads: 1850, sql: 410, closedDeals: 62, avgDealValue: 8400,
@@ -685,6 +736,7 @@ function renderComputed() {
     chips.push(chip('CTR', fmtPct(c.ctr, 2), c.ctrLift));
   }
   container.innerHTML = chips.join('');
+  renderLinkedInPostPreview();
 }
 
 /* ============================================================
@@ -704,6 +756,11 @@ function renderPreview() {
                    : dataLayout(d, c, heroStats, strategyLines, clientLabel);
 
   mount.innerHTML = `<div class="case-page s-${d.style}">${layoutHTML}</div>`;
+}
+
+function renderLinkedInPostPreview() {
+  const box = document.getElementById('linkedin-post-preview');
+  if (box) box.textContent = buildLinkedInPost();
 }
 
 function buildHeroStats(c, d) {
@@ -821,6 +878,10 @@ function endorsementHTML(d, style) {
   }
 }
 
+function pwpSignatureHTML(color = '#666') {
+  return `<div class="pwp-signature" style="color:${color};">Post With Passion · UGC · Real Voices · Riyadh</div>`;
+}
+
 function escapeHTML(s) {
   if (!s) return '';
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -866,6 +927,148 @@ function comparisonBarsHTML(d, c) {
   }</div>`;
 }
 
+/* ============================================================
+   SHARE OUTPUTS: LINKEDIN POST + CAROUSEL
+   ============================================================ */
+function mainMetricLine() {
+  const c = calc();
+  const d = state;
+  if (d.type === 'ecommerce') {
+    if (!d.hideRevenue && c.roas) return `${fmtROAS(c.roas)} ROAS`;
+    if (c.cpa) return `${fmtCurrency(c.cpa, d.currency)} CPA`;
+    return `${fmtNumber(c.conversions)} conversions`;
+  }
+  if (c.cac) return `${fmtCurrency(c.cac, d.currency)} CAC`;
+  if (c.cpl) return `${fmtCurrency(c.cpl, d.currency)} CPL`;
+  return `${fmtNumber(c.leads)} qualified leads`;
+}
+
+function buildLinkedInPost() {
+  const c = calc();
+  const d = state;
+  const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
+  const metricLines = d.type === 'ecommerce'
+    ? [
+        !d.hideRevenue && `ROAS: ${fmtROAS(c.roas)}${c.roasLift ? ` (${Math.abs(c.roasLift).toFixed(0)}% lift)` : ''}`,
+        `CPA: ${fmtCurrency(c.cpa, d.currency)}${c.cpaLift ? ` (${Math.abs(c.cpaLift).toFixed(0)}% reduction)` : ''}`,
+        `CTR: ${fmtPct(c.ctr, 2)}`,
+        `Conversions: ${fmtNumber(c.conversions)}${c.conversionsLift ? ` (${Math.abs(c.conversionsLift).toFixed(0)}% lift)` : ''}`,
+      ].filter(Boolean)
+    : [
+        `Qualified leads: ${fmtNumber(c.leads)}${c.leadsLift ? ` (${Math.abs(c.leadsLift).toFixed(0)}% lift)` : ''}`,
+        `CAC: ${fmtCurrency(c.cac, d.currency)}${c.cacLift ? ` (${Math.abs(c.cacLift).toFixed(0)}% reduction)` : ''}`,
+        `Lead to SQL: ${fmtPct(c.leadToSQL, 1)}`,
+        !d.hideRevenue && `Pipeline value: ${fmtCurrency(c.pipelineRevenue, d.currency)}`,
+      ].filter(Boolean);
+
+  return [
+    `${d.headline}`,
+    '',
+    `For ${d.descriptor.toLowerCase()}, the goal was bigger than better ads. It was to make the brand feel closer to the people it wanted to reach.`,
+    '',
+    'What shifted:',
+    ...strategyLines.map(line => `• ${line}`),
+    '',
+    'What changed:',
+    ...metricLines.map(line => `• ${line}`),
+    '',
+    `${d.outcomeCallout}`,
+    '',
+    'Real voices. Local context. Performance that can be measured.',
+    '',
+    '— Post With Passion',
+    'Made in Riyadh · بشغف',
+    '',
+    '#PostWithPassion #UGC #PerformanceMarketing #SaudiMarketing #DigitalMarketing'
+  ].join('\n');
+}
+
+async function exportLinkedInPost() {
+  const post = buildLinkedInPost();
+  try {
+    await navigator.clipboard.writeText(post);
+    alert('LinkedIn post copied. Paste it into LinkedIn when you are ready.');
+  } catch (e) {
+    const blob = new Blob([post], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'linkedin-post.txt';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  }
+}
+
+function carouselSlidesHTML() {
+  const c = calc();
+  const d = state;
+  const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
+  const stats = buildHeroStats(c, d).slice(0, 4);
+  const brandFooter = (n) => `<div class="carousel-footer"><span class="pwp-mark">Post With Passion</span><span>${n}/6 · Made in Riyadh · بشغف</span></div>`;
+
+  return `
+    <section class="carousel-slide dark">
+      <div class="kicker">Case Study · Real voices</div>
+      <h1>${escapeHTML(d.headline)}</h1>
+      <div style="position:absolute; left:74px; bottom:170px; max-width:760px; font-size:28px; line-height:1.35; color:#DADADA;">${escapeHTML(d.descriptor)} · ${escapeHTML(d.period)}</div>
+      ${brandFooter(1)}
+    </section>
+    <section class="carousel-slide">
+      <div class="kicker">The challenge</div>
+      <h2>Attention was there. Trust needed a more human voice.</h2>
+      <p>${escapeHTML(d.challenge)}</p>
+      ${brandFooter(2)}
+    </section>
+    <section class="carousel-slide">
+      <div class="kicker">The shift</div>
+      <h2>We built the campaign around audience language, not agency language.</h2>
+      <ul>${strategyLines.map(line => `<li>${escapeHTML(line)}</li>`).join('')}</ul>
+      ${brandFooter(3)}
+    </section>
+    <section class="carousel-slide dark">
+      <div class="kicker">The numbers</div>
+      <h2>Creative with feeling. Performance with proof.</h2>
+      <div class="carousel-stats">
+        ${stats.map(stat => `<div class="carousel-stat"><span>${escapeHTML(stat.label)}</span><strong>${stat.value}</strong></div>`).join('')}
+      </div>
+      ${brandFooter(4)}
+    </section>
+    <section class="carousel-slide">
+      <div class="kicker">The takeaway</div>
+      <h2>When the content sounds real, the media works harder.</h2>
+      <p>${escapeHTML(d.outcomeCallout)}</p>
+      ${brandFooter(5)}
+    </section>
+    <section class="carousel-slide dark">
+      <div class="kicker">Post With Passion</div>
+      <h1>Turn local stories into measurable growth.</h1>
+      <p style="margin-top:36px; max-width:780px; color:#DADADA;">UGC, paid media, social, and brand strategy built for Saudi audiences.</p>
+      ${brandFooter(6)}
+    </section>
+  `;
+}
+
+function exportCarouselPDF() {
+  const slides = carouselSlidesHTML();
+  const win = window.open('', '_blank');
+  if (!win) { alert('Please allow pop-ups to export the carousel.'); return; }
+  const styleTag = document.querySelector('style').outerHTML;
+  const fonts = document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>${escapeHTML(state.descriptor)} — LinkedIn Carousel</title>
+    ${fonts}
+    ${styleTag}
+    <style>
+      body { margin: 0; background: #F5F5F2; }
+      @page { size: 1080px 1080px; margin: 0; }
+    </style>
+  </head><body class="carousel-export">${slides}
+    <script>window.addEventListener('load', () => { setTimeout(() => window.print(), 600); });<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
 /* ---------- LAYOUTS ---------- */
 function editorialLayout(d, c, heroStats, strategyLines, clientLabel) {
   return `
@@ -878,6 +1081,7 @@ function editorialLayout(d, c, heroStats, strategyLines, clientLabel) {
         <div style="font-size: 11px; font-weight: 600;">${escapeHTML(d.agencyName)}</div>
         <div style="font-size: 9px; color: #666; margin-top: 2px;">${escapeHTML(d.agencyTagline)}</div>
         <div style="font-size: 9px; color: #666; margin-top: 4px;">${escapeHTML(d.period)}</div>
+        <div style="margin-top:8px;">${pwpSignatureHTML('#666')}</div>
       </div>
     </div>
 
@@ -918,7 +1122,7 @@ function editorialLayout(d, c, heroStats, strategyLines, clientLabel) {
     ${endorsementHTML(d, 'editorial')}
 
     <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#666; padding-top:8px; border-top:1px solid #E5E5E0;">
-      <div>${escapeHTML(d.agencyName)} · ${escapeHTML(d.agencyTagline)}</div>
+      <div>${escapeHTML(d.agencyName)} · Real voices · Local context</div>
       <div>Prepared ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
     </div>
   `;
@@ -931,7 +1135,7 @@ function boldLayout(d, c, heroStats, strategyLines, clientLabel) {
         <div style="width:28px; height:28px; background:#D4FF3F; border-radius:6px;"></div>
         <div>
           <div style="font-size:13px; font-weight:700;">${escapeHTML(d.agencyName)}</div>
-          <div style="font-size:9px; color:#999; text-transform:uppercase; letter-spacing:0.12em;">${escapeHTML(d.agencyTagline)}</div>
+          <div style="font-size:9px; color:#999; text-transform:uppercase; letter-spacing:0.12em;">Real voices · Riyadh</div>
         </div>
       </div>
       <div style="font-size:10px; color:#999; text-transform:uppercase; letter-spacing:0.14em;">${escapeHTML(d.period)}</div>
@@ -972,7 +1176,7 @@ function boldLayout(d, c, heroStats, strategyLines, clientLabel) {
 
     <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#999; padding-top:10px; border-top:1px solid #2A2A2A;">
       <div>Channels: ${escapeHTML(d.channels)}</div>
-      <div>${escapeHTML(d.agencyName)}</div>
+      <div>${escapeHTML(d.agencyName)} · بشغف</div>
     </div>
   `;
 }
@@ -987,7 +1191,7 @@ function dataLayout(d, c, heroStats, strategyLines, clientLabel) {
       </div>
       <div style="text-align:right;">
         <div style="font-size:12px; font-weight:600;">${escapeHTML(d.agencyName)}</div>
-        <div style="font-size:9px; color:#5A6B82;">${escapeHTML(d.agencyTagline)}</div>
+        <div style="font-size:9px; color:#5A6B82;">Real voices · Local insight · Performance</div>
       </div>
     </div>
 
@@ -1030,7 +1234,7 @@ function dataLayout(d, c, heroStats, strategyLines, clientLabel) {
     ${endorsementHTML(d, 'data')}
 
     <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#5A6B82; padding-top:8px; border-top:1px solid #E1E5EC;">
-      <div>${escapeHTML(d.agencyName)} · ${escapeHTML(d.agencyTagline)}</div>
+      <div>${escapeHTML(d.agencyName)} · Made in Riyadh · بشغف</div>
       <div>Generated ${new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
     </div>
   `;
@@ -1084,7 +1288,7 @@ function bindAllInputs() {
   ];
   textFields.forEach(k => {
     const el = document.getElementById('f-' + k);
-    if (el) el.addEventListener('input', e => { state[k] = e.target.value; });
+    if (el) el.addEventListener('input', e => { state[k] = e.target.value; renderLinkedInPostPreview(); });
   });
 
   // AI drafters
@@ -1092,16 +1296,19 @@ function bindAllInputs() {
     const h = draftHeadline();
     state.headline = h;
     document.getElementById('f-headline').value = h;
+    renderLinkedInPostPreview();
   });
   document.getElementById('ai-outcome').addEventListener('click', () => {
     const o = draftOutcomeCallout();
     state.outcomeCallout = o;
     document.getElementById('f-outcomeCallout').value = o;
+    renderLinkedInPostPreview();
   });
   document.getElementById('ai-testimonial').addEventListener('click', () => {
     const t = draftTestimonial();
     state.testimonial = t;
     document.getElementById('f-testimonial').value = t;
+    renderLinkedInPostPreview();
   });
 
   // Tabs
@@ -1110,6 +1317,11 @@ function bindAllInputs() {
 
   // Export
   document.getElementById('export-btn').addEventListener('click', exportPDF);
+  document.getElementById('export-btn-inline').addEventListener('click', exportPDF);
+  document.getElementById('linkedin-post-btn').addEventListener('click', exportLinkedInPost);
+  document.getElementById('linkedin-post-btn-inline').addEventListener('click', exportLinkedInPost);
+  document.getElementById('carousel-btn').addEventListener('click', exportCarouselPDF);
+  document.getElementById('carousel-btn-inline').addEventListener('click', exportCarouselPDF);
 
   // Reset
   document.getElementById('reset-btn').addEventListener('click', () => {
