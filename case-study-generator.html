@@ -228,8 +228,8 @@
         <div>
           <label class="label">Client Type</label>
           <div class="toggle-group">
-            <button class="toggle-btn active" data-type="ecommerce">Ecommerce</button>
-            <button class="toggle-btn" data-type="leadgen">Lead-gen</button>
+            <button class="toggle-btn" data-type="ecommerce">Ecommerce</button>
+            <button class="toggle-btn active" data-type="leadgen">Lead-gen</button>
           </div>
         </div>
         <div>
@@ -279,13 +279,13 @@
           </label>
         </div>
         <div class="switch">
-          <input type="checkbox" id="t-hideRevenue">
+          <input type="checkbox" id="t-hideRevenue" checked>
           <label for="t-hideRevenue">Hide absolute revenue
             <span class="hint">Keep ROAS, lifts, ratios — hide dollar amounts</span>
           </label>
         </div>
         <div class="switch">
-          <input type="checkbox" id="t-noBaseline">
+          <input type="checkbox" id="t-noBaseline" checked>
           <label for="t-noBaseline">Built from scratch (no baseline)
             <span class="hint">Frame as "0 → achieved" instead of "before → after"</span>
           </label>
@@ -351,7 +351,7 @@
 
         <div class="field">
           <label class="label">Headline Result</label>
-          <input class="input" id="f-headline" value="Turned real voices into a performance engine with stronger ROAS and lower CPA">
+          <input class="input" id="f-headline" value="Generated 5,258 leads at SAR 3 CPL through creator-led campaigns">
           <button class="btn btn-ai" id="ai-headline" style="margin-top: 6px; width: 100%;">🤖 Generate headline from metrics</button>
         </div>
 
@@ -379,7 +379,7 @@ Connected creative learnings back to paid media reporting</textarea>
           </div>
 
           <div id="endorsement-outcome">
-            <textarea class="input" id="f-outcomeCallout" rows="2">We turned local insight and real creator voices into a measurable acquisition system — content that felt close to the audience, with numbers strong enough for the boardroom.</textarea>
+            <textarea class="input" id="f-outcomeCallout" rows="2">Mapped audience moments around Saudi buying behavior. The result was 5,258 leads at SAR 3 CPL — proof that UGC can carry both the story and the performance target.</textarea>
             <button class="btn btn-ai" id="ai-outcome" style="margin-top: 6px; width: 100%;">🤖 Draft outcome callout from inputs</button>
             <p class="hint-text">Spoken in your agency's voice. No fake quotes, no attribution. Always safe to publish.</p>
           </div>
@@ -433,12 +433,12 @@ Connected creative learnings back to paid media reporting</textarea>
    STATE
    ============================================================ */
 const state = {
-  type: 'ecommerce',          // 'ecommerce' | 'leadgen'
+  type: 'leadgen',            // 'ecommerce' | 'leadgen'
   style: 'editorial',         // 'editorial' | 'bold' | 'data'
   currency: 'SAR',
   hideName: true,
-  hideRevenue: false,
-  noBaseline: false,
+  hideRevenue: true,
+  noBaseline: true,
   endorsement: 'outcome',     // 'outcome' | 'testimonial' | 'none'
   agencyName: 'Post With Passion',
   agencyTagline: 'UGC · Real Voices · Riyadh',
@@ -447,19 +447,36 @@ const state = {
   size: '$1M – $10M revenue',
   period: 'Jan – Jun 2026',
   channels: 'Meta Ads, TikTok, UGC Creators, Google Ads',
-  headline: 'Turned real voices into a performance engine with stronger ROAS and lower CPA',
+  headline: 'Generated 5,258 leads at SAR 3 CPL through creator-led campaigns',
   challenge: 'The brand had attention, but the message felt too polished to move local audiences. They needed creative that sounded like people, not ads, while keeping performance accountable.',
   strategy: 'Mapped audience moments around Saudi buying behavior\nProduced UGC scripts built on real customer language\nTested creator-led hooks across Meta and TikTok\nReallocated budget toward the stories that converted\nConnected creative learnings back to paid media reporting',
-  outcomeCallout: 'We turned local insight and real creator voices into a measurable acquisition system — content that felt close to the audience, with numbers strong enough for the boardroom.',
+  outcomeCallout: 'Mapped audience moments around Saudi buying behavior. The result was 5,258 leads at SAR 3 CPL — proof that UGC can carry both the story and the performance target.',
   testimonial: 'The work felt like our audience was finally speaking for the brand, not just watching another ad.',
   testimonialAuthor: 'Marketing Lead, anonymous client',
   // perf
-  spend: 180000, revenue: 612000, impressions: 14200000, clicks: 198000, conversions: 4250, aov: 144,
-  leads: 1850, sql: 410, closedDeals: 62, avgDealValue: 8400,
+  spend: 15774, revenue: '', impressions: '', clicks: '', conversions: '', aov: '',
+  leads: 5258, sql: '', closedDeals: '', avgDealValue: '',
   // baseline
-  baseSpend: 90000, baseRevenue: 162000, baseImpressions: 8500000, baseClicks: 71000, baseConversions: 1280,
-  baseLeads: 540, baseSql: 95, baseClosedDeals: 14,
+  baseSpend: '', baseRevenue: '', baseImpressions: '', baseClicks: '', baseConversions: '',
+  baseLeads: '', baseSql: '', baseClosedDeals: '',
 };
+let headlineTouched = false;
+let outcomeTouched = false;
+
+function refreshSmartCopy() {
+  if (!headlineTouched) {
+    const h = draftHeadline();
+    state.headline = h;
+    const headlineField = document.getElementById('f-headline');
+    if (headlineField) headlineField.value = h;
+  }
+  if (!outcomeTouched) {
+    const o = draftOutcomeCallout();
+    state.outcomeCallout = o;
+    const outcomeField = document.getElementById('f-outcomeCallout');
+    if (outcomeField) outcomeField.value = o;
+  }
+}
 
 /* ============================================================
    FORMATTERS
@@ -480,6 +497,10 @@ const fmtROAS = (n) => {
   if (n === '' || n === null || n === undefined || isNaN(n) || !isFinite(n)) return '—';
   return Number(n).toFixed(2) + 'x';
 };
+const hasInput = (k) => state[k] !== '' && state[k] !== null && state[k] !== undefined && !isNaN(Number(state[k])) && Number(state[k]) > 0;
+const valueOf = (k) => hasInput(k) ? Number(state[k]) : null;
+const hasMetric = (v) => v !== null && v !== undefined && !isNaN(v) && isFinite(v) && Number(v) > 0;
+const calcRatio = (top, bottom, multiplier = 1) => hasMetric(top) && hasMetric(bottom) ? (top / bottom) * multiplier : null;
 const lift = (current, baseline) => {
   const c = Number(current), b = Number(baseline);
   if (!b || isNaN(c) || isNaN(b)) return null;
@@ -496,44 +517,49 @@ const liftInverse = (current, baseline) => {
    ============================================================ */
 function calc() {
   const d = state;
-  const num = (k) => Number(d[k]) || 0;
+  const spend = valueOf('spend'), revenue = valueOf('revenue'),
+        impressions = valueOf('impressions'), clicks = valueOf('clicks'),
+        conversions = valueOf('conversions'),
+        leads = valueOf('leads'), sql = valueOf('sql'),
+        closedDeals = valueOf('closedDeals'), avgDealValue = valueOf('avgDealValue');
 
-  const spend = num('spend'), revenue = num('revenue'),
-        impressions = num('impressions'), clicks = num('clicks'),
-        conversions = num('conversions'),
-        leads = num('leads'), sql = num('sql'),
-        closedDeals = num('closedDeals'), avgDealValue = num('avgDealValue');
-
-  const pipelineRevenue = closedDeals * avgDealValue;
+  const pipelineRevenue = hasMetric(closedDeals) && hasMetric(avgDealValue) ? closedDeals * avgDealValue : null;
 
   const out = {
     spend, revenue, impressions, clicks, conversions, leads, sql, closedDeals, pipelineRevenue, avgDealValue,
-    ctr: impressions ? (clicks / impressions) * 100 : 0,
-    cpc: clicks ? spend / clicks : 0,
-    cpm: impressions ? (spend / impressions) * 1000 : 0,
-    cvr: clicks ? (conversions / clicks) * 100 : 0,
-    cpa: conversions ? spend / conversions : 0,
-    roas: spend ? revenue / spend : 0,
-    netROI: spend ? ((revenue - spend) / spend) * 100 : 0,
-    cpl: leads ? spend / leads : 0,
-    leadToSQL: leads ? (sql / leads) * 100 : 0,
-    sqlToClose: sql ? (closedDeals / sql) * 100 : 0,
-    cac: closedDeals ? spend / closedDeals : 0,
-    pipelineROAS: spend ? pipelineRevenue / spend : 0,
+    ctr: calcRatio(clicks, impressions, 100),
+    cpc: calcRatio(spend, clicks),
+    cpm: calcRatio(spend, impressions, 1000),
+    cvr: calcRatio(conversions, clicks, 100),
+    cpa: calcRatio(spend, conversions),
+    roas: calcRatio(revenue, spend),
+    netROI: hasMetric(spend) && hasMetric(revenue) ? ((revenue - spend) / spend) * 100 : null,
+    cpl: calcRatio(spend, leads),
+    leadToSQL: calcRatio(sql, leads, 100),
+    sqlToClose: calcRatio(closedDeals, sql, 100),
+    cac: calcRatio(spend, closedDeals),
+    pipelineROAS: calcRatio(pipelineRevenue, spend),
   };
 
   if (!d.noBaseline) {
-    const baseSpend = num('baseSpend'), baseRevenue = num('baseRevenue'),
-          baseClicks = num('baseClicks'), baseImpressions = num('baseImpressions'),
-          baseConversions = num('baseConversions'),
-          baseLeads = num('baseLeads'), baseClosedDeals = num('baseClosedDeals');
+    const baseSpend = valueOf('baseSpend'), baseRevenue = valueOf('baseRevenue'),
+          baseClicks = valueOf('baseClicks'), baseImpressions = valueOf('baseImpressions'),
+          baseConversions = valueOf('baseConversions'),
+          baseLeads = valueOf('baseLeads'), baseClosedDeals = valueOf('baseClosedDeals');
 
-    out.baseROAS = baseSpend ? baseRevenue / baseSpend : 0;
-    out.baseCTR = baseImpressions ? (baseClicks / baseImpressions) * 100 : 0;
-    out.baseCVR = baseClicks ? (baseConversions / baseClicks) * 100 : 0;
-    out.baseCPA = baseConversions ? baseSpend / baseConversions : 0;
-    out.baseCPL = baseLeads ? baseSpend / baseLeads : 0;
-    out.baseCAC = baseClosedDeals ? baseSpend / baseClosedDeals : 0;
+    out.baseSpend = baseSpend;
+    out.baseRevenue = baseRevenue;
+    out.baseImpressions = baseImpressions;
+    out.baseClicks = baseClicks;
+    out.baseConversions = baseConversions;
+    out.baseLeads = baseLeads;
+    out.baseClosedDeals = baseClosedDeals;
+    out.baseROAS = calcRatio(baseRevenue, baseSpend);
+    out.baseCTR = calcRatio(baseClicks, baseImpressions, 100);
+    out.baseCVR = calcRatio(baseConversions, baseClicks, 100);
+    out.baseCPA = calcRatio(baseSpend, baseConversions);
+    out.baseCPL = calcRatio(baseSpend, baseLeads);
+    out.baseCAC = calcRatio(baseSpend, baseClosedDeals);
 
     out.revenueLift = lift(revenue, baseRevenue);
     out.roasLift = lift(out.roas, out.baseROAS);
@@ -542,12 +568,28 @@ function calc() {
     out.cpaLift = liftInverse(out.cpa, out.baseCPA);
     out.cplLift = liftInverse(out.cpl, out.baseCPL);
     out.cacLift = liftInverse(out.cac, out.baseCAC);
-    out.leadsLift = lift(leads, num('baseLeads'));
-    out.dealsLift = lift(closedDeals, num('baseClosedDeals'));
-    out.conversionsLift = lift(conversions, num('baseConversions'));
+    out.leadsLift = lift(leads, baseLeads);
+    out.dealsLift = lift(closedDeals, baseClosedDeals);
+    out.conversionsLift = lift(conversions, baseConversions);
   }
 
   return out;
+}
+
+function storyType(c, d) {
+  const channels = `${d.channels} ${d.strategy}`.toLowerCase();
+  const creativeLed = /(ugc|creator|influencer|tiktok|content|creative|hook|script)/.test(channels);
+  if (hasMetric(c.leads) && hasMetric(c.cpl) && creativeLed) return 'creative-leadgen';
+  if (hasMetric(c.leads) && hasMetric(c.cpl)) return 'leadgen';
+  if (hasMetric(c.roas) || hasMetric(c.revenue)) return 'ecommerce';
+  if (hasMetric(c.impressions) && (hasMetric(c.cpm) || hasMetric(c.ctr))) return 'awareness';
+  if (hasMetric(c.closedDeals) || hasMetric(c.pipelineRevenue)) return 'full-funnel';
+  return 'performance';
+}
+
+function metric(label, value, liftValue = null, liftLabel = '', inverted = false) {
+  if (!hasMetric(value)) return null;
+  return { label, value, lift: liftValue, liftLabel, inverted };
 }
 
 /* ============================================================
@@ -556,62 +598,51 @@ function calc() {
 function draftHeadline() {
   const c = calc();
   const d = state;
-  const pieces = [];
+  const story = storyType(c, d);
 
-  if (d.noBaseline) {
-    if (d.type === 'ecommerce' && c.roas > 0 && !d.hideRevenue) {
-      pieces.push(`Built ${d.descriptor.toLowerCase()} from zero to ${fmtROAS(c.roas)} ROAS in ${d.period}`);
-    } else if (d.type === 'ecommerce' && c.conversions > 0) {
-      pieces.push(`Generated ${fmtNumber(c.conversions)} conversions at ${fmtROAS(c.roas)} ROAS from a standing start`);
-    } else if (d.type === 'leadgen' && c.closedDeals > 0) {
-      pieces.push(`Built a pipeline of ${fmtNumber(c.closedDeals)} closed deals from scratch in ${d.period}`);
-    } else if (d.type === 'leadgen' && c.leads > 0) {
-      pieces.push(`Generated ${fmtNumber(c.leads)} qualified leads from zero in ${d.period}`);
-    }
-  } else {
-    if (d.type === 'ecommerce') {
-      const roasMultiple = c.baseROAS ? (c.roas / c.baseROAS) : null;
-      const revMultiple = Number(d.baseRevenue) ? (c.revenue / Number(d.baseRevenue)) : null;
-      if (revMultiple && c.cpaLift > 10) {
-        pieces.push(`Scaled revenue ${revMultiple.toFixed(1)}x while cutting CPA by ${Math.round(c.cpaLift)}%`);
-      } else if (roasMultiple && roasMultiple > 1.2) {
-        pieces.push(`Lifted ROAS from ${fmtROAS(c.baseROAS)} to ${fmtROAS(c.roas)} in ${d.period}`);
-      } else if (c.revenueLift > 0) {
-        pieces.push(`Drove ${Math.round(c.revenueLift)}% revenue lift through restructured paid acquisition`);
-      }
-    } else {
-      if (c.dealsLift > 0 && c.cacLift > 0) {
-        pieces.push(`Grew closed deals ${Math.round(c.dealsLift)}% while reducing CAC by ${Math.round(c.cacLift)}%`);
-      } else if (c.cplLift > 10) {
-        pieces.push(`Cut cost-per-lead by ${Math.round(c.cplLift)}% while scaling volume ${Math.round(c.leadsLift)}%`);
-      } else if (c.leadsLift > 0) {
-        pieces.push(`Generated ${Math.round(c.leadsLift)}% more qualified leads at improved efficiency`);
-      }
-    }
+  if ((story === 'creative-leadgen' || story === 'leadgen') && hasMetric(c.leads) && hasMetric(c.cpl)) {
+    return `Generated ${fmtNumber(c.leads)} leads at ${fmtCurrency(c.cpl, d.currency)} CPL through creator-led campaigns`;
   }
-
-  return pieces[0] || `Delivered measurable performance gains across ${d.channels}`;
+  if (hasMetric(c.leads) && hasMetric(c.leadsLift)) {
+    return `Generated ${fmtNumber(c.leads)} leads with ${Math.round(c.leadsLift)}% lift in volume`;
+  }
+  if (hasMetric(c.roas) && hasMetric(c.cpaLift)) {
+    return `Reached ${fmtROAS(c.roas)} ROAS while cutting CPA by ${Math.round(c.cpaLift)}%`;
+  }
+  if (hasMetric(c.roas)) {
+    return `Reached ${fmtROAS(c.roas)} ROAS across ${d.channels}`;
+  }
+  if (hasMetric(c.conversions) && hasMetric(c.cpa)) {
+    return `Generated ${fmtNumber(c.conversions)} conversions at ${fmtCurrency(c.cpa, d.currency)} CPA`;
+  }
+  if (story === 'awareness' && hasMetric(c.impressions) && hasMetric(c.cpm)) {
+    return `Reached ${fmtNumber(c.impressions)} impressions at ${fmtCurrency(c.cpm, d.currency)} CPM`;
+  }
+  if (hasMetric(c.closedDeals) && hasMetric(c.cac)) {
+    return `Generated ${fmtNumber(c.closedDeals)} closed deals at ${fmtCurrency(c.cac, d.currency)} CAC`;
+  }
+  return `Turned real voices into measurable demand across ${d.channels}`;
 }
 
 function draftOutcomeCallout() {
   const c = calc();
   const d = state;
-  const channels = d.channels.toLowerCase();
-  const verticalShort = d.industry.toLowerCase();
+  const story = storyType(c, d);
+  const firstStrategy = d.strategy.split('\n').map(s => s.trim()).filter(Boolean)[0] || 'Built the campaign around the audience language';
 
-  const fromScratch = d.noBaseline;
-  const templates = fromScratch ? [
-    `Built ${verticalShort} acquisition from zero into a predictable revenue engine across ${channels}, with unit economics that compound month over month.`,
-    `Architected ${channels} from a blank slate into a diversified, measurable acquisition system, with full attribution and clean reporting from day one.`,
-    `Stood up a complete paid acquisition motion from scratch — strategy, creative, tracking, and reporting — that delivered profitable scale in the first reporting period.`,
-  ] : [
-    `Rebuilt ${verticalShort} acquisition from a single-channel dependency into a diversified system that compounds across ${channels} with tighter unit economics.`,
-    `Untangled inherited account structures and rebuilt them around audience-first testing, unlocking efficient scale that prior agencies couldn't reach.`,
-    `Turned ${channels} from a cost-center into a measurable growth engine with cleaner attribution, sharper creative, and structurally lower CAC.`,
-  ];
-  // Pick deterministically based on inputs so user can re-roll by tweaking
-  const seed = (d.spend + d.clicks + d.conversions + d.leads + d.closedDeals) % templates.length;
-  return templates[seed];
+  if ((story === 'creative-leadgen' || story === 'leadgen') && hasMetric(c.leads) && hasMetric(c.cpl)) {
+    return `${firstStrategy}. The result was ${fmtNumber(c.leads)} leads at ${fmtCurrency(c.cpl, d.currency)} CPL — proof that UGC can carry both the story and the performance target.`;
+  }
+  if (story === 'awareness' && hasMetric(c.impressions)) {
+    return `${firstStrategy}. The campaign turned creator-led attention into ${fmtNumber(c.impressions)} measurable impressions without losing the local voice of the brand.`;
+  }
+  if (story === 'ecommerce' && hasMetric(c.roas)) {
+    return `${firstStrategy}. The work connected real customer language to paid performance, reaching ${fmtROAS(c.roas)} ROAS while keeping the creative grounded in local context.`;
+  }
+  if (story === 'full-funnel' && hasMetric(c.closedDeals)) {
+    return `${firstStrategy}. The campaign carried the audience from attention to action, producing ${fmtNumber(c.closedDeals)} closed deals from a more human acquisition journey.`;
+  }
+  return `${firstStrategy}. The work translated audience insight into content people could recognize, trust, and act on.`;
 }
 
 function draftTestimonial() {
@@ -659,7 +690,7 @@ function renderPerfFields() {
     </div>
   `).join('');
   container.querySelectorAll('.perf-input').forEach(input => {
-    input.addEventListener('input', e => { state[e.target.dataset.key] = e.target.value; renderComputed(); });
+    input.addEventListener('input', e => { state[e.target.dataset.key] = e.target.value; refreshSmartCopy(); renderComputed(); });
   });
 }
 
@@ -696,7 +727,7 @@ function renderBaselineFields() {
     </div>
   `).join('');
   container.querySelectorAll('.base-input').forEach(input => {
-    input.addEventListener('input', e => { state[e.target.dataset.key] = e.target.value; renderComputed(); });
+    input.addEventListener('input', e => { state[e.target.dataset.key] = e.target.value; refreshSmartCopy(); renderComputed(); });
   });
 }
 
@@ -721,21 +752,23 @@ function renderComputed() {
 
   let chips = [];
   if (d.type === 'ecommerce') {
-    if (!d.hideRevenue) chips.push(chip('ROAS', fmtROAS(c.roas), c.roasLift));
-    chips.push(chip('CPA', fmtCurrency(c.cpa, d.currency), c.cpaLift, true));
-    chips.push(chip('CTR', fmtPct(c.ctr, 2), c.ctrLift));
-    chips.push(chip('CVR', fmtPct(c.cvr, 2), c.cvrLift));
-    chips.push(chip('CPC', fmtCurrency(c.cpc, d.currency), null));
-    chips.push(chip('Conv.', fmtNumber(c.conversions), c.conversionsLift));
+    if (!d.hideRevenue && hasMetric(c.roas)) chips.push(chip('ROAS', fmtROAS(c.roas), c.roasLift));
+    if (hasMetric(c.cpa)) chips.push(chip('CPA', fmtCurrency(c.cpa, d.currency), c.cpaLift, true));
+    if (hasMetric(c.ctr)) chips.push(chip('CTR', fmtPct(c.ctr, 2), c.ctrLift));
+    if (hasMetric(c.cvr)) chips.push(chip('CVR', fmtPct(c.cvr, 2), c.cvrLift));
+    if (hasMetric(c.cpc)) chips.push(chip('CPC', fmtCurrency(c.cpc, d.currency), null));
+    if (hasMetric(c.conversions)) chips.push(chip('Conv.', fmtNumber(c.conversions), c.conversionsLift));
   } else {
-    chips.push(chip('CPL', fmtCurrency(c.cpl, d.currency), c.cplLift, true));
-    chips.push(chip('CAC', fmtCurrency(c.cac, d.currency), c.cacLift, true));
-    if (!d.hideRevenue) chips.push(chip('Pipe ROAS', fmtROAS(c.pipelineROAS), null));
-    chips.push(chip('Lead→SQL', fmtPct(c.leadToSQL), null));
-    chips.push(chip('SQL→Close', fmtPct(c.sqlToClose), null));
-    chips.push(chip('CTR', fmtPct(c.ctr, 2), c.ctrLift));
+    if (hasMetric(c.leads)) chips.push(chip('Leads', fmtNumber(c.leads), c.leadsLift));
+    if (hasMetric(c.cpl)) chips.push(chip('CPL', fmtCurrency(c.cpl, d.currency), c.cplLift, true));
+    if (hasMetric(c.cac)) chips.push(chip('CAC', fmtCurrency(c.cac, d.currency), c.cacLift, true));
+    if (!d.hideRevenue && hasMetric(c.pipelineROAS)) chips.push(chip('Pipe ROAS', fmtROAS(c.pipelineROAS), null));
+    if (hasMetric(c.leadToSQL)) chips.push(chip('Lead→SQL', fmtPct(c.leadToSQL), null));
+    if (hasMetric(c.sqlToClose)) chips.push(chip('SQL→Close', fmtPct(c.sqlToClose), null));
+    if (hasMetric(c.ctr)) chips.push(chip('CTR', fmtPct(c.ctr, 2), c.ctrLift));
+    if (hasMetric(c.cpm)) chips.push(chip('CPM', fmtCurrency(c.cpm, d.currency), null));
   }
-  container.innerHTML = chips.join('');
+  container.innerHTML = chips.length ? chips.join('') : '<p style="font-size:12px;color:#999;">Enter campaign numbers to calculate the story.</p>';
   renderLinkedInPostPreview();
 }
 
@@ -764,31 +797,49 @@ function renderLinkedInPostPreview() {
 }
 
 function buildHeroStats(c, d) {
-  if (d.type === 'ecommerce') {
-    const stats = [];
-    if (!d.hideRevenue) {
-      stats.push({ label: 'ROAS', value: fmtROAS(c.roas), lift: c.roasLift, liftLabel: 'vs baseline' });
-      stats.push({ label: 'Revenue', value: fmtCurrency(c.revenue, d.currency), lift: c.revenueLift, liftLabel: 'lift' });
-    } else {
-      stats.push({ label: 'ROAS', value: fmtROAS(c.roas), lift: c.roasLift, liftLabel: 'lift' });
-      stats.push({ label: 'Conversions', value: fmtNumber(c.conversions), lift: c.conversionsLift, liftLabel: 'lift' });
-    }
-    stats.push({ label: 'CPA', value: fmtCurrency(c.cpa, d.currency), lift: c.cpaLift, liftLabel: d.noBaseline ? '' : 'reduction', inverted: true });
-    stats.push({ label: 'CTR', value: fmtPct(c.ctr, 2), lift: c.ctrLift, liftLabel: 'lift' });
-    return stats;
-  } else {
-    const stats = [
-      { label: 'Closed deals', value: fmtNumber(c.closedDeals), lift: c.dealsLift, liftLabel: 'lift' },
-      { label: 'Qualified leads', value: fmtNumber(c.leads), lift: c.leadsLift, liftLabel: 'lift' },
-      { label: 'CAC', value: fmtCurrency(c.cac, d.currency), lift: c.cacLift, liftLabel: 'reduction', inverted: true },
-    ];
-    if (!d.hideRevenue) {
-      stats.push({ label: 'Pipeline', value: fmtCurrency(c.pipelineRevenue, d.currency), lift: null, liftLabel: '' });
-    } else {
-      stats.push({ label: 'CPL', value: fmtCurrency(c.cpl, d.currency), lift: c.cplLift, liftLabel: 'reduction', inverted: true });
-    }
-    return stats;
-  }
+  const candidates = [
+    metric('Leads', c.leads, c.leadsLift, 'lift'),
+    metric('CPL', c.cpl, c.cplLift, 'reduction', true),
+    !d.hideRevenue && metric('ROAS', c.roas, c.roasLift, 'lift'),
+    !d.hideRevenue && metric('Revenue', c.revenue, c.revenueLift, 'lift'),
+    metric('Conversions', c.conversions, c.conversionsLift, 'lift'),
+    metric('CPA', c.cpa, c.cpaLift, 'reduction', true),
+    metric('CTR', c.ctr, c.ctrLift, 'lift'),
+    metric('Impressions', c.impressions),
+    metric('CPM', c.cpm),
+    metric('Closed deals', c.closedDeals, c.dealsLift, 'lift'),
+    metric('CAC', c.cac, c.cacLift, 'reduction', true),
+    !d.hideRevenue && metric('Pipeline', c.pipelineRevenue),
+  ].filter(Boolean);
+
+  const formatters = {
+    Leads: v => fmtNumber(v),
+    CPL: v => fmtCurrency(v, d.currency),
+    ROAS: v => fmtROAS(v),
+    Revenue: v => fmtCurrency(v, d.currency),
+    Conversions: v => fmtNumber(v),
+    CPA: v => fmtCurrency(v, d.currency),
+    CTR: v => fmtPct(v, 2),
+    Impressions: v => fmtNumber(v),
+    CPM: v => fmtCurrency(v, d.currency),
+    'Closed deals': v => fmtNumber(v),
+    CAC: v => fmtCurrency(v, d.currency),
+    Pipeline: v => fmtCurrency(v, d.currency),
+  };
+
+  const priority = storyType(c, d).includes('leadgen')
+    ? ['Leads', 'CPL', 'CTR', 'Impressions', 'CPM', 'Lead→SQL']
+    : storyType(c, d) === 'awareness'
+      ? ['Impressions', 'CPM', 'CTR', 'CPC', 'Leads']
+      : ['ROAS', 'Revenue', 'Conversions', 'CPA', 'CTR', 'Leads', 'CPL'];
+
+  const rank = label => priority.includes(label) ? priority.indexOf(label) : 99;
+  const selected = candidates
+    .sort((a, b) => rank(a.label) - rank(b.label))
+    .filter((item, index, arr) => priority.includes(item.label) || index < 4)
+    .slice(0, 4)
+    .map(item => ({ ...item, value: formatters[item.label] ? formatters[item.label](item.value) : fmtNumber(item.value) }));
+  return selected.length ? selected : [{ label: 'Metrics', value: 'Add data', lift: null, liftLabel: '' }];
 }
 
 function liftHTML(s) {
@@ -798,30 +849,36 @@ function liftHTML(s) {
 }
 
 function buildResultsTableHTML(d, c, showBaseline) {
-  const rows = d.type === 'ecommerce'
-    ? [
-        ['Spend', fmtCurrency(c.spend, d.currency), fmtCurrency(Number(d.baseSpend), d.currency), null],
-        !d.hideRevenue && ['Revenue', fmtCurrency(c.revenue, d.currency), fmtCurrency(Number(d.baseRevenue), d.currency), c.revenueLift],
-        !d.hideRevenue && ['ROAS', fmtROAS(c.roas), fmtROAS(c.baseROAS), c.roasLift],
-        ['Conversions', fmtNumber(c.conversions), fmtNumber(Number(d.baseConversions)), c.conversionsLift],
-        ['CPA', fmtCurrency(c.cpa, d.currency), fmtCurrency(c.baseCPA, d.currency), c.cpaLift, true],
-        ['CTR', fmtPct(c.ctr, 2), fmtPct(c.baseCTR, 2), c.ctrLift],
-      ].filter(Boolean)
-    : [
-        ['Spend', fmtCurrency(c.spend, d.currency), fmtCurrency(Number(d.baseSpend), d.currency), null],
-        ['Leads', fmtNumber(c.leads), fmtNumber(Number(d.baseLeads)), c.leadsLift],
-        ['CPL', fmtCurrency(c.cpl, d.currency), fmtCurrency(c.baseCPL, d.currency), c.cplLift, true],
-        ['Closed deals', fmtNumber(c.closedDeals), fmtNumber(Number(d.baseClosedDeals)), c.dealsLift],
-        ['CAC', fmtCurrency(c.cac, d.currency), fmtCurrency(c.baseCAC, d.currency), c.cacLift, true],
-        !d.hideRevenue && ['Pipeline', fmtCurrency(c.pipelineRevenue, d.currency), '—', null],
-      ].filter(Boolean);
+  const makeRow = (label, current, formatter, baseline, change, inverted) => {
+    if (!hasMetric(current)) return null;
+    return [label, formatter(current), hasMetric(baseline) ? formatter(baseline) : '—', change, inverted, hasMetric(baseline)];
+  };
+  const rows = [
+    makeRow('Spend', c.spend, v => fmtCurrency(v, d.currency), c.baseSpend, null),
+    makeRow('Leads', c.leads, v => fmtNumber(v), c.baseLeads, c.leadsLift),
+    makeRow('CPL', c.cpl, v => fmtCurrency(v, d.currency), c.baseCPL, c.cplLift, true),
+    makeRow('Revenue', c.revenue, v => fmtCurrency(v, d.currency), c.baseRevenue, c.revenueLift),
+    makeRow('ROAS', c.roas, v => fmtROAS(v), c.baseROAS, c.roasLift),
+    makeRow('Conversions', c.conversions, v => fmtNumber(v), c.baseConversions, c.conversionsLift),
+    makeRow('CPA', c.cpa, v => fmtCurrency(v, d.currency), c.baseCPA, c.cpaLift, true),
+    makeRow('CTR', c.ctr, v => fmtPct(v, 2), c.baseCTR, c.ctrLift),
+    makeRow('Impressions', c.impressions, v => fmtNumber(v), c.baseImpressions, null),
+    makeRow('CPM', c.cpm, v => fmtCurrency(v, d.currency), null, null),
+    makeRow('Closed deals', c.closedDeals, v => fmtNumber(v), c.baseClosedDeals, c.dealsLift),
+    makeRow('CAC', c.cac, v => fmtCurrency(v, d.currency), c.baseCAC, c.cacLift, true),
+    !d.hideRevenue && makeRow('Pipeline', c.pipelineRevenue, v => fmtCurrency(v, d.currency), null, null),
+  ].filter(Boolean).filter(row => !d.hideRevenue || !['Revenue', 'ROAS', 'Pipeline'].includes(row[0]));
+
+  const hasAnyBaseline = rows.some(row => row[5]);
+  const showBaselineColumn = showBaseline && !d.noBaseline && hasAnyBaseline;
+  const showChangeColumn = !d.noBaseline && rows.some(row => row[3] !== null && row[3] !== undefined && !isNaN(row[3]));
 
   return `<table class="results-table">
     <thead><tr class="muted">
       <th>Metric</th>
-      ${showBaseline && !d.noBaseline ? '<th class="num">Baseline</th>' : ''}
+      ${showBaselineColumn ? '<th class="num">Baseline</th>' : ''}
       <th class="num">Achieved</th>
-      ${!d.noBaseline ? '<th class="num">Change</th>' : ''}
+      ${showChangeColumn ? '<th class="num">Change</th>' : ''}
     </tr></thead>
     <tbody class="border-c">
     ${rows.map(([label, val, base, lf, inverted]) => {
@@ -835,9 +892,9 @@ function buildResultsTableHTML(d, c, showBaseline) {
       }
       return `<tr>
         <td style="font-weight: 500;">${label}</td>
-        ${showBaseline && !d.noBaseline ? `<td class="num muted">${base}</td>` : ''}
+        ${showBaselineColumn ? `<td class="num muted">${base}</td>` : ''}
         <td class="num" style="font-weight: 600;">${val}</td>
-        ${!d.noBaseline ? `<td class="num" ${chClass} style="font-weight:600;${chClass.replace('style="','').replace('"','')}">${chText}</td>` : ''}
+        ${showChangeColumn ? `<td class="num" ${chClass} style="font-weight:600;${chClass.replace('style="','').replace('"','')}">${chText}</td>` : ''}
       </tr>`;
     }).join('')}
     </tbody>
@@ -891,15 +948,16 @@ function comparisonBarsHTML(d, c) {
   if (d.noBaseline) return '<p style="font-size:11px; color:#5A6B82;">Built from scratch — no baseline to compare against.</p>';
   const items = d.type === 'ecommerce'
     ? [
-        !d.hideRevenue && { label: 'Revenue', baseline: Number(d.baseRevenue), current: c.revenue, fmt: v => fmtCurrency(v, d.currency) },
-        !d.hideRevenue && { label: 'ROAS', baseline: c.baseROAS, current: c.roas, fmt: v => fmtROAS(v) },
-        { label: 'Conversions', baseline: Number(d.baseConversions), current: c.conversions, fmt: v => fmtNumber(v) },
+        !d.hideRevenue && hasMetric(c.revenue) && hasMetric(c.baseRevenue) && { label: 'Revenue', baseline: c.baseRevenue, current: c.revenue, fmt: v => fmtCurrency(v, d.currency) },
+        !d.hideRevenue && hasMetric(c.roas) && hasMetric(c.baseROAS) && { label: 'ROAS', baseline: c.baseROAS, current: c.roas, fmt: v => fmtROAS(v) },
+        hasMetric(c.conversions) && hasMetric(c.baseConversions) && { label: 'Conversions', baseline: c.baseConversions, current: c.conversions, fmt: v => fmtNumber(v) },
       ].filter(Boolean)
     : [
-        { label: 'Leads', baseline: Number(d.baseLeads), current: c.leads, fmt: v => fmtNumber(v) },
-        { label: 'Closed deals', baseline: Number(d.baseClosedDeals), current: c.closedDeals, fmt: v => fmtNumber(v) },
-        !d.hideRevenue && { label: 'Pipeline', baseline: 0, current: c.pipelineRevenue, fmt: v => fmtCurrency(v, d.currency) },
+        hasMetric(c.leads) && hasMetric(c.baseLeads) && { label: 'Leads', baseline: c.baseLeads, current: c.leads, fmt: v => fmtNumber(v) },
+        hasMetric(c.closedDeals) && hasMetric(c.baseClosedDeals) && { label: 'Closed deals', baseline: c.baseClosedDeals, current: c.closedDeals, fmt: v => fmtNumber(v) },
+        !d.hideRevenue && hasMetric(c.pipelineRevenue) && { label: 'Pipeline', baseline: 0, current: c.pipelineRevenue, fmt: v => fmtCurrency(v, d.currency) },
       ].filter(Boolean);
+  if (!items.length) return '<p style="font-size:11px; color:#5A6B82;">No baseline metrics available for comparison. This story is shown through achieved results only.</p>';
   return `<div style="display:flex; flex-direction:column; gap:10px;">${
     items.map(item => {
       const max = Math.max(item.baseline, item.current, 1);
@@ -933,38 +991,30 @@ function comparisonBarsHTML(d, c) {
 function mainMetricLine() {
   const c = calc();
   const d = state;
-  if (d.type === 'ecommerce') {
-    if (!d.hideRevenue && c.roas) return `${fmtROAS(c.roas)} ROAS`;
-    if (c.cpa) return `${fmtCurrency(c.cpa, d.currency)} CPA`;
-    return `${fmtNumber(c.conversions)} conversions`;
-  }
-  if (c.cac) return `${fmtCurrency(c.cac, d.currency)} CAC`;
-  if (c.cpl) return `${fmtCurrency(c.cpl, d.currency)} CPL`;
-  return `${fmtNumber(c.leads)} qualified leads`;
+  if (hasMetric(c.leads) && hasMetric(c.cpl)) return `${fmtNumber(c.leads)} leads at ${fmtCurrency(c.cpl, d.currency)} CPL`;
+  if (!d.hideRevenue && hasMetric(c.roas)) return `${fmtROAS(c.roas)} ROAS`;
+  if (hasMetric(c.cpa)) return `${fmtCurrency(c.cpa, d.currency)} CPA`;
+  if (hasMetric(c.cac)) return `${fmtCurrency(c.cac, d.currency)} CAC`;
+  if (hasMetric(c.impressions)) return `${fmtNumber(c.impressions)} impressions`;
+  return 'measurable performance lift';
 }
 
 function buildLinkedInPost() {
   const c = calc();
   const d = state;
   const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
-  const metricLines = d.type === 'ecommerce'
-    ? [
-        !d.hideRevenue && `ROAS: ${fmtROAS(c.roas)}${c.roasLift ? ` (${Math.abs(c.roasLift).toFixed(0)}% lift)` : ''}`,
-        `CPA: ${fmtCurrency(c.cpa, d.currency)}${c.cpaLift ? ` (${Math.abs(c.cpaLift).toFixed(0)}% reduction)` : ''}`,
-        `CTR: ${fmtPct(c.ctr, 2)}`,
-        `Conversions: ${fmtNumber(c.conversions)}${c.conversionsLift ? ` (${Math.abs(c.conversionsLift).toFixed(0)}% lift)` : ''}`,
-      ].filter(Boolean)
-    : [
-        `Qualified leads: ${fmtNumber(c.leads)}${c.leadsLift ? ` (${Math.abs(c.leadsLift).toFixed(0)}% lift)` : ''}`,
-        `CAC: ${fmtCurrency(c.cac, d.currency)}${c.cacLift ? ` (${Math.abs(c.cacLift).toFixed(0)}% reduction)` : ''}`,
-        `Lead to SQL: ${fmtPct(c.leadToSQL, 1)}`,
-        !d.hideRevenue && `Pipeline value: ${fmtCurrency(c.pipelineRevenue, d.currency)}`,
-      ].filter(Boolean);
+  const heroMetrics = buildHeroStats(c, d);
+  const metricLines = heroMetrics.map(item => {
+    const liftText = item.lift !== null && item.lift !== undefined && !isNaN(item.lift)
+      ? ` (${Math.abs(item.lift).toFixed(0)}% ${item.liftLabel || 'change'})`
+      : '';
+    return `${item.label}: ${item.value}${liftText}`;
+  });
 
   return [
     `${d.headline}`,
     '',
-    `For ${d.descriptor.toLowerCase()}, the goal was bigger than better ads. It was to make the brand feel closer to the people it wanted to reach.`,
+    `For ${d.descriptor.toLowerCase()}, the story was ${mainMetricLine()} — not every metric under the sun.`,
     '',
     'What shifted:',
     ...strategyLines.map(line => `• ${line}`),
@@ -1252,6 +1302,7 @@ function bindAllInputs() {
       state.type = btn.dataset.type;
       renderPerfFields();
       renderBaselineFields();
+      refreshSmartCopy();
       renderComputed();
     });
   });
@@ -1259,17 +1310,17 @@ function bindAllInputs() {
   document.getElementById('f-style').addEventListener('change', e => { state.style = e.target.value; });
   document.getElementById('f-currency').addEventListener('change', e => {
     state.currency = e.target.value;
-    renderPerfFields(); renderBaselineFields(); renderComputed();
+    renderPerfFields(); renderBaselineFields(); refreshSmartCopy(); renderComputed();
   });
   // Privacy switches
   document.getElementById('t-hideName').addEventListener('change', e => { state.hideName = e.target.checked; });
   document.getElementById('t-hideRevenue').addEventListener('change', e => {
     state.hideRevenue = e.target.checked;
-    renderPerfFields(); renderBaselineFields(); renderComputed();
+    renderPerfFields(); renderBaselineFields(); refreshSmartCopy(); renderComputed();
   });
   document.getElementById('t-noBaseline').addEventListener('change', e => {
     state.noBaseline = e.target.checked;
-    renderBaselineFields(); renderComputed();
+    renderBaselineFields(); refreshSmartCopy(); renderComputed();
   });
   // Endorsement tabs
   document.querySelectorAll('.ai-tab').forEach(btn => {
@@ -1288,19 +1339,26 @@ function bindAllInputs() {
   ];
   textFields.forEach(k => {
     const el = document.getElementById('f-' + k);
-    if (el) el.addEventListener('input', e => { state[k] = e.target.value; renderLinkedInPostPreview(); });
+    if (el) el.addEventListener('input', e => {
+      state[k] = e.target.value;
+      if (k === 'headline') headlineTouched = true;
+      if (k === 'outcomeCallout') outcomeTouched = true;
+      renderLinkedInPostPreview();
+    });
   });
 
   // AI drafters
   document.getElementById('ai-headline').addEventListener('click', () => {
     const h = draftHeadline();
     state.headline = h;
+    headlineTouched = false;
     document.getElementById('f-headline').value = h;
     renderLinkedInPostPreview();
   });
   document.getElementById('ai-outcome').addEventListener('click', () => {
     const o = draftOutcomeCallout();
     state.outcomeCallout = o;
+    outcomeTouched = false;
     document.getElementById('f-outcomeCallout').value = o;
     renderLinkedInPostPreview();
   });
