@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Client Case Study Generator</title>
+  <style>
+    :root {
+      --navy: #07182d;
+      --navy-2: #0b2343;
+      --blue: #2f6df2;
+      --green: #34c85a;
+      --orange: #f09a2c;
+      --teal: #16a9c7;
+      --violet: #6653db;
+      --ink: #11223b;
+      --muted: #657184;
+      --line: #dce4ee;
+      --paper: #f4f7fb;
+      --white: #ffffff;
+      --shadow: 0 24px 70px rgba(9, 27, 51, .16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(135deg, #eef3f8 0%, #f9fbfd 52%, #edf6f8 100%);
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: minmax(320px, 440px) minmax(520px, 1fr);
+      gap: 24px;
+      width: min(1500px, calc(100% - 32px));
+      margin: 24px auto;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid rgba(204, 215, 228, .9);
+      border-radius: 8px;
+      box-shadow: 0 18px 48px rgba(20, 37, 59, .12);
+      overflow: hidden;
+    }
+
+    .form-panel {
+      position: sticky;
+      top: 18px;
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+    }
+
+    .panel-header {
+      padding: 18px 20px;
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    .panel-header h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+      letter-spacing: .02em;
+    }
+
+    .panel-header p {
+      margin: 8px 0 0;
+      color: #bdd0e8;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .field-group {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .field-group h2 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #18345a;
+    }
+
+    .help-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #34445d;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #cbd7e5;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 10px 11px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+      line-height: 1.35;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(47, 109, 242, .13);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 18px 20px 20px;
+      background: #f7f9fc;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 6px;
+      padding: 11px 12px;
+      color: #fff;
+      background: var(--blue);
+      cursor: pointer;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .btn.secondary {
+      background: var(--navy-2);
+    }
+
+    .btn.light {
+      color: var(--navy);
+      background: #dce8fb;
+    }
+
+    .btn:hover {
+      filter: brightness(.96);
+    }
+
+    .preview-wrap {
+      padding: 16px;
+      background: #d7e2ee;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .case-study {
+      width: min(100%, 820px);
+      margin: 0 auto;
+      background: var(--white);
+      overflow: hidden;
+      box-shadow: 0 20px 55px rgba(0, 18, 45, .22);
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      min-height: 410px;
+      padding: 24px 28px 30px;
+      color: #fff;
+      background:
+        radial-gradient(circle at 72% 36%, rgba(37, 108, 255, .34), transparent 30%),
+        linear-gradient(135deg, #08182c 0%, #071629 55%, #031020 100%);
+      overflow: hidden;
+    }
+
+    .hero:before {
+      content: "";
+      position: absolute;
+      right: 20px;
+      bottom: 54px;
+      width: 390px;
+      height: 210px;
+      background: repeating-linear-gradient(90deg, transparent 0 18px, rgba(43, 108, 209, .23) 18px 35px);
+      clip-path: polygon(0 80%, 100% 0, 100% 100%, 0 100%);
+      opacity: .58;
+    }
+
+    .hero-copy,
+    .hero-chart {
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 8px 16px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #1d5fe7, #2c72ff);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+
+    .hero h2 {
+      margin: 22px 0 0;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: clamp(44px, 6.4vw, 72px);
+      line-height: .94;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      max-width: 430px;
+      text-wrap: balance;
+    }
+
+    .hero h2 span {
+      color: var(--green);
+    }
+
+    .accent-line {
+      width: 74px;
+      height: 4px;
+      margin: 24px 0 20px;
+      background: #4f91ff;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 360px;
+      color: #d6e1ef;
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    .hero-chart {
+      display: grid;
+      align-content: end;
+      min-height: 330px;
+      padding-top: 42px;
+    }
+
+    .chart-stage {
+      position: relative;
+      height: 286px;
+    }
+
+    .platform {
+      position: absolute;
+      left: 22px;
+      right: 0;
+      bottom: 20px;
+      height: 54px;
+      background: linear-gradient(135deg, #173969, #0d274e);
+      clip-path: polygon(10% 0, 86% 0, 100% 45%, 4% 45%);
+      opacity: .95;
+    }
+
+    .cylinder {
+      position: absolute;
+      bottom: 64px;
+      width: 104px;
+      border-radius: 52px / 17px;
+      box-shadow: inset -22px 0 28px rgba(0, 0, 0, .16), inset 18px 0 22px rgba(255, 255, 255, .17);
+    }
+
+    .cylinder:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -16px;
+      height: 34px;
+      border-radius: 52px / 17px;
+      background: rgba(255, 255, 255, .18);
+    }
+
+    .before-bar {
+      left: 92px;
+      height: var(--before-height, 220px);
+      background: linear-gradient(90deg, #2569df, #4a8cff);
+    }
+
+    .after-bar {
+      left: 255px;
+      height: var(--after-height, 118px);
+      background: linear-gradient(90deg, #2ab84d, #69e36f);
+    }
+
+    .metric-label {
+      position: absolute;
+      min-width: 98px;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 1.15;
+      text-shadow: 0 3px 12px rgba(0, 0, 0, .34);
+    }
+
+    .metric-label small {
+      display: block;
+      font-size: 11px;
+      color: #d7e4f4;
+    }
+
+    .metric-label b {
+      display: block;
+      margin-top: 3px;
+      font-size: 22px;
+      color: #5d91ff;
+    }
+
+    .metric-label.after b {
+      color: #5be16e;
+    }
+
+    .metric-label.before {
+      left: 95px;
+      top: 8px;
+    }
+
+    .metric-label.after {
+      left: 238px;
+      top: 132px;
+    }
+
+    .reduction-badge {
+      position: absolute;
+      right: 6px;
+      top: 0;
+      display: grid;
+      place-items: center;
+      width: 108px;
+      min-height: 118px;
+      padding: 12px;
+      color: #fff;
+      text-align: center;
+      background: linear-gradient(145deg, #37b94b, #1f933b);
+      border-radius: 15px 15px 28px 28px;
+      box-shadow: 0 12px 30px rgba(25, 176, 70, .3);
+      clip-path: polygon(0 0, 100% 0, 100% 74%, 50% 100%, 0 74%);
+    }
+
+    .reduction-badge b {
+      display: block;
+      font-size: 39px;
+      line-height: .95;
+    }
+
+    .reduction-badge span {
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .arrow-line {
+      position: absolute;
+      left: 185px;
+      top: 50px;
+      width: 118px;
+      height: 78px;
+      border-top: 4px dotted rgba(255, 255, 255, .85);
+      border-radius: 50%;
+      transform: rotate(18deg);
+    }
+
+    .strategy {
+      padding: 22px 24px 14px;
+      background: #fff;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      color: #102541;
+      text-align: center;
+      font-size: 28px;
+      line-height: 1.1;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+    }
+
+    .strategy-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    .strategy-card {
+      padding: 6px 18px 8px;
+      border-right: 1px solid #d7dfeb;
+    }
+
+    .strategy-card:last-child {
+      border-right: 0;
+    }
+
+    .icon-disc {
+      display: grid;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      color: #fff;
+      font-weight: 900;
+      font-size: 18px;
+      box-shadow: inset 0 -10px 20px rgba(0, 0, 0, .12);
+    }
+
+    .blue { background: linear-gradient(135deg, #1f62e2, #4585ff); }
+    .green { background: linear-gradient(135deg, #27a94b, #55d768); }
+    .violet { background: linear-gradient(135deg, #5146c9, #7b66e8); }
+    .orange { background: linear-gradient(135deg, #e58920, #f6aa38); }
+    .teal { background: linear-gradient(135deg, #079eb4, #27c1dc); }
+
+    .strategy-card h3 {
+      margin: 0 0 12px;
+      color: #102541;
+      font-size: 15px;
+      line-height: 1.12;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .strategy-card ul {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 13px;
+      line-height: 1.42;
+    }
+
+    .strategy-card li {
+      margin-bottom: 7px;
+    }
+
+    .results {
+      margin: 0 8px 12px;
+      padding: 18px 16px 16px;
+      background: #eff7ff;
+      border-radius: 8px;
+    }
+
+    .results .section-title {
+      font-size: 23px;
+      margin-bottom: 18px;
+    }
+
+    .results .section-title span {
+      color: #255ec9;
+      font-size: 14px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    .result-card {
+      min-height: 122px;
+      padding: 0 13px;
+      text-align: center;
+      border-right: 1px solid #cbd8e8;
+    }
+
+    .result-card:last-child {
+      border-right: 0;
+    }
+
+    .result-card .icon-disc {
+      width: 58px;
+      height: 58px;
+      margin-bottom: 10px;
+      font-size: 17px;
+    }
+
+    .result-card h3 {
+      margin: 0;
+      color: #102541;
+      font-size: 13px;
+      line-height: 1.12;
+      text-transform: uppercase;
+    }
+
+    .result-card strong {
+      display: block;
+      margin-top: 3px;
+      color: #23b84f;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .takeaway {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr) 178px;
+      gap: 18px;
+      align-items: center;
+      margin: 0 8px 8px;
+      padding: 16px 22px;
+      color: #fff;
+      background: #06182d;
+      border-radius: 8px;
+    }
+
+    .target {
+      display: grid;
+      place-items: center;
+      width: 66px;
+      height: 66px;
+      border: 7px solid #4388ff;
+      border-radius: 50%;
+      color: #fff;
+      font-weight: 900;
+      font-size: 24px;
+      box-shadow: inset 0 0 0 7px #0b2c54;
+    }
+
+    .takeaway h3 {
+      margin: 0 0 5px;
+      color: #4c86ff;
+      font-size: 15px;
+      text-transform: uppercase;
+    }
+
+    .takeaway p {
+      margin: 0;
+      color: #dbe8f8;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .timeframe {
+      min-height: 78px;
+      padding-left: 20px;
+      border-left: 1px solid rgba(255, 255, 255, .34);
+      display: grid;
+      align-content: center;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .timeframe span {
+      color: #4c86ff;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .timeframe b {
+      color: #fff;
+      font-size: 30px;
+      line-height: 1.1;
+    }
+
+    @media (max-width: 1100px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .form-panel {
+        position: static;
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app-shell {
+        width: 100%;
+        margin: 0;
+      }
+
+      .preview-wrap,
+      .panel {
+        border-radius: 0;
+      }
+
+      .grid-2,
+      .hero,
+      .strategy-grid,
+      .result-grid,
+      .takeaway {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        gap: 16px;
+        padding: 22px 18px;
+      }
+
+      .hero h2 {
+        font-size: 43px;
+      }
+
+      .hero-chart {
+        min-height: 280px;
+        padding-top: 0;
+      }
+
+      .chart-stage {
+        transform: scale(.88);
+        transform-origin: left bottom;
+      }
+
+      .strategy-card,
+      .result-card {
+        border-right: 0;
+        border-bottom: 1px solid #d7dfeb;
+      }
+
+      .takeaway {
+        text-align: center;
+      }
+
+      .target {
+        margin: 0 auto;
+      }
+
+      .timeframe {
+        padding-left: 0;
+        border-left: 0;
+        border-top: 1px solid rgba(255, 255, 255, .34);
+        padding-top: 14px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .form-panel,
+      .no-print {
+        display: none !important;
+      }
+
+      .app-shell,
+      .preview-wrap {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        box-shadow: none;
+      }
+
+      .case-study {
+        width: 100%;
+        box-shadow: none;
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="panel form-panel">
+      <div class="panel-header">
+        <h1>Client Case Study Generator</h1>
+        <p>Enter the client numbers once, then download a case-study document for sharing.</p>
+      </div>
+
+      <section class="field-group">
+        <h2>Numbers to collect</h2>
+        <ul class="help-list">
+          <li>Before CPA and after CPA, plus the number of days measured.</li>
+          <li>Before and after conversion rate.</li>
+          <li>Before and after ROAS.</li>
+          <li>Before and after cost per qualified lead.</li>
+          <li>Qualified leads before and after.</li>
+          <li>Optional: spend, impressions, CTR, landing-page conversion rate, and ad relevance score.</li>
+        </ul>
+      </section>
+
+      <section class="field-group">
+        <h2>Client details</h2>
+        <div class="grid-2">
+          <label>Client name
+            <input data-field="clientName" value="Client Name">
+          </label>
+          <label>Campaign type
+            <input data-field="campaignType" value="Lead Generation">
+          </label>
+          <label>Currency
+            <select data-field="currency">
+              <option value="$">$</option>
+              <option value="SAR">SAR</option>
+              <option value="AED">AED</option>
+              <option value="QAR">QAR</option>
+              <option value="KWD">KWD</option>
+              <option value="BHD">BHD</option>
+              <option value="OMR">OMR</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </label>
+          <label>Timeframe days
+            <input type="number" min="1" data-field="days" value="7">
+          </label>
+        </div>
+      </section>
+
+      <section class="field-group">
+        <h2>Core performance</h2>
+        <div class="grid-2">
+          <label>Before CPA
+            <input type="number" min="0" step="0.01" data-field="beforeCpa" value="50">
+          </label>
+          <label>After CPA
+            <input type="number" min="0" step="0.01" data-field="afterCpa" value="30">
+          </label>
+          <label>Before conversion rate %
+            <input type="number" min="0" step="0.01" data-field="beforeConversion" value="2.4">
+          </label>
+          <label>After conversion rate %
+            <input type="number" min="0" step="0.01" data-field="afterConversion" value="3.8">
+          </label>
+          <label>Before ROAS
+            <input type="number" min="0" step="0.01" data-field="beforeRoas" value="2.1">
+          </label>
+          <label>After ROAS
+            <input type="number" min="0" step="0.01" data-field="afterRoas" value="3.4">
+          </label>
+          <label>Before qualified leads
+            <input type="number" min="0" step="1" data-field="beforeLeads" value="82">
+          </label>
+          <label>After qualified leads
+            <input type="number" min="0" step="1" data-field="afterLeads" value="131">
+          </label>
+          <label>Before cost per qualified lead
+            <input type="number" min="0" step="0.01" data-field="beforeCpl" value="74">
+          </label>
+          <label>After cost per qualified lead
+            <input type="number" min="0" step="0.01" data-field="afterCpl" value="46">
+          </label>
+        </div>
+      </section>
+
+      <section class="field-group">
+        <h2>Optional support metrics</h2>
+        <div class="grid-2">
+          <label>Ad spend
+            <input type="number" min="0" step="0.01" data-field="adSpend" value="4200">
+          </label>
+          <label>CTR %
+            <input type="number" min="0" step="0.01" data-field="ctr" value="2.9">
+          </label>
+          <label>Landing page CVR %
+            <input type="number" min="0" step="0.01" data-field="landingCvr" value="18">
+          </label>
+          <label>Ad relevance score
+            <input type="number" min="0" step="0.1" data-field="relevanceScore" value="8.6">
+          </label>
+        </div>
+      </section>
+
+      <section class="field-group">
+        <h2>Copy</h2>
+        <label>Short intro
+          <textarea data-field="intro">A data-driven strategy, creative testing, and smart optimization helped us deliver exceptional results in just one week.</textarea>
+        </label>
+        <br>
+        <label>Key takeaway
+          <textarea data-field="takeaway">Lowering CPA is not about spending more money. It is about making smarter marketing decisions. With the right targeting, creative strategy, and optimization process, businesses can scale profitably and achieve sustainable growth.</textarea>
+        </label>
+      </section>
+
+      <section class="field-group">
+        <h2>Strategy bullets</h2>
+        <label>Audience optimization
+          <textarea data-field="strategyAudience">Removed low-performing audience segments
+Focused on high-intent users
+Created lookalike audiences based on past converters
+Retargeted website visitors and engaged users</textarea>
+        </label>
+        <br>
+        <label>Creative testing
+          <textarea data-field="strategyCreative">Launched multiple ad creatives
+Tested different hooks, headlines, CTA styles, and visual formats
+Identified top-performing ads with highest engagement and lowest CPA</textarea>
+        </label>
+        <br>
+        <label>Landing page improvements
+          <textarea data-field="strategyLanding">Improved loading speed
+Simplified call-to-action
+Added social proof and testimonials
+Created a mobile-friendly experience</textarea>
+        </label>
+        <br>
+        <label>Budget reallocation
+          <textarea data-field="strategyBudget">Shifted budget toward high-performing ads
+Paused underperforming campaigns
+Optimized placements based on conversion data</textarea>
+        </label>
+      </section>
+
+      <div class="actions">
+        <button class="btn" id="downloadDoc" type="button">Download Word</button>
+        <button class="btn secondary" id="downloadHtml" type="button">Download HTML</button>
+        <button class="btn light" id="printPdf" type="button">Print PDF</button>
+        <button class="btn light" id="resetDemo" type="button">Reset Demo</button>
+      </div>
+    </aside>
+
+    <section class="preview-wrap">
+      <article class="case-study" id="caseStudy">
+        <section class="hero">
+          <div class="hero-copy">
+            <div class="badge">Case Study</div>
+            <h2>How we reduced CPA by <span data-out="reduction">40%</span> in <span data-out="daysText">7 days</span></h2>
+            <div class="accent-line"></div>
+            <p data-out="intro">A data-driven strategy, creative testing, and smart optimization helped us deliver exceptional results in just one week.</p>
+          </div>
+          <div class="hero-chart">
+            <div class="chart-stage" id="chartStage">
+              <div class="reduction-badge"><span><b data-out="reductionBadge">40%</b>Reduction</span></div>
+              <div class="arrow-line"></div>
+              <div class="metric-label before"><small>Before</small><b data-out="beforeCpa">$50.00</b><small>CPA</small></div>
+              <div class="metric-label after"><small>After <span data-out="daysShort">7</span> days</small><b data-out="afterCpa">$30.00</b><small>CPA</small></div>
+              <div class="platform"></div>
+              <div class="cylinder before-bar"></div>
+              <div class="cylinder after-bar"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="strategy">
+          <h2 class="section-title">Our Strategy</h2>
+          <div class="strategy-grid">
+            <div class="strategy-card">
+              <div class="icon-disc blue">01</div>
+              <h3>1. Audience Optimization</h3>
+              <ul data-list="strategyAudience"></ul>
+            </div>
+            <div class="strategy-card">
+              <div class="icon-disc green">02</div>
+              <h3>2. Creative Testing</h3>
+              <ul data-list="strategyCreative"></ul>
+            </div>
+            <div class="strategy-card">
+              <div class="icon-disc violet">03</div>
+              <h3>3. Landing Page Improvements</h3>
+              <ul data-list="strategyLanding"></ul>
+            </div>
+            <div class="strategy-card">
+              <div class="icon-disc orange">04</div>
+              <h3>4. Budget Reallocation</h3>
+              <ul data-list="strategyBudget"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="results">
+          <h2 class="section-title">The Results <span>(within <span data-out="daysLower">7 days</span>)</span></h2>
+          <div class="result-grid">
+            <div class="result-card">
+              <div class="icon-disc green">CPA</div>
+              <h3>CPA reduced by<strong data-out="resultReduction">40%</strong></h3>
+            </div>
+            <div class="result-card">
+              <div class="icon-disc blue">CVR</div>
+              <h3>Higher conversion rate<strong data-out="conversionLift">58%</strong></h3>
+            </div>
+            <div class="result-card">
+              <div class="icon-disc violet">ADS</div>
+              <h3>Better ad relevance score<strong data-out="relevanceScore">8.6</strong></h3>
+            </div>
+            <div class="result-card">
+              <div class="icon-disc orange">ROAS</div>
+              <h3>Increased ROAS<strong data-out="roasLift">62%</strong></h3>
+            </div>
+            <div class="result-card">
+              <div class="icon-disc teal">LEADS</div>
+              <h3>More qualified leads at lower cost<strong data-out="leadSummary">60%</strong></h3>
+            </div>
+          </div>
+        </section>
+
+        <section class="takeaway">
+          <div class="target">OK</div>
+          <div>
+            <h3>Key Takeaway</h3>
+            <p data-out="takeaway">Lowering CPA is not about spending more money. It is about making smarter marketing decisions. With the right targeting, creative strategy, and optimization process, businesses can scale profitably and achieve sustainable growth.</p>
+          </div>
+          <div class="timeframe">
+            <span>Timeframe</span>
+            <b data-out="timeframe">7 days</b>
+          </div>
+        </section>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const defaults = {};
+    const fields = Array.from(document.querySelectorAll("[data-field]"));
+
+    fields.forEach((field) => {
+      defaults[field.dataset.field] = field.value;
+      field.addEventListener("input", render);
+      field.addEventListener("change", render);
+    });
+
+    document.getElementById("downloadDoc").addEventListener("click", () => downloadCaseStudy("doc"));
+    document.getElementById("downloadHtml").addEventListener("click", () => downloadCaseStudy("html"));
+    document.getElementById("printPdf").addEventListener("click", () => window.print());
+    document.getElementById("resetDemo").addEventListener("click", () => {
+      fields.forEach((field) => {
+        field.value = defaults[field.dataset.field];
+      });
+      render();
+    });
+
+    function getData() {
+      return fields.reduce((data, field) => {
+        data[field.dataset.field] = field.value;
+        return data;
+      }, {});
+    }
+
+    function num(value) {
+      const clean = Number.parseFloat(value);
+      return Number.isFinite(clean) ? clean : 0;
+    }
+
+    function pctChange(before, after, inverted = false) {
+      if (!before) return 0;
+      const raw = inverted ? ((before - after) / before) * 100 : ((after - before) / before) * 100;
+      return Math.round(raw);
+    }
+
+    function money(value, currency) {
+      const amount = num(value).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+      return currency === "$" ? `$${amount}` : `${amount} ${currency}`;
+    }
+
+    function setText(key, value) {
+      document.querySelectorAll(`[data-out="${key}"]`).forEach((node) => {
+        node.textContent = value;
+      });
+    }
+
+    function setList(key, value) {
+      const lines = value.split("\n").map((line) => line.trim()).filter(Boolean);
+      document.querySelectorAll(`[data-list="${key}"]`).forEach((list) => {
+        list.innerHTML = "";
+        lines.forEach((line) => {
+          const item = document.createElement("li");
+          item.textContent = line;
+          list.appendChild(item);
+        });
+      });
+    }
+
+    function render() {
+      const data = getData();
+      const reduction = Math.max(0, pctChange(num(data.beforeCpa), num(data.afterCpa), true));
+      const conversionLift = pctChange(num(data.beforeConversion), num(data.afterConversion));
+      const roasLift = pctChange(num(data.beforeRoas), num(data.afterRoas));
+      const leadLift = pctChange(num(data.beforeLeads), num(data.afterLeads));
+      const cplReduction = Math.max(0, pctChange(num(data.beforeCpl), num(data.afterCpl), true));
+      const days = Math.max(1, Math.round(num(data.days) || 1));
+      const beforeCpa = num(data.beforeCpa);
+      const afterCpa = num(data.afterCpa);
+      const ratio = beforeCpa ? Math.max(.25, Math.min(1, afterCpa / beforeCpa)) : .6;
+      const beforeHeight = 210;
+      const afterHeight = Math.round(beforeHeight * ratio);
+
+      setText("reduction", `${reduction}%`);
+      setText("reductionBadge", `${reduction}%`);
+      setText("resultReduction", `${reduction}%`);
+      setText("daysText", `${days} days`);
+      setText("daysShort", days);
+      setText("daysLower", `${days} days`);
+      setText("timeframe", `${days} days`);
+      setText("beforeCpa", money(data.beforeCpa, data.currency));
+      setText("afterCpa", money(data.afterCpa, data.currency));
+      setText("intro", data.intro);
+      setText("takeaway", data.takeaway);
+      setText("conversionLift", `${Math.max(0, conversionLift)}%`);
+      setText("roasLift", `${Math.max(0, roasLift)}%`);
+      setText("relevanceScore", num(data.relevanceScore).toFixed(1));
+      setText("leadSummary", `${Math.max(leadLift, cplReduction)}%`);
+
+      document.getElementById("chartStage").style.setProperty("--before-height", `${beforeHeight}px`);
+      document.getElementById("chartStage").style.setProperty("--after-height", `${afterHeight}px`);
+
+      setList("strategyAudience", data.strategyAudience);
+      setList("strategyCreative", data.strategyCreative);
+      setList("strategyLanding", data.strategyLanding);
+      setList("strategyBudget", data.strategyBudget);
+    }
+
+    function filename(extension) {
+      const data = getData();
+      const client = (data.clientName || "client").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      return `${client || "client"}-case-study.${extension}`;
+    }
+
+    function downloadCaseStudy(type) {
+      const caseStudy = document.getElementById("caseStudy").cloneNode(true);
+      const styles = Array.from(document.querySelectorAll("style")).map((style) => style.textContent).join("\n");
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Case Study</title><style>${styles}</style></head><body><main class="preview-wrap">${caseStudy.outerHTML}</main></body></html>`;
+      const blob = new Blob([html], {
+        type: type === "doc" ? "application/msword;charset=utf-8" : "text/html;charset=utf-8"
+      });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename(type === "doc" ? "doc" : "html");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(link.href);
+    }
+
+    render();
+  </script>
+</body>
+</html>
