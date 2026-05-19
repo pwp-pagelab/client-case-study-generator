@@ -104,10 +104,49 @@
       line-height: 1.55;
     }
 
+    .field-note {
+      margin: -4px 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .calc-card {
+      min-height: 74px;
+      padding: 12px;
+      border: 1px solid #d5e0ed;
+      border-radius: 7px;
+      background: #f7fbff;
+    }
+
+    .calc-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .calc-card strong {
+      display: block;
+      margin-top: 7px;
+      color: #102541;
+      font-size: 20px;
+      line-height: 1.1;
     }
 
     label {
@@ -141,6 +180,12 @@
     select:focus {
       border-color: var(--blue);
       box-shadow: 0 0 0 3px rgba(47, 109, 242, .13);
+    }
+
+    input[readonly] {
+      color: #445268;
+      background: #eef4fb;
+      cursor: default;
     }
 
     .actions {
@@ -606,6 +651,7 @@
       }
 
       .grid-2,
+      .calc-grid,
       .hero,
       .strategy-grid,
       .result-grid,
@@ -697,12 +743,12 @@
       <section class="field-group">
         <h2>Numbers to collect</h2>
         <ul class="help-list">
-          <li>Before CPA and after CPA, plus the number of days measured.</li>
-          <li>Before and after conversion rate.</li>
-          <li>Before and after ROAS.</li>
-          <li>Before and after cost per qualified lead.</li>
-          <li>Qualified leads before and after.</li>
-          <li>Optional: spend, impressions, CTR, landing-page conversion rate, and ad relevance score.</li>
+          <li>Before and after ad spend.</li>
+          <li>Before and after results, conversions, or leads from the ad platform.</li>
+          <li>Before and after conversion value or sales revenue, if ROAS matters.</li>
+          <li>Before and after link clicks and impressions.</li>
+          <li>Before and after qualified leads from CRM or sales review.</li>
+          <li>Optional: ad relevance, quality ranking, or quality score.</li>
         </ul>
       </section>
 
@@ -735,56 +781,93 @@
       </section>
 
       <section class="field-group">
-        <h2>Core performance</h2>
+        <h2>Ad account calculator</h2>
+        <p class="field-note">Enter the raw before/after numbers from Meta, Google, TikTok, LinkedIn, or your CRM. The case study metrics below update automatically.</p>
         <div class="grid-2">
-          <label>Before CPA
-            <input type="number" min="0" step="0.01" data-field="beforeCpa" value="50">
+          <label>Before ad spend
+            <input type="number" min="0" step="0.01" data-field="beforeSpend" value="4100">
           </label>
-          <label>After CPA
-            <input type="number" min="0" step="0.01" data-field="afterCpa" value="30">
+          <label>After ad spend
+            <input type="number" min="0" step="0.01" data-field="afterSpend" value="3930">
           </label>
-          <label>Before conversion rate %
-            <input type="number" min="0" step="0.01" data-field="beforeConversion" value="2.4">
+          <label>Before results / conversions
+            <input type="number" min="0" step="1" data-field="beforeResults" value="82">
           </label>
-          <label>After conversion rate %
-            <input type="number" min="0" step="0.01" data-field="afterConversion" value="3.8">
+          <label>After results / conversions
+            <input type="number" min="0" step="1" data-field="afterResults" value="131">
           </label>
-          <label>Before ROAS
-            <input type="number" min="0" step="0.01" data-field="beforeRoas" value="2.1">
+          <label>Before conversion value / revenue
+            <input type="number" min="0" step="0.01" data-field="beforeRevenue" value="8610">
           </label>
-          <label>After ROAS
-            <input type="number" min="0" step="0.01" data-field="afterRoas" value="3.4">
+          <label>After conversion value / revenue
+            <input type="number" min="0" step="0.01" data-field="afterRevenue" value="13362">
+          </label>
+          <label>Before link clicks
+            <input type="number" min="0" step="1" data-field="beforeClicks" value="3417">
+          </label>
+          <label>After link clicks
+            <input type="number" min="0" step="1" data-field="afterClicks" value="3447">
+          </label>
+          <label>Before impressions
+            <input type="number" min="0" step="1" data-field="beforeImpressions" value="117828">
+          </label>
+          <label>After impressions
+            <input type="number" min="0" step="1" data-field="afterImpressions" value="118862">
           </label>
           <label>Before qualified leads
-            <input type="number" min="0" step="1" data-field="beforeLeads" value="82">
+            <input type="number" min="0" step="1" data-field="beforeQualifiedLeads" value="55">
           </label>
           <label>After qualified leads
-            <input type="number" min="0" step="1" data-field="afterLeads" value="131">
-          </label>
-          <label>Before cost per qualified lead
-            <input type="number" min="0" step="0.01" data-field="beforeCpl" value="74">
-          </label>
-          <label>After cost per qualified lead
-            <input type="number" min="0" step="0.01" data-field="afterCpl" value="46">
+            <input type="number" min="0" step="1" data-field="afterQualifiedLeads" value="85">
           </label>
         </div>
       </section>
 
       <section class="field-group">
-        <h2>Optional support metrics</h2>
+        <h2>Calculated case study metrics</h2>
+        <p class="field-note">These are the numbers that will be added to the case study.</p>
         <div class="grid-2">
-          <label>Ad spend
-            <input type="number" min="0" step="0.01" data-field="adSpend" value="4200">
+          <label>Before CPA
+            <input type="number" min="0" step="0.01" data-field="beforeCpa" value="50" readonly>
+          </label>
+          <label>After CPA
+            <input type="number" min="0" step="0.01" data-field="afterCpa" value="30" readonly>
+          </label>
+          <label>Before conversion rate %
+            <input type="number" min="0" step="0.01" data-field="beforeConversion" value="2.4" readonly>
+          </label>
+          <label>After conversion rate %
+            <input type="number" min="0" step="0.01" data-field="afterConversion" value="3.8" readonly>
+          </label>
+          <label>Before ROAS
+            <input type="number" min="0" step="0.01" data-field="beforeRoas" value="2.1" readonly>
+          </label>
+          <label>After ROAS
+            <input type="number" min="0" step="0.01" data-field="afterRoas" value="3.4" readonly>
+          </label>
+          <label>Before cost per qualified lead
+            <input type="number" min="0" step="0.01" data-field="beforeCpl" value="74.55" readonly>
+          </label>
+          <label>After cost per qualified lead
+            <input type="number" min="0" step="0.01" data-field="afterCpl" value="46.24" readonly>
           </label>
           <label>CTR %
-            <input type="number" min="0" step="0.01" data-field="ctr" value="2.9">
+            <input type="number" min="0" step="0.01" data-field="ctr" value="2.9" readonly>
           </label>
           <label>Landing page CVR %
-            <input type="number" min="0" step="0.01" data-field="landingCvr" value="18">
+            <input type="number" min="0" step="0.01" data-field="landingCvr" value="3.8" readonly>
           </label>
           <label>Ad relevance score
             <input type="number" min="0" step="0.1" data-field="relevanceScore" value="8.6">
           </label>
+        </div>
+        <div class="calc-grid">
+          <div class="calc-card"><span>CPA reduction</span><strong data-out="calcCpaReduction">40%</strong></div>
+          <div class="calc-card"><span>Conversion rate lift</span><strong data-out="calcConversionLift">58%</strong></div>
+          <div class="calc-card"><span>ROAS lift</span><strong data-out="calcRoasLift">62%</strong></div>
+          <div class="calc-card"><span>Qualified lead lift</span><strong data-out="calcLeadLift">55%</strong></div>
+          <div class="calc-card"><span>Cost per qualified lead reduction</span><strong data-out="calcCplReduction">38%</strong></div>
+          <div class="calc-card"><span>CTR</span><strong data-out="calcCtr">2.90%</strong></div>
         </div>
       </section>
 
@@ -963,6 +1046,20 @@ Optimized placements based on conversion data</textarea>
       return Math.round(raw);
     }
 
+    function rate(part, whole) {
+      return whole ? (part / whole) * 100 : 0;
+    }
+
+    function divide(part, whole) {
+      return whole ? part / whole : 0;
+    }
+
+    function setField(key, value, decimals = 2) {
+      const field = document.querySelector(`[data-field="${key}"]`);
+      if (!field) return;
+      field.value = Number.isFinite(value) ? value.toFixed(decimals) : "0.00";
+    }
+
     function money(value, currency) {
       const amount = num(value).toLocaleString("en-US", {
         minimumFractionDigits: 2,
@@ -991,17 +1088,49 @@ Optimized placements based on conversion data</textarea>
 
     function render() {
       const data = getData();
-      const reduction = Math.max(0, pctChange(num(data.beforeCpa), num(data.afterCpa), true));
-      const conversionLift = pctChange(num(data.beforeConversion), num(data.afterConversion));
-      const roasLift = pctChange(num(data.beforeRoas), num(data.afterRoas));
-      const leadLift = pctChange(num(data.beforeLeads), num(data.afterLeads));
-      const cplReduction = Math.max(0, pctChange(num(data.beforeCpl), num(data.afterCpl), true));
+      const beforeSpend = num(data.beforeSpend);
+      const afterSpend = num(data.afterSpend);
+      const beforeResults = num(data.beforeResults);
+      const afterResults = num(data.afterResults);
+      const beforeRevenue = num(data.beforeRevenue);
+      const afterRevenue = num(data.afterRevenue);
+      const beforeClicks = num(data.beforeClicks);
+      const afterClicks = num(data.afterClicks);
+      const beforeImpressions = num(data.beforeImpressions);
+      const afterImpressions = num(data.afterImpressions);
+      const beforeQualifiedLeads = num(data.beforeQualifiedLeads);
+      const afterQualifiedLeads = num(data.afterQualifiedLeads);
+      const calculatedBeforeCpa = divide(beforeSpend, beforeResults);
+      const calculatedAfterCpa = divide(afterSpend, afterResults);
+      const calculatedBeforeConversion = rate(beforeResults, beforeClicks);
+      const calculatedAfterConversion = rate(afterResults, afterClicks);
+      const calculatedBeforeRoas = divide(beforeRevenue, beforeSpend);
+      const calculatedAfterRoas = divide(afterRevenue, afterSpend);
+      const calculatedBeforeCpl = divide(beforeSpend, beforeQualifiedLeads);
+      const calculatedAfterCpl = divide(afterSpend, afterQualifiedLeads);
+      const calculatedCtr = rate(afterClicks, afterImpressions);
+      const reduction = Math.max(0, pctChange(calculatedBeforeCpa, calculatedAfterCpa, true));
+      const conversionLift = pctChange(calculatedBeforeConversion, calculatedAfterConversion);
+      const roasLift = pctChange(calculatedBeforeRoas, calculatedAfterRoas);
+      const leadLift = pctChange(beforeQualifiedLeads, afterQualifiedLeads);
+      const cplReduction = Math.max(0, pctChange(calculatedBeforeCpl, calculatedAfterCpl, true));
       const days = Math.max(1, Math.round(num(data.days) || 1));
-      const beforeCpa = num(data.beforeCpa);
-      const afterCpa = num(data.afterCpa);
+      const beforeCpa = calculatedBeforeCpa;
+      const afterCpa = calculatedAfterCpa;
       const ratio = beforeCpa ? Math.max(.25, Math.min(1, afterCpa / beforeCpa)) : .6;
       const beforeHeight = 210;
       const afterHeight = Math.round(beforeHeight * ratio);
+
+      setField("beforeCpa", calculatedBeforeCpa);
+      setField("afterCpa", calculatedAfterCpa);
+      setField("beforeConversion", calculatedBeforeConversion);
+      setField("afterConversion", calculatedAfterConversion);
+      setField("beforeRoas", calculatedBeforeRoas);
+      setField("afterRoas", calculatedAfterRoas);
+      setField("beforeCpl", calculatedBeforeCpl);
+      setField("afterCpl", calculatedAfterCpl);
+      setField("landingCvr", calculatedAfterConversion);
+      setField("ctr", calculatedCtr);
 
       setText("reduction", `${reduction}%`);
       setText("reductionBadge", `${reduction}%`);
@@ -1010,14 +1139,20 @@ Optimized placements based on conversion data</textarea>
       setText("daysShort", days);
       setText("daysLower", `${days} days`);
       setText("timeframe", `${days} days`);
-      setText("beforeCpa", money(data.beforeCpa, data.currency));
-      setText("afterCpa", money(data.afterCpa, data.currency));
+      setText("beforeCpa", money(calculatedBeforeCpa, data.currency));
+      setText("afterCpa", money(calculatedAfterCpa, data.currency));
       setText("intro", data.intro);
       setText("takeaway", data.takeaway);
       setText("conversionLift", `${Math.max(0, conversionLift)}%`);
       setText("roasLift", `${Math.max(0, roasLift)}%`);
       setText("relevanceScore", num(data.relevanceScore).toFixed(1));
       setText("leadSummary", `${Math.max(leadLift, cplReduction)}%`);
+      setText("calcCpaReduction", `${reduction}%`);
+      setText("calcConversionLift", `${Math.max(0, conversionLift)}%`);
+      setText("calcRoasLift", `${Math.max(0, roasLift)}%`);
+      setText("calcLeadLift", `${Math.max(0, leadLift)}%`);
+      setText("calcCplReduction", `${cplReduction}%`);
+      setText("calcCtr", `${calculatedCtr.toFixed(2)}%`);
 
       document.getElementById("chartStage").style.setProperty("--before-height", `${beforeHeight}px`);
       document.getElementById("chartStage").style.setProperty("--after-height", `${afterHeight}px`);
