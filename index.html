@@ -1,1191 +1,1164 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Client Case Study Generator</title>
-  <style>
-    :root {
-      --navy: #07182d;
-      --navy-2: #0b2343;
-      --blue: #2f6df2;
-      --green: #34c85a;
-      --orange: #f09a2c;
-      --teal: #16a9c7;
-      --violet: #6653db;
-      --ink: #11223b;
-      --muted: #657184;
-      --line: #dce4ee;
-      --paper: #f4f7fb;
-      --white: #ffffff;
-      --shadow: 0 24px 70px rgba(9, 27, 51, .16);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      color: var(--ink);
-      background: linear-gradient(135deg, #eef3f8 0%, #f9fbfd 52%, #edf6f8 100%);
-    }
-
-    button,
-    input,
-    textarea,
-    select {
-      font: inherit;
-    }
-
-    .app-shell {
-      display: grid;
-      grid-template-columns: minmax(320px, 440px) minmax(520px, 1fr);
-      gap: 24px;
-      width: min(1500px, calc(100% - 32px));
-      margin: 24px auto;
-      align-items: start;
-    }
-
-    .panel {
-      background: rgba(255, 255, 255, .92);
-      border: 1px solid rgba(204, 215, 228, .9);
-      border-radius: 8px;
-      box-shadow: 0 18px 48px rgba(20, 37, 59, .12);
-      overflow: hidden;
-    }
-
-    .form-panel {
-      position: sticky;
-      top: 18px;
-      max-height: calc(100vh - 36px);
-      overflow: auto;
-    }
-
-    .panel-header {
-      padding: 18px 20px;
-      background: var(--navy);
-      color: var(--white);
-    }
-
-    .panel-header h1 {
-      margin: 0;
-      font-size: 20px;
-      line-height: 1.2;
-      letter-spacing: .02em;
-    }
-
-    .panel-header p {
-      margin: 8px 0 0;
-      color: #bdd0e8;
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .field-group {
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .field-group h2 {
-      margin: 0 0 12px;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: #18345a;
-    }
-
-    .help-list {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .field-note {
-      margin: -4px 0 14px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .calc-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .calc-card {
-      min-height: 74px;
-      padding: 12px;
-      border: 1px solid #d5e0ed;
-      border-radius: 7px;
-      background: #f7fbff;
-    }
-
-    .calc-card span {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-
-    .calc-card strong {
-      display: block;
-      margin-top: 7px;
-      color: #102541;
-      font-size: 20px;
-      line-height: 1.1;
-    }
-
-    label {
-      display: grid;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #34445d;
-    }
-
-    input,
-    textarea,
-    select {
-      width: 100%;
-      border: 1px solid #cbd7e5;
-      border-radius: 6px;
-      background: #fff;
-      color: var(--ink);
-      padding: 10px 11px;
-      outline: none;
-    }
-
-    textarea {
-      min-height: 92px;
-      resize: vertical;
-      line-height: 1.35;
-    }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(47, 109, 242, .13);
-    }
-
-    input[readonly] {
-      color: #445268;
-      background: #eef4fb;
-      cursor: default;
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 18px 20px 20px;
-      background: #f7f9fc;
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 6px;
-      padding: 11px 12px;
-      color: #fff;
-      background: var(--blue);
-      cursor: pointer;
-      font-weight: 800;
-      text-align: center;
-    }
-
-    .btn.secondary {
-      background: var(--navy-2);
-    }
-
-    .btn.light {
-      color: var(--navy);
-      background: #dce8fb;
-    }
-
-    .btn:hover {
-      filter: brightness(.96);
-    }
-
-    .preview-wrap {
-      padding: 16px;
-      background: #d7e2ee;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-    }
-
-    .case-study {
-      width: min(100%, 820px);
-      margin: 0 auto;
-      background: var(--white);
-      overflow: hidden;
-      box-shadow: 0 20px 55px rgba(0, 18, 45, .22);
-    }
-
-    .hero {
-      position: relative;
-      display: grid;
-      grid-template-columns: 1.05fr .95fr;
-      min-height: 410px;
-      padding: 24px 28px 30px;
-      color: #fff;
-      background:
-        radial-gradient(circle at 72% 36%, rgba(37, 108, 255, .34), transparent 30%),
-        linear-gradient(135deg, #08182c 0%, #071629 55%, #031020 100%);
-      overflow: hidden;
-    }
-
-    .hero:before {
-      content: "";
-      position: absolute;
-      right: 20px;
-      bottom: 54px;
-      width: 390px;
-      height: 210px;
-      background: repeating-linear-gradient(90deg, transparent 0 18px, rgba(43, 108, 209, .23) 18px 35px);
-      clip-path: polygon(0 80%, 100% 0, 100% 100%, 0 100%);
-      opacity: .58;
-    }
-
-    .hero-copy,
-    .hero-chart {
-      position: relative;
-      z-index: 1;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 38px;
-      padding: 8px 16px;
-      border-radius: 7px;
-      background: linear-gradient(135deg, #1d5fe7, #2c72ff);
-      color: #fff;
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: .02em;
-      text-transform: uppercase;
-    }
-
-    .hero h2 {
-      margin: 22px 0 0;
-      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-      font-size: clamp(44px, 6.4vw, 72px);
-      line-height: .94;
-      letter-spacing: .03em;
-      text-transform: uppercase;
-      max-width: 430px;
-      text-wrap: balance;
-    }
-
-    .hero h2 span {
-      color: var(--green);
-    }
-
-    .accent-line {
-      width: 74px;
-      height: 4px;
-      margin: 24px 0 20px;
-      background: #4f91ff;
-    }
-
-    .hero p {
-      margin: 0;
-      max-width: 360px;
-      color: #d6e1ef;
-      font-size: 17px;
-      line-height: 1.45;
-    }
-
-    .hero-chart {
-      display: grid;
-      align-content: end;
-      min-height: 330px;
-      padding-top: 42px;
-    }
-
-    .chart-stage {
-      position: relative;
-      height: 286px;
-    }
-
-    .platform {
-      position: absolute;
-      left: 22px;
-      right: 0;
-      bottom: 20px;
-      height: 54px;
-      background: linear-gradient(135deg, #173969, #0d274e);
-      clip-path: polygon(10% 0, 86% 0, 100% 45%, 4% 45%);
-      opacity: .95;
-    }
-
-    .cylinder {
-      position: absolute;
-      bottom: 64px;
-      width: 104px;
-      border-radius: 52px / 17px;
-      box-shadow: inset -22px 0 28px rgba(0, 0, 0, .16), inset 18px 0 22px rgba(255, 255, 255, .17);
-    }
-
-    .cylinder:before {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: -16px;
-      height: 34px;
-      border-radius: 52px / 17px;
-      background: rgba(255, 255, 255, .18);
-    }
-
-    .before-bar {
-      left: 92px;
-      height: var(--before-height, 220px);
-      background: linear-gradient(90deg, #2569df, #4a8cff);
-    }
-
-    .after-bar {
-      left: 255px;
-      height: var(--after-height, 118px);
-      background: linear-gradient(90deg, #2ab84d, #69e36f);
-    }
-
-    .metric-label {
-      position: absolute;
-      min-width: 98px;
-      font-weight: 900;
-      text-transform: uppercase;
-      text-align: center;
-      line-height: 1.15;
-      text-shadow: 0 3px 12px rgba(0, 0, 0, .34);
-    }
-
-    .metric-label small {
-      display: block;
-      font-size: 11px;
-      color: #d7e4f4;
-    }
-
-    .metric-label b {
-      display: block;
-      margin-top: 3px;
-      font-size: 22px;
-      color: #5d91ff;
-    }
-
-    .metric-label.after b {
-      color: #5be16e;
-    }
-
-    .metric-label.before {
-      left: 95px;
-      top: 8px;
-    }
-
-    .metric-label.after {
-      left: 238px;
-      top: 132px;
-    }
-
-    .reduction-badge {
-      position: absolute;
-      right: 6px;
-      top: 0;
-      display: grid;
-      place-items: center;
-      width: 108px;
-      min-height: 118px;
-      padding: 12px;
-      color: #fff;
-      text-align: center;
-      background: linear-gradient(145deg, #37b94b, #1f933b);
-      border-radius: 15px 15px 28px 28px;
-      box-shadow: 0 12px 30px rgba(25, 176, 70, .3);
-      clip-path: polygon(0 0, 100% 0, 100% 74%, 50% 100%, 0 74%);
-    }
-
-    .reduction-badge b {
-      display: block;
-      font-size: 39px;
-      line-height: .95;
-    }
-
-    .reduction-badge span {
-      display: block;
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-
-    .arrow-line {
-      position: absolute;
-      left: 185px;
-      top: 50px;
-      width: 118px;
-      height: 78px;
-      border-top: 4px dotted rgba(255, 255, 255, .85);
-      border-radius: 50%;
-      transform: rotate(18deg);
-    }
-
-    .strategy {
-      padding: 22px 24px 14px;
-      background: #fff;
-    }
-
-    .section-title {
-      margin: 0 0 14px;
-      color: #102541;
-      text-align: center;
-      font-size: 28px;
-      line-height: 1.1;
-      letter-spacing: .03em;
-      text-transform: uppercase;
-    }
-
-    .strategy-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-    }
-
-    .strategy-card {
-      padding: 6px 18px 8px;
-      border-right: 1px solid #d7dfeb;
-    }
-
-    .strategy-card:last-child {
-      border-right: 0;
-    }
-
-    .icon-disc {
-      display: grid;
-      place-items: center;
-      width: 62px;
-      height: 62px;
-      margin: 0 auto 12px;
-      border-radius: 50%;
-      color: #fff;
-      font-weight: 900;
-      font-size: 18px;
-      box-shadow: inset 0 -10px 20px rgba(0, 0, 0, .12);
-    }
-
-    .blue { background: linear-gradient(135deg, #1f62e2, #4585ff); }
-    .green { background: linear-gradient(135deg, #27a94b, #55d768); }
-    .violet { background: linear-gradient(135deg, #5146c9, #7b66e8); }
-    .orange { background: linear-gradient(135deg, #e58920, #f6aa38); }
-    .teal { background: linear-gradient(135deg, #079eb4, #27c1dc); }
-
-    .strategy-card h3 {
-      margin: 0 0 12px;
-      color: #102541;
-      font-size: 15px;
-      line-height: 1.12;
-      text-align: center;
-      text-transform: uppercase;
-    }
-
-    .strategy-card ul {
-      margin: 0;
-      padding-left: 16px;
-      font-size: 13px;
-      line-height: 1.42;
-    }
-
-    .strategy-card li {
-      margin-bottom: 7px;
-    }
-
-    .results {
-      margin: 0 8px 12px;
-      padding: 18px 16px 16px;
-      background: #eff7ff;
-      border-radius: 8px;
-    }
-
-    .results .section-title {
-      font-size: 23px;
-      margin-bottom: 18px;
-    }
-
-    .results .section-title span {
-      color: #255ec9;
-      font-size: 14px;
-    }
-
-    .result-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-    }
-
-    .result-card {
-      min-height: 122px;
-      padding: 0 13px;
-      text-align: center;
-      border-right: 1px solid #cbd8e8;
-    }
-
-    .result-card:last-child {
-      border-right: 0;
-    }
-
-    .result-card .icon-disc {
-      width: 58px;
-      height: 58px;
-      margin-bottom: 10px;
-      font-size: 17px;
-    }
-
-    .result-card h3 {
-      margin: 0;
-      color: #102541;
-      font-size: 13px;
-      line-height: 1.12;
-      text-transform: uppercase;
-    }
-
-    .result-card strong {
-      display: block;
-      margin-top: 3px;
-      color: #23b84f;
-      font-size: 25px;
-      line-height: 1;
-    }
-
-    .takeaway {
-      display: grid;
-      grid-template-columns: 76px minmax(0, 1fr) 178px;
-      gap: 18px;
-      align-items: center;
-      margin: 0 8px 8px;
-      padding: 16px 22px;
-      color: #fff;
-      background: #06182d;
-      border-radius: 8px;
-    }
-
-    .target {
-      display: grid;
-      place-items: center;
-      width: 66px;
-      height: 66px;
-      border: 7px solid #4388ff;
-      border-radius: 50%;
-      color: #fff;
-      font-weight: 900;
-      font-size: 24px;
-      box-shadow: inset 0 0 0 7px #0b2c54;
-    }
-
-    .takeaway h3 {
-      margin: 0 0 5px;
-      color: #4c86ff;
-      font-size: 15px;
-      text-transform: uppercase;
-    }
-
-    .takeaway p {
-      margin: 0;
-      color: #dbe8f8;
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .timeframe {
-      min-height: 78px;
-      padding-left: 20px;
-      border-left: 1px solid rgba(255, 255, 255, .34);
-      display: grid;
-      align-content: center;
-      text-align: center;
-      text-transform: uppercase;
-    }
-
-    .timeframe span {
-      color: #4c86ff;
-      font-size: 14px;
-      font-weight: 900;
-    }
-
-    .timeframe b {
-      color: #fff;
-      font-size: 30px;
-      line-height: 1.1;
-    }
-
-    @media (max-width: 1100px) {
-      .app-shell {
-        grid-template-columns: 1fr;
-      }
-
-      .form-panel {
-        position: static;
-        max-height: none;
-      }
-    }
-
-    @media (max-width: 760px) {
-      .app-shell {
-        width: 100%;
-        margin: 0;
-      }
-
-      .preview-wrap,
-      .panel {
-        border-radius: 0;
-      }
-
-      .grid-2,
-      .calc-grid,
-      .hero,
-      .strategy-grid,
-      .result-grid,
-      .takeaway {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        gap: 16px;
-        padding: 22px 18px;
-      }
-
-      .hero h2 {
-        font-size: 43px;
-      }
-
-      .hero-chart {
-        min-height: 280px;
-        padding-top: 0;
-      }
-
-      .chart-stage {
-        transform: scale(.88);
-        transform-origin: left bottom;
-      }
-
-      .strategy-card,
-      .result-card {
-        border-right: 0;
-        border-bottom: 1px solid #d7dfeb;
-      }
-
-      .takeaway {
-        text-align: center;
-      }
-
-      .target {
-        margin: 0 auto;
-      }
-
-      .timeframe {
-        padding-left: 0;
-        border-left: 0;
-        border-top: 1px solid rgba(255, 255, 255, .34);
-        padding-top: 14px;
-      }
-    }
-
-    @media print {
-      body {
-        background: #fff;
-      }
-
-      .form-panel,
-      .no-print {
-        display: none !important;
-      }
-
-      .app-shell,
-      .preview-wrap {
-        display: block;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        background: #fff;
-        box-shadow: none;
-      }
-
-      .case-study {
-        width: 100%;
-        box-shadow: none;
-      }
-
-      @page {
-        size: A4;
-        margin: 0;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study Generator — Performance Marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     RESET + BASE
+     ============================================ */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #F5F5F2; color: #1A1A1A; line-height: 1.5; }
+  button { font-family: inherit; cursor: pointer; }
+  input, textarea, select { font-family: inherit; font-size: 13px; }
+
+  /* ============================================
+     APP CHROME
+     ============================================ */
+  .topbar {
+    background: white; border-bottom: 1px solid #ECECE7;
+    padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark { width: 30px; height: 30px; background: #1A1A1A; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
+  .brand-name { font-size: 14px; font-weight: 600; }
+  .brand-sub { font-size: 11px; color: #888; }
+  .topbar-actions { display: flex; gap: 8px; }
+  .btn {
+    background: white; color: #333; border: 1px solid #E0E0DC;
+    padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;
+  }
+  .btn:hover { border-color: #1A1A1A; }
+  .btn.active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
+  .btn-primary { background: #0F7A3D; color: white; border-color: #0F7A3D; font-weight: 600; }
+  .btn-primary:hover { background: #0c6432; border-color: #0c6432; }
+  .btn-ai { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; border-color: transparent; font-weight: 600; }
+  .btn-ai:hover { opacity: 0.9; }
+
+  .main { max-width: 1200px; margin: 0 auto; padding: 20px 24px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .full { grid-column: 1 / -1; }
+
+  .card { background: white; border-radius: 10px; padding: 20px; border: 1px solid #ECECE7; margin-bottom: 14px; }
+  .card-dark { background: #1A1A1A; color: white; }
+  .card-title { font-size: 13px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .card-title svg { width: 14px; height: 14px; }
+
+  .label { display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #666; margin-bottom: 5px; }
+  .field { margin-bottom: 10px; }
+  .input, textarea.input, select.input {
+    width: 100%; padding: 9px 12px; border: 1px solid #E0E0DC; border-radius: 6px;
+    background: white; transition: border-color 0.15s;
+  }
+  .input:focus { outline: none; border-color: #1A1A1A; }
+  textarea.input { resize: vertical; min-height: 60px; }
+
+  .numfield { display: grid; grid-template-columns: 1fr 130px; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .numfield label { font-size: 12px; color: #333; font-weight: 500; }
+  .numfield .currency { color: #999; margin-left: 6px; font-size: 11px; }
+  .numfield input { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .toggle-group { display: flex; gap: 6px; }
+  .toggle-btn { flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid #E0E0DC; background: white; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+  .toggle-btn.active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
+
+  .switch { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FAFAF7; border-radius: 7px; margin-bottom: 8px; }
+  .switch input { width: 36px; height: 20px; appearance: none; background: #D0D0CB; border-radius: 10px; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+  .switch input:checked { background: #0F7A3D; }
+  .switch input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: left 0.2s; }
+  .switch input:checked::after { left: 18px; }
+  .switch label { font-size: 12px; font-weight: 500; cursor: pointer; flex: 1; }
+  .switch .hint { font-size: 11px; color: #888; font-weight: 400; display: block; margin-top: 2px; }
+
+  .metric-chip { background: #252525; padding: 10px 12px; border-radius: 7px; }
+  .metric-chip .l { font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 4px; }
+  .metric-chip .v { font-size: 16px; font-weight: 600; color: white; letter-spacing: -0.01em; }
+  .metric-chip .ch { font-size: 10px; margin-top: 3px; font-weight: 600; }
+  .ch-up { color: #7EFFA0; }
+  .ch-down { color: #FF8888; }
+
+  .ai-output-box { background: #F5F3FF; border: 1px solid #DDD6FE; border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 12px; line-height: 1.5; color: #4C1D95; }
+  .ai-output-box .label-pill { display: inline-block; background: #6366F1; color: white; font-size: 9px; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 6px; }
+  .ai-tab-bar { display: flex; gap: 4px; margin-bottom: 10px; }
+  .ai-tab-bar button { padding: 5px 10px; font-size: 11px; border-radius: 5px; border: 1px solid #E0E0DC; background: white; color: #555; }
+  .ai-tab-bar button.active { background: #6366F1; color: white; border-color: #6366F1; }
+
+  .hint-text { font-size: 11px; color: #888; margin: 4px 0 12px; line-height: 1.5; }
+
+  /* ============================================
+     1-PAGER PREVIEW (A4)
+     ============================================ */
+  .preview-stage { display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+  .case-page {
+    width: 210mm; min-height: 297mm; background: white; padding: 14mm 14mm;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08); position: relative; overflow: hidden;
+  }
+
+  /* === Style: Editorial === */
+  .s-editorial { background: #FAFAF7; color: #1A1A1A; font-family: 'Inter', sans-serif; }
+  .s-editorial .display { font-family: 'Fraunces', Georgia, serif; }
+  .s-editorial .accent { color: #1A1A1A; }
+  .s-editorial .border-c { border-color: #E5E5E0; }
+  .s-editorial .muted { color: #666; }
+  .s-editorial .surface { background: #FFFFFF; }
+
+  /* === Style: Bold === */
+  .s-bold { background: #0F0F0F; color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; }
+  .s-bold .display { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+  .s-bold .accent-fill { background: #D4FF3F; color: #0F0F0F; }
+  .s-bold .accent-text { color: #D4FF3F; }
+  .s-bold .border-c { border-color: #2A2A2A; }
+  .s-bold .muted { color: #999; }
+  .s-bold .surface { background: #1A1A1A; }
+
+  /* === Style: Data === */
+  .s-data { background: #FFFFFF; color: #0A1628; font-family: 'IBM Plex Sans', sans-serif; }
+  .s-data .display { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; }
+  .s-data .accent-fill { background: #0066FF; color: #FFFFFF; }
+  .s-data .accent-text { color: #0066FF; }
+  .s-data .accent-border { border-color: #0066FF; }
+  .s-data .border-c { border-color: #E1E5EC; }
+  .s-data .muted { color: #5A6B82; }
+  .s-data .surface { background: #F7F8FA; }
+
+  /* shared page elements */
+  .page-h1 { font-size: 32px; line-height: 1.06; letter-spacing: -0.025em; margin: 0; font-weight: 500; }
+  .s-bold .page-h1 { font-weight: 700; }
+  .s-data .page-h1 { font-weight: 600; font-size: 26px; }
+
+  .eyebrow { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; }
+  .stat-label { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; }
+  .stat-value { font-size: 28px; line-height: 1; letter-spacing: -0.02em; font-weight: 500; }
+  .s-bold .stat-value { font-weight: 700; }
+  .stat-lift { font-size: 10px; margin-top: 4px; font-weight: 600; color: #0F7A3D; }
+  .s-bold .stat-lift { color: inherit; opacity: 0.85; }
+
+  .results-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .results-table th { text-align: left; padding: 5px 6px; font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .results-table td { padding: 5px 6px; }
+  .results-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .results-table tr { border-top: 1px solid currentColor; border-color: inherit; }
+  .results-table tr:first-child { border-top: none; }
+
+  /* ============================================
+     PRINT
+     ============================================ */
+  @media print {
+    body { background: white; margin: 0; padding: 0; }
+    .no-print { display: none !important; }
+    .case-page { box-shadow: none; width: 210mm; min-height: 297mm; padding: 14mm; page-break-after: avoid; }
+    @page { size: A4; margin: 0; }
+  }
+</style>
 </head>
 <body>
-  <main class="app-shell">
-    <aside class="panel form-panel">
-      <div class="panel-header">
-        <h1>Client Case Study Generator</h1>
-        <p>Enter the client numbers once, then download a case-study document for sharing.</p>
+
+<!-- ========== TOP BAR ========== -->
+<div class="topbar no-print">
+  <div class="brand">
+    <div class="brand-mark">⌬</div>
+    <div>
+      <div class="brand-name">Case Study Generator</div>
+      <div class="brand-sub">Performance Marketing · Anonymized · 1-pager PDF</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn active" id="tab-input">Inputs</button>
+    <button class="btn" id="tab-preview">Preview</button>
+    <button class="btn btn-primary" id="export-btn">↓ Export PDF</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ============================================
+       INPUT VIEW
+       ============================================ -->
+  <div id="view-input">
+
+    <!-- SETUP -->
+    <div class="card">
+      <div class="card-title">⚙️ Setup</div>
+      <div class="grid-4">
+        <div>
+          <label class="label">Client Type</label>
+          <div class="toggle-group">
+            <button class="toggle-btn active" data-type="ecommerce">Ecommerce</button>
+            <button class="toggle-btn" data-type="leadgen">Lead-gen</button>
+          </div>
+        </div>
+        <div>
+          <label class="label">Style</label>
+          <select class="input" id="f-style">
+            <option value="editorial">Editorial (clean)</option>
+            <option value="bold">Bold (dark, punchy)</option>
+            <option value="data">Data-heavy</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Currency</label>
+          <select class="input" id="f-currency">
+            <option>USD</option><option>EUR</option><option>GBP</option><option>SAR</option><option>AED</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Reset</label>
+          <button class="btn" id="reset-btn" style="width:100%;">↺ Reset all</button>
+        </div>
       </div>
+    </div>
 
-      <section class="field-group">
-        <h2>Numbers to collect</h2>
-        <ul class="help-list">
-          <li>Before and after ad spend.</li>
-          <li>Before and after results, conversions, or leads from the ad platform.</li>
-          <li>Before and after conversion value or sales revenue, if ROAS matters.</li>
-          <li>Before and after link clicks and impressions.</li>
-          <li>Before and after qualified leads from CRM or sales review.</li>
-          <li>Optional: ad relevance, quality ranking, or quality score.</li>
-        </ul>
-      </section>
+    <!-- PRIVACY TOGGLES -->
+    <div class="card">
+      <div class="card-title">🔒 Privacy & data availability</div>
+      <p class="hint-text">These flags change how the case study presents the client and which numbers it features.</p>
+      <div class="grid-3">
+        <div class="switch">
+          <input type="checkbox" id="t-hideName" checked>
+          <label for="t-hideName">Hide client name
+            <span class="hint">Show as anonymous descriptor (e.g. "US DTC skincare brand")</span>
+          </label>
+        </div>
+        <div class="switch">
+          <input type="checkbox" id="t-hideRevenue">
+          <label for="t-hideRevenue">Hide absolute revenue
+            <span class="hint">Keep ROAS, lifts, ratios — hide dollar amounts</span>
+          </label>
+        </div>
+        <div class="switch">
+          <input type="checkbox" id="t-noBaseline">
+          <label for="t-noBaseline">Built from scratch (no baseline)
+            <span class="hint">Frame as "0 → achieved" instead of "before → after"</span>
+          </label>
+        </div>
+      </div>
+    </div>
 
-      <section class="field-group">
-        <h2>Client details</h2>
-        <div class="grid-2">
-          <label>Client name
-            <input data-field="clientName" value="Client Name">
-          </label>
-          <label>Campaign type
-            <input data-field="campaignType" value="Lead Generation">
-          </label>
-          <label>Currency
-            <select data-field="currency">
-              <option value="$">$</option>
-              <option value="SAR">SAR</option>
-              <option value="AED">AED</option>
-              <option value="QAR">QAR</option>
-              <option value="KWD">KWD</option>
-              <option value="BHD">BHD</option>
-              <option value="OMR">OMR</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
+    <div class="grid-2">
+
+      <!-- ANONYMIZED CLIENT -->
+      <div class="card">
+        <div class="card-title">👤 Anonymized client profile</div>
+        <p class="hint-text">No client names anywhere. Build a descriptor sharp enough that prospects in similar situations recognize themselves.</p>
+
+        <div class="field">
+          <label class="label">Your Agency Name</label>
+          <input class="input" id="f-agencyName" value="Your Agency">
+        </div>
+        <div class="field">
+          <label class="label">Agency Tagline</label>
+          <input class="input" id="f-agencyTagline" value="Performance Marketing">
+        </div>
+
+        <div class="field">
+          <label class="label">Anonymous Descriptor (replaces client name)</label>
+          <input class="input" id="f-descriptor" value="A US-based DTC skincare brand">
+          <p class="hint-text" style="margin: 4px 0 0;">Format: "[geography] [model] [vertical]" — e.g. "A UK B2B SaaS company in HR tech"</p>
+        </div>
+
+        <div class="grid-2" style="gap: 10px;">
+          <div class="field">
+            <label class="label">Industry / Vertical</label>
+            <input class="input" id="f-industry" value="DTC Skincare">
+          </div>
+          <div class="field">
+            <label class="label">Company Size</label>
+            <select class="input" id="f-size">
+              <option>Pre-launch / startup</option>
+              <option>Under $1M revenue</option>
+              <option selected>$1M – $10M revenue</option>
+              <option>$10M – $50M revenue</option>
+              <option>$50M+ revenue</option>
+              <option>SMB (1-50 employees)</option>
+              <option>Mid-market (50-500 employees)</option>
+              <option>Enterprise (500+ employees)</option>
             </select>
-          </label>
-          <label>Timeframe days
-            <input type="number" min="1" data-field="days" value="7">
-          </label>
+          </div>
         </div>
-      </section>
 
-      <section class="field-group">
-        <h2>Ad account calculator</h2>
-        <p class="field-note">Enter the raw before/after numbers from Meta, Google, TikTok, LinkedIn, or your CRM. The case study metrics below update automatically.</p>
-        <div class="grid-2">
-          <label>Before ad spend
-            <input type="number" min="0" step="0.01" data-field="beforeSpend" value="4100">
-          </label>
-          <label>After ad spend
-            <input type="number" min="0" step="0.01" data-field="afterSpend" value="3930">
-          </label>
-          <label>Before results / conversions
-            <input type="number" min="0" step="1" data-field="beforeResults" value="82">
-          </label>
-          <label>After results / conversions
-            <input type="number" min="0" step="1" data-field="afterResults" value="131">
-          </label>
-          <label>Before conversion value / revenue
-            <input type="number" min="0" step="0.01" data-field="beforeRevenue" value="8610">
-          </label>
-          <label>After conversion value / revenue
-            <input type="number" min="0" step="0.01" data-field="afterRevenue" value="13362">
-          </label>
-          <label>Before link clicks
-            <input type="number" min="0" step="1" data-field="beforeClicks" value="3417">
-          </label>
-          <label>After link clicks
-            <input type="number" min="0" step="1" data-field="afterClicks" value="3447">
-          </label>
-          <label>Before impressions
-            <input type="number" min="0" step="1" data-field="beforeImpressions" value="117828">
-          </label>
-          <label>After impressions
-            <input type="number" min="0" step="1" data-field="afterImpressions" value="118862">
-          </label>
-          <label>Before qualified leads
-            <input type="number" min="0" step="1" data-field="beforeQualifiedLeads" value="55">
-          </label>
-          <label>After qualified leads
-            <input type="number" min="0" step="1" data-field="afterQualifiedLeads" value="85">
-          </label>
+        <div class="field">
+          <label class="label">Engagement Period</label>
+          <input class="input" id="f-period" value="Jan – Jun 2026">
         </div>
-      </section>
-
-      <section class="field-group">
-        <h2>Calculated case study metrics</h2>
-        <p class="field-note">These are the numbers that will be added to the case study.</p>
-        <div class="grid-2">
-          <label>Before CPA
-            <input type="number" min="0" step="0.01" data-field="beforeCpa" value="50" readonly>
-          </label>
-          <label>After CPA
-            <input type="number" min="0" step="0.01" data-field="afterCpa" value="30" readonly>
-          </label>
-          <label>Before conversion rate %
-            <input type="number" min="0" step="0.01" data-field="beforeConversion" value="2.4" readonly>
-          </label>
-          <label>After conversion rate %
-            <input type="number" min="0" step="0.01" data-field="afterConversion" value="3.8" readonly>
-          </label>
-          <label>Before ROAS
-            <input type="number" min="0" step="0.01" data-field="beforeRoas" value="2.1" readonly>
-          </label>
-          <label>After ROAS
-            <input type="number" min="0" step="0.01" data-field="afterRoas" value="3.4" readonly>
-          </label>
-          <label>Before cost per qualified lead
-            <input type="number" min="0" step="0.01" data-field="beforeCpl" value="74.55" readonly>
-          </label>
-          <label>After cost per qualified lead
-            <input type="number" min="0" step="0.01" data-field="afterCpl" value="46.24" readonly>
-          </label>
-          <label>CTR %
-            <input type="number" min="0" step="0.01" data-field="ctr" value="2.9" readonly>
-          </label>
-          <label>Landing page CVR %
-            <input type="number" min="0" step="0.01" data-field="landingCvr" value="3.8" readonly>
-          </label>
-          <label>Ad relevance score
-            <input type="number" min="0" step="0.1" data-field="relevanceScore" value="8.6">
-          </label>
+        <div class="field">
+          <label class="label">Channels Used</label>
+          <input class="input" id="f-channels" value="Meta Ads, Google Ads">
         </div>
-        <div class="calc-grid">
-          <div class="calc-card"><span>CPA reduction</span><strong data-out="calcCpaReduction">40%</strong></div>
-          <div class="calc-card"><span>Conversion rate lift</span><strong data-out="calcConversionLift">58%</strong></div>
-          <div class="calc-card"><span>ROAS lift</span><strong data-out="calcRoasLift">62%</strong></div>
-          <div class="calc-card"><span>Qualified lead lift</span><strong data-out="calcLeadLift">55%</strong></div>
-          <div class="calc-card"><span>Cost per qualified lead reduction</span><strong data-out="calcCplReduction">38%</strong></div>
-          <div class="calc-card"><span>CTR</span><strong data-out="calcCtr">2.90%</strong></div>
-        </div>
-      </section>
-
-      <section class="field-group">
-        <h2>Copy</h2>
-        <label>Short intro
-          <textarea data-field="intro">A data-driven strategy, creative testing, and smart optimization helped us deliver exceptional results in just one week.</textarea>
-        </label>
-        <br>
-        <label>Key takeaway
-          <textarea data-field="takeaway">Lowering CPA is not about spending more money. It is about making smarter marketing decisions. With the right targeting, creative strategy, and optimization process, businesses can scale profitably and achieve sustainable growth.</textarea>
-        </label>
-      </section>
-
-      <section class="field-group">
-        <h2>Strategy bullets</h2>
-        <label>Audience optimization
-          <textarea data-field="strategyAudience">Removed low-performing audience segments
-Focused on high-intent users
-Created lookalike audiences based on past converters
-Retargeted website visitors and engaged users</textarea>
-        </label>
-        <br>
-        <label>Creative testing
-          <textarea data-field="strategyCreative">Launched multiple ad creatives
-Tested different hooks, headlines, CTA styles, and visual formats
-Identified top-performing ads with highest engagement and lowest CPA</textarea>
-        </label>
-        <br>
-        <label>Landing page improvements
-          <textarea data-field="strategyLanding">Improved loading speed
-Simplified call-to-action
-Added social proof and testimonials
-Created a mobile-friendly experience</textarea>
-        </label>
-        <br>
-        <label>Budget reallocation
-          <textarea data-field="strategyBudget">Shifted budget toward high-performing ads
-Paused underperforming campaigns
-Optimized placements based on conversion data</textarea>
-        </label>
-      </section>
-
-      <div class="actions">
-        <button class="btn" id="downloadDoc" type="button">Download Word</button>
-        <button class="btn secondary" id="downloadHtml" type="button">Download HTML</button>
-        <button class="btn light" id="printPdf" type="button">Print PDF</button>
-        <button class="btn light" id="resetDemo" type="button">Reset Demo</button>
       </div>
-    </aside>
 
-    <section class="preview-wrap">
-      <article class="case-study" id="caseStudy">
-        <section class="hero">
-          <div class="hero-copy">
-            <div class="badge">Case Study</div>
-            <h2>How we reduced CPA by <span data-out="reduction">40%</span> in <span data-out="daysText">7 days</span></h2>
-            <div class="accent-line"></div>
-            <p data-out="intro">A data-driven strategy, creative testing, and smart optimization helped us deliver exceptional results in just one week.</p>
-          </div>
-          <div class="hero-chart">
-            <div class="chart-stage" id="chartStage">
-              <div class="reduction-badge"><span><b data-out="reductionBadge">40%</b>Reduction</span></div>
-              <div class="arrow-line"></div>
-              <div class="metric-label before"><small>Before</small><b data-out="beforeCpa">$50.00</b><small>CPA</small></div>
-              <div class="metric-label after"><small>After <span data-out="daysShort">7</span> days</small><b data-out="afterCpa">$30.00</b><small>CPA</small></div>
-              <div class="platform"></div>
-              <div class="cylinder before-bar"></div>
-              <div class="cylinder after-bar"></div>
-            </div>
-          </div>
-        </section>
+      <!-- NARRATIVE + AI -->
+      <div class="card">
+        <div class="card-title">✨ Narrative</div>
 
-        <section class="strategy">
-          <h2 class="section-title">Our Strategy</h2>
-          <div class="strategy-grid">
-            <div class="strategy-card">
-              <div class="icon-disc blue">01</div>
-              <h3>1. Audience Optimization</h3>
-              <ul data-list="strategyAudience"></ul>
-            </div>
-            <div class="strategy-card">
-              <div class="icon-disc green">02</div>
-              <h3>2. Creative Testing</h3>
-              <ul data-list="strategyCreative"></ul>
-            </div>
-            <div class="strategy-card">
-              <div class="icon-disc violet">03</div>
-              <h3>3. Landing Page Improvements</h3>
-              <ul data-list="strategyLanding"></ul>
-            </div>
-            <div class="strategy-card">
-              <div class="icon-disc orange">04</div>
-              <h3>4. Budget Reallocation</h3>
-              <ul data-list="strategyBudget"></ul>
-            </div>
-          </div>
-        </section>
+        <div class="field">
+          <label class="label">Headline Result</label>
+          <input class="input" id="f-headline" value="Scaled paid acquisition 3.2x while cutting CAC by 41%">
+          <button class="btn btn-ai" id="ai-headline" style="margin-top: 6px; width: 100%;">🤖 Generate headline from metrics</button>
+        </div>
 
-        <section class="results">
-          <h2 class="section-title">The Results <span>(within <span data-out="daysLower">7 days</span>)</span></h2>
-          <div class="result-grid">
-            <div class="result-card">
-              <div class="icon-disc green">CPA</div>
-              <h3>CPA reduced by<strong data-out="resultReduction">40%</strong></h3>
-            </div>
-            <div class="result-card">
-              <div class="icon-disc blue">CVR</div>
-              <h3>Higher conversion rate<strong data-out="conversionLift">58%</strong></h3>
-            </div>
-            <div class="result-card">
-              <div class="icon-disc violet">ADS</div>
-              <h3>Better ad relevance score<strong data-out="relevanceScore">8.6</strong></h3>
-            </div>
-            <div class="result-card">
-              <div class="icon-disc orange">ROAS</div>
-              <h3>Increased ROAS<strong data-out="roasLift">62%</strong></h3>
-            </div>
-            <div class="result-card">
-              <div class="icon-disc teal">LEADS</div>
-              <h3>More qualified leads at lower cost<strong data-out="leadSummary">60%</strong></h3>
-            </div>
-          </div>
-        </section>
+        <div class="field">
+          <label class="label">The Challenge (1–2 sentences)</label>
+          <textarea class="input" id="f-challenge" rows="3">Plateaued growth with rising CAC and falling ROAS. Brand needed a new acquisition motion without sacrificing margin.</textarea>
+        </div>
 
-        <section class="takeaway">
-          <div class="target">OK</div>
-          <div>
-            <h3>Key Takeaway</h3>
-            <p data-out="takeaway">Lowering CPA is not about spending more money. It is about making smarter marketing decisions. With the right targeting, creative strategy, and optimization process, businesses can scale profitably and achieve sustainable growth.</p>
-          </div>
-          <div class="timeframe">
-            <span>Timeframe</span>
-            <b data-out="timeframe">7 days</b>
-          </div>
-        </section>
-      </article>
-    </section>
-  </main>
+        <div class="field">
+          <label class="label">What We Did (one line per bullet)</label>
+          <textarea class="input" id="f-strategy" rows="4">Rebuilt account structure around audience-first creative testing
+Launched broad + lookalike split with rapid creative iteration
+Implemented PMax with feed optimization for assisted lift
+Introduced server-side conversion tracking for cleaner signal</textarea>
+        </div>
 
-  <script>
-    const defaults = {};
-    const fields = Array.from(document.querySelectorAll("[data-field]"));
+        <!-- ENDORSEMENT MODE -->
+        <div class="field">
+          <label class="label">Endorsement Style</label>
+          <div class="ai-tab-bar">
+            <button class="ai-tab active" data-endorsement="outcome">Outcome callout (recommended)</button>
+            <button class="ai-tab" data-endorsement="testimonial">Quote (needs client approval)</button>
+            <button class="ai-tab" data-endorsement="none">None</button>
+          </div>
 
-    fields.forEach((field) => {
-      defaults[field.dataset.field] = field.value;
-      field.addEventListener("input", render);
-      field.addEventListener("change", render);
+          <div id="endorsement-outcome">
+            <textarea class="input" id="f-outcomeCallout" rows="2">The team rebuilt their acquisition motion from a single-channel dependency into a diversified, predictable system that compounds month over month.</textarea>
+            <button class="btn btn-ai" id="ai-outcome" style="margin-top: 6px; width: 100%;">🤖 Draft outcome callout from inputs</button>
+            <p class="hint-text">Spoken in your agency's voice. No fake quotes, no attribution. Always safe to publish.</p>
+          </div>
+
+          <div id="endorsement-testimonial" style="display:none;">
+            <textarea class="input" id="f-testimonial" rows="2">They turned our paid channels from a cost center into our biggest growth engine.</textarea>
+            <input class="input" id="f-testimonialAuthor" style="margin-top: 6px;" placeholder="Attribution (e.g. 'Head of Growth, anonymous client')" value="Head of Growth, client">
+            <button class="btn btn-ai" id="ai-testimonial" style="margin-top: 6px; width: 100%;">🤖 Draft testimonial (for client to approve)</button>
+            <p class="hint-text" style="color: #B45309; background: #FEF3C7; padding: 8px; border-radius: 6px;">
+              ⚠️ <strong>Important:</strong> AI generates a draft only. You must send it to your client for explicit written approval before publishing. Fabricating attributed quotes is false advertising in most jurisdictions.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERFORMANCE INPUTS -->
+      <div class="card">
+        <div class="card-title">🎯 Performance (engagement period)</div>
+        <div id="perf-fields"></div>
+      </div>
+
+      <!-- BASELINE -->
+      <div class="card" id="baseline-card">
+        <div class="card-title">📈 Baseline (pre-engagement)</div>
+        <p class="hint-text">Used to auto-calculate % lift. Leave blank if a baseline doesn't apply — lift figures will simply hide. (If you toggled "Built from scratch" above, this section is bypassed.)</p>
+        <div id="baseline-fields"></div>
+      </div>
+
+      <!-- COMPUTED METRICS -->
+      <div class="card card-dark full">
+        <div class="card-title" style="color:white;">⚡ Auto-calculated metrics</div>
+        <div class="grid-6" id="computed-chips"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================
+       PREVIEW VIEW
+       ============================================ -->
+  <div id="view-preview" style="display:none;">
+    <div class="preview-stage">
+      <div id="case-page-mount"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  type: 'ecommerce',          // 'ecommerce' | 'leadgen'
+  style: 'editorial',         // 'editorial' | 'bold' | 'data'
+  currency: 'USD',
+  hideName: true,
+  hideRevenue: false,
+  noBaseline: false,
+  endorsement: 'outcome',     // 'outcome' | 'testimonial' | 'none'
+  agencyName: 'Your Agency',
+  agencyTagline: 'Performance Marketing',
+  descriptor: 'A US-based DTC skincare brand',
+  industry: 'DTC Skincare',
+  size: '$1M – $10M revenue',
+  period: 'Jan – Jun 2026',
+  channels: 'Meta Ads, Google Ads',
+  headline: 'Scaled paid acquisition 3.2x while cutting CAC by 41%',
+  challenge: 'Plateaued growth with rising CAC and falling ROAS. Brand needed a new acquisition motion without sacrificing margin.',
+  strategy: 'Rebuilt account structure around audience-first creative testing\nLaunched broad + lookalike split with rapid creative iteration\nImplemented PMax with feed optimization for assisted lift\nIntroduced server-side conversion tracking for cleaner signal',
+  outcomeCallout: 'The team rebuilt their acquisition motion from a single-channel dependency into a diversified, predictable system that compounds month over month.',
+  testimonial: 'They turned our paid channels from a cost center into our biggest growth engine.',
+  testimonialAuthor: 'Head of Growth, client',
+  // perf
+  spend: 180000, revenue: 612000, impressions: 14200000, clicks: 198000, conversions: 4250, aov: 144,
+  leads: 1850, sql: 410, closedDeals: 62, avgDealValue: 8400,
+  // baseline
+  baseSpend: 90000, baseRevenue: 162000, baseImpressions: 8500000, baseClicks: 71000, baseConversions: 1280,
+  baseLeads: 540, baseSql: 95, baseClosedDeals: 14,
+};
+
+/* ============================================================
+   FORMATTERS
+   ============================================================ */
+const fmtCurrency = (n, c = 'USD') => {
+  if (n === '' || n === null || n === undefined || isNaN(n)) return '—';
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(Number(n));
+};
+const fmtNumber = (n, d = 0) => {
+  if (n === '' || n === null || n === undefined || isNaN(n)) return '—';
+  return Number(n).toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+};
+const fmtPct = (n, d = 1) => {
+  if (n === '' || n === null || n === undefined || isNaN(n)) return '—';
+  return Number(n).toFixed(d) + '%';
+};
+const fmtROAS = (n) => {
+  if (n === '' || n === null || n === undefined || isNaN(n) || !isFinite(n)) return '—';
+  return Number(n).toFixed(2) + 'x';
+};
+const lift = (current, baseline) => {
+  const c = Number(current), b = Number(baseline);
+  if (!b || isNaN(c) || isNaN(b)) return null;
+  return ((c - b) / b) * 100;
+};
+const liftInverse = (current, baseline) => {
+  const c = Number(current), b = Number(baseline);
+  if (!b || isNaN(c) || isNaN(b)) return null;
+  return ((b - c) / b) * 100;
+};
+
+/* ============================================================
+   CALCULATIONS
+   ============================================================ */
+function calc() {
+  const d = state;
+  const num = (k) => Number(d[k]) || 0;
+
+  const spend = num('spend'), revenue = num('revenue'),
+        impressions = num('impressions'), clicks = num('clicks'),
+        conversions = num('conversions'),
+        leads = num('leads'), sql = num('sql'),
+        closedDeals = num('closedDeals'), avgDealValue = num('avgDealValue');
+
+  const pipelineRevenue = closedDeals * avgDealValue;
+
+  const out = {
+    spend, revenue, impressions, clicks, conversions, leads, sql, closedDeals, pipelineRevenue, avgDealValue,
+    ctr: impressions ? (clicks / impressions) * 100 : 0,
+    cpc: clicks ? spend / clicks : 0,
+    cpm: impressions ? (spend / impressions) * 1000 : 0,
+    cvr: clicks ? (conversions / clicks) * 100 : 0,
+    cpa: conversions ? spend / conversions : 0,
+    roas: spend ? revenue / spend : 0,
+    netROI: spend ? ((revenue - spend) / spend) * 100 : 0,
+    cpl: leads ? spend / leads : 0,
+    leadToSQL: leads ? (sql / leads) * 100 : 0,
+    sqlToClose: sql ? (closedDeals / sql) * 100 : 0,
+    cac: closedDeals ? spend / closedDeals : 0,
+    pipelineROAS: spend ? pipelineRevenue / spend : 0,
+  };
+
+  if (!d.noBaseline) {
+    const baseSpend = num('baseSpend'), baseRevenue = num('baseRevenue'),
+          baseClicks = num('baseClicks'), baseImpressions = num('baseImpressions'),
+          baseConversions = num('baseConversions'),
+          baseLeads = num('baseLeads'), baseClosedDeals = num('baseClosedDeals');
+
+    out.baseROAS = baseSpend ? baseRevenue / baseSpend : 0;
+    out.baseCTR = baseImpressions ? (baseClicks / baseImpressions) * 100 : 0;
+    out.baseCVR = baseClicks ? (baseConversions / baseClicks) * 100 : 0;
+    out.baseCPA = baseConversions ? baseSpend / baseConversions : 0;
+    out.baseCPL = baseLeads ? baseSpend / baseLeads : 0;
+    out.baseCAC = baseClosedDeals ? baseSpend / baseClosedDeals : 0;
+
+    out.revenueLift = lift(revenue, baseRevenue);
+    out.roasLift = lift(out.roas, out.baseROAS);
+    out.ctrLift = lift(out.ctr, out.baseCTR);
+    out.cvrLift = lift(out.cvr, out.baseCVR);
+    out.cpaLift = liftInverse(out.cpa, out.baseCPA);
+    out.cplLift = liftInverse(out.cpl, out.baseCPL);
+    out.cacLift = liftInverse(out.cac, out.baseCAC);
+    out.leadsLift = lift(leads, num('baseLeads'));
+    out.dealsLift = lift(closedDeals, num('baseClosedDeals'));
+    out.conversionsLift = lift(conversions, num('baseConversions'));
+  }
+
+  return out;
+}
+
+/* ============================================================
+   AI-LIKE DRAFTERS (deterministic, template-based; can be swapped for real LLM call later)
+   ============================================================ */
+function draftHeadline() {
+  const c = calc();
+  const d = state;
+  const pieces = [];
+
+  if (d.noBaseline) {
+    if (d.type === 'ecommerce' && c.roas > 0 && !d.hideRevenue) {
+      pieces.push(`Built ${d.descriptor.toLowerCase()} from zero to ${fmtROAS(c.roas)} ROAS in ${d.period}`);
+    } else if (d.type === 'ecommerce' && c.conversions > 0) {
+      pieces.push(`Generated ${fmtNumber(c.conversions)} conversions at ${fmtROAS(c.roas)} ROAS from a standing start`);
+    } else if (d.type === 'leadgen' && c.closedDeals > 0) {
+      pieces.push(`Built a pipeline of ${fmtNumber(c.closedDeals)} closed deals from scratch in ${d.period}`);
+    } else if (d.type === 'leadgen' && c.leads > 0) {
+      pieces.push(`Generated ${fmtNumber(c.leads)} qualified leads from zero in ${d.period}`);
+    }
+  } else {
+    if (d.type === 'ecommerce') {
+      const roasMultiple = c.baseROAS ? (c.roas / c.baseROAS) : null;
+      const revMultiple = Number(d.baseRevenue) ? (c.revenue / Number(d.baseRevenue)) : null;
+      if (revMultiple && c.cpaLift > 10) {
+        pieces.push(`Scaled revenue ${revMultiple.toFixed(1)}x while cutting CPA by ${Math.round(c.cpaLift)}%`);
+      } else if (roasMultiple && roasMultiple > 1.2) {
+        pieces.push(`Lifted ROAS from ${fmtROAS(c.baseROAS)} to ${fmtROAS(c.roas)} in ${d.period}`);
+      } else if (c.revenueLift > 0) {
+        pieces.push(`Drove ${Math.round(c.revenueLift)}% revenue lift through restructured paid acquisition`);
+      }
+    } else {
+      if (c.dealsLift > 0 && c.cacLift > 0) {
+        pieces.push(`Grew closed deals ${Math.round(c.dealsLift)}% while reducing CAC by ${Math.round(c.cacLift)}%`);
+      } else if (c.cplLift > 10) {
+        pieces.push(`Cut cost-per-lead by ${Math.round(c.cplLift)}% while scaling volume ${Math.round(c.leadsLift)}%`);
+      } else if (c.leadsLift > 0) {
+        pieces.push(`Generated ${Math.round(c.leadsLift)}% more qualified leads at improved efficiency`);
+      }
+    }
+  }
+
+  return pieces[0] || `Delivered measurable performance gains across ${d.channels}`;
+}
+
+function draftOutcomeCallout() {
+  const c = calc();
+  const d = state;
+  const channels = d.channels.toLowerCase();
+  const verticalShort = d.industry.toLowerCase();
+
+  const fromScratch = d.noBaseline;
+  const templates = fromScratch ? [
+    `Built ${verticalShort} acquisition from zero into a predictable revenue engine across ${channels}, with unit economics that compound month over month.`,
+    `Architected ${channels} from a blank slate into a diversified, measurable acquisition system, with full attribution and clean reporting from day one.`,
+    `Stood up a complete paid acquisition motion from scratch — strategy, creative, tracking, and reporting — that delivered profitable scale in the first reporting period.`,
+  ] : [
+    `Rebuilt ${verticalShort} acquisition from a single-channel dependency into a diversified system that compounds across ${channels} with tighter unit economics.`,
+    `Untangled inherited account structures and rebuilt them around audience-first testing, unlocking efficient scale that prior agencies couldn't reach.`,
+    `Turned ${channels} from a cost-center into a measurable growth engine with cleaner attribution, sharper creative, and structurally lower CAC.`,
+  ];
+  // Pick deterministically based on inputs so user can re-roll by tweaking
+  const seed = (d.spend + d.clicks + d.conversions + d.leads + d.closedDeals) % templates.length;
+  return templates[seed];
+}
+
+function draftTestimonial() {
+  const c = calc();
+  const d = state;
+
+  const templates = d.type === 'ecommerce' ? [
+    `Our acquisition costs had been climbing for three quarters when we brought them in. They identified the structural issues in the first two weeks and rebuilt the account in a way that finally let us scale profitably.`,
+    `What separated them was the rigor. Every test had a hypothesis, every result was tied back to revenue, and the reporting was honest about what wasn't working as much as what was. We finally trust our paid numbers.`,
+    `They moved fast without being reckless. Within the first month we saw clear improvements in efficiency, and by the end of the engagement period our paid channels were the most predictable part of our business.`,
+  ] : [
+    `Our pipeline used to be feast or famine. They built us a predictable lead engine — qualified meetings every week, clean attribution, and a CAC that finally makes sense relative to our deal size.`,
+    `They took the time to understand our sales process before touching anything. That meant the leads they delivered actually converted, instead of just looking good on a dashboard.`,
+    `We've worked with three agencies before this one. This is the first time the dashboards, the spend, the SQLs, and our closed revenue have all told the same story.`,
+  ];
+  const seed = (d.spend + d.conversions + d.leads + d.closedDeals) % templates.length;
+  return templates[seed];
+}
+
+/* ============================================================
+   RENDER: INPUT FIELDS (dynamic based on type)
+   ============================================================ */
+function renderPerfFields() {
+  const container = document.getElementById('perf-fields');
+  const d = state;
+  const fields = [
+    ['spend', 'Ad Spend', true],
+    ['impressions', 'Impressions', false],
+    ['clicks', 'Clicks', false],
+  ];
+  if (d.type === 'ecommerce') {
+    if (!d.hideRevenue) fields.push(['revenue', 'Revenue', true]);
+    fields.push(['conversions', 'Conversions / Purchases', false]);
+    fields.push(['aov', 'Average Order Value', true]);
+  } else {
+    fields.push(['leads', 'Leads', false]);
+    fields.push(['sql', 'SQLs (qualified)', false]);
+    fields.push(['closedDeals', 'Closed / Won Deals', false]);
+    fields.push(['avgDealValue', 'Avg Deal Value', true]);
+  }
+  container.innerHTML = fields.map(([k, l, isCurrency]) => `
+    <div class="numfield">
+      <label>${l}${isCurrency ? `<span class="currency">(${d.currency})</span>` : ''}</label>
+      <input type="number" class="input perf-input" data-key="${k}" value="${d[k] ?? ''}">
+    </div>
+  `).join('');
+  container.querySelectorAll('.perf-input').forEach(input => {
+    input.addEventListener('input', e => { state[e.target.dataset.key] = e.target.value; renderComputed(); });
+  });
+}
+
+function renderBaselineFields() {
+  const container = document.getElementById('baseline-fields');
+  const card = document.getElementById('baseline-card');
+  const d = state;
+  if (d.noBaseline) {
+    card.style.opacity = '0.4';
+    card.style.pointerEvents = 'none';
+    container.innerHTML = '<p style="font-size:12px; color:#999; padding: 8px 0;">Disabled — "Built from scratch" toggle is on.</p>';
+    return;
+  }
+  card.style.opacity = '1';
+  card.style.pointerEvents = 'auto';
+
+  const fields = [
+    ['baseSpend', 'Baseline Ad Spend', true],
+    ['baseImpressions', 'Baseline Impressions', false],
+    ['baseClicks', 'Baseline Clicks', false],
+  ];
+  if (d.type === 'ecommerce') {
+    if (!d.hideRevenue) fields.push(['baseRevenue', 'Baseline Revenue', true]);
+    fields.push(['baseConversions', 'Baseline Conversions', false]);
+  } else {
+    fields.push(['baseLeads', 'Baseline Leads', false]);
+    fields.push(['baseSql', 'Baseline SQLs', false]);
+    fields.push(['baseClosedDeals', 'Baseline Closed Deals', false]);
+  }
+  container.innerHTML = fields.map(([k, l, isCurrency]) => `
+    <div class="numfield">
+      <label>${l}${isCurrency ? `<span class="currency">(${d.currency})</span>` : ''}</label>
+      <input type="number" class="input base-input" data-key="${k}" value="${d[k] ?? ''}">
+    </div>
+  `).join('');
+  container.querySelectorAll('.base-input').forEach(input => {
+    input.addEventListener('input', e => { state[e.target.dataset.key] = e.target.value; renderComputed(); });
+  });
+}
+
+/* ============================================================
+   RENDER: COMPUTED METRICS STRIP
+   ============================================================ */
+function renderComputed() {
+  const c = calc();
+  const d = state;
+  const container = document.getElementById('computed-chips');
+
+  const chip = (label, value, change, inverted) => {
+    let chHTML = '';
+    if (change !== null && change !== undefined && !isNaN(change)) {
+      const isUp = change > 0;
+      const cls = (inverted ? !isUp : isUp) ? 'ch-up' : 'ch-down';
+      const arrow = (inverted ? (isUp ? '↓' : '↑') : (isUp ? '↑' : '↓'));
+      chHTML = `<div class="ch ${cls}">${arrow} ${Math.abs(change).toFixed(0)}%</div>`;
+    }
+    return `<div class="metric-chip"><div class="l">${label}</div><div class="v">${value}</div>${chHTML}</div>`;
+  };
+
+  let chips = [];
+  if (d.type === 'ecommerce') {
+    if (!d.hideRevenue) chips.push(chip('ROAS', fmtROAS(c.roas), c.roasLift));
+    chips.push(chip('CPA', fmtCurrency(c.cpa, d.currency), c.cpaLift, true));
+    chips.push(chip('CTR', fmtPct(c.ctr, 2), c.ctrLift));
+    chips.push(chip('CVR', fmtPct(c.cvr, 2), c.cvrLift));
+    chips.push(chip('CPC', fmtCurrency(c.cpc, d.currency), null));
+    chips.push(chip('Conv.', fmtNumber(c.conversions), c.conversionsLift));
+  } else {
+    chips.push(chip('CPL', fmtCurrency(c.cpl, d.currency), c.cplLift, true));
+    chips.push(chip('CAC', fmtCurrency(c.cac, d.currency), c.cacLift, true));
+    if (!d.hideRevenue) chips.push(chip('Pipe ROAS', fmtROAS(c.pipelineROAS), null));
+    chips.push(chip('Lead→SQL', fmtPct(c.leadToSQL), null));
+    chips.push(chip('SQL→Close', fmtPct(c.sqlToClose), null));
+    chips.push(chip('CTR', fmtPct(c.ctr, 2), c.ctrLift));
+  }
+  container.innerHTML = chips.join('');
+}
+
+/* ============================================================
+   RENDER: 1-PAGER PREVIEW
+   ============================================================ */
+function renderPreview() {
+  const c = calc();
+  const d = state;
+  const mount = document.getElementById('case-page-mount');
+
+  const heroStats = buildHeroStats(c, d);
+  const strategyLines = d.strategy.split('\n').filter(s => s.trim());
+  const clientLabel = d.hideName ? d.descriptor : (d.descriptor); // descriptor is what shows either way; we never store a real name
+
+  const layoutHTML = d.style === 'editorial' ? editorialLayout(d, c, heroStats, strategyLines, clientLabel)
+                   : d.style === 'bold' ? boldLayout(d, c, heroStats, strategyLines, clientLabel)
+                   : dataLayout(d, c, heroStats, strategyLines, clientLabel);
+
+  mount.innerHTML = `<div class="case-page s-${d.style}">${layoutHTML}</div>`;
+}
+
+function buildHeroStats(c, d) {
+  if (d.type === 'ecommerce') {
+    const stats = [];
+    if (!d.hideRevenue) {
+      stats.push({ label: 'ROAS', value: fmtROAS(c.roas), lift: c.roasLift, liftLabel: 'vs baseline' });
+      stats.push({ label: 'Revenue', value: fmtCurrency(c.revenue, d.currency), lift: c.revenueLift, liftLabel: 'lift' });
+    } else {
+      stats.push({ label: 'ROAS', value: fmtROAS(c.roas), lift: c.roasLift, liftLabel: 'lift' });
+      stats.push({ label: 'Conversions', value: fmtNumber(c.conversions), lift: c.conversionsLift, liftLabel: 'lift' });
+    }
+    stats.push({ label: 'CPA', value: fmtCurrency(c.cpa, d.currency), lift: c.cpaLift, liftLabel: d.noBaseline ? '' : 'reduction', inverted: true });
+    stats.push({ label: 'CTR', value: fmtPct(c.ctr, 2), lift: c.ctrLift, liftLabel: 'lift' });
+    return stats;
+  } else {
+    const stats = [
+      { label: 'Closed deals', value: fmtNumber(c.closedDeals), lift: c.dealsLift, liftLabel: 'lift' },
+      { label: 'Qualified leads', value: fmtNumber(c.leads), lift: c.leadsLift, liftLabel: 'lift' },
+      { label: 'CAC', value: fmtCurrency(c.cac, d.currency), lift: c.cacLift, liftLabel: 'reduction', inverted: true },
+    ];
+    if (!d.hideRevenue) {
+      stats.push({ label: 'Pipeline', value: fmtCurrency(c.pipelineRevenue, d.currency), lift: null, liftLabel: '' });
+    } else {
+      stats.push({ label: 'CPL', value: fmtCurrency(c.cpl, d.currency), lift: c.cplLift, liftLabel: 'reduction', inverted: true });
+    }
+    return stats;
+  }
+}
+
+function liftHTML(s) {
+  if (s.lift === null || s.lift === undefined || isNaN(s.lift)) return '';
+  const arrow = s.inverted ? '↓' : '↑';
+  return `<div class="stat-lift">${arrow} ${Math.abs(s.lift).toFixed(0)}% ${s.liftLabel}</div>`;
+}
+
+function buildResultsTableHTML(d, c, showBaseline) {
+  const rows = d.type === 'ecommerce'
+    ? [
+        ['Spend', fmtCurrency(c.spend, d.currency), fmtCurrency(Number(d.baseSpend), d.currency), null],
+        !d.hideRevenue && ['Revenue', fmtCurrency(c.revenue, d.currency), fmtCurrency(Number(d.baseRevenue), d.currency), c.revenueLift],
+        !d.hideRevenue && ['ROAS', fmtROAS(c.roas), fmtROAS(c.baseROAS), c.roasLift],
+        ['Conversions', fmtNumber(c.conversions), fmtNumber(Number(d.baseConversions)), c.conversionsLift],
+        ['CPA', fmtCurrency(c.cpa, d.currency), fmtCurrency(c.baseCPA, d.currency), c.cpaLift, true],
+        ['CTR', fmtPct(c.ctr, 2), fmtPct(c.baseCTR, 2), c.ctrLift],
+      ].filter(Boolean)
+    : [
+        ['Spend', fmtCurrency(c.spend, d.currency), fmtCurrency(Number(d.baseSpend), d.currency), null],
+        ['Leads', fmtNumber(c.leads), fmtNumber(Number(d.baseLeads)), c.leadsLift],
+        ['CPL', fmtCurrency(c.cpl, d.currency), fmtCurrency(c.baseCPL, d.currency), c.cplLift, true],
+        ['Closed deals', fmtNumber(c.closedDeals), fmtNumber(Number(d.baseClosedDeals)), c.dealsLift],
+        ['CAC', fmtCurrency(c.cac, d.currency), fmtCurrency(c.baseCAC, d.currency), c.cacLift, true],
+        !d.hideRevenue && ['Pipeline', fmtCurrency(c.pipelineRevenue, d.currency), '—', null],
+      ].filter(Boolean);
+
+  return `<table class="results-table">
+    <thead><tr class="muted">
+      <th>Metric</th>
+      ${showBaseline && !d.noBaseline ? '<th class="num">Baseline</th>' : ''}
+      <th class="num">Achieved</th>
+      ${!d.noBaseline ? '<th class="num">Change</th>' : ''}
+    </tr></thead>
+    <tbody class="border-c">
+    ${rows.map(([label, val, base, lf, inverted]) => {
+      let chClass = '', chText = '—';
+      if (lf !== null && lf !== undefined && !isNaN(lf)) {
+        const isUp = lf > 0;
+        const positive = inverted ? !isUp : isUp;
+        chClass = positive ? 'style="color:#0F7A3D;"' : 'style="color:#B33A3A;"';
+        const arrow = inverted ? (isUp ? '↓' : '↑') : (isUp ? '↑' : '↓');
+        chText = `${arrow} ${Math.abs(lf).toFixed(0)}%`;
+      }
+      return `<tr>
+        <td style="font-weight: 500;">${label}</td>
+        ${showBaseline && !d.noBaseline ? `<td class="num muted">${base}</td>` : ''}
+        <td class="num" style="font-weight: 600;">${val}</td>
+        ${!d.noBaseline ? `<td class="num" ${chClass} style="font-weight:600;${chClass.replace('style="','').replace('"','')}">${chText}</td>` : ''}
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
+
+function endorsementHTML(d, style) {
+  if (d.endorsement === 'none') return '';
+  if (d.endorsement === 'outcome') {
+    if (style === 'editorial') {
+      return `<div style="border-top: 1px solid #E5E5E0; padding-top: 14px; margin-bottom: 14px;">
+        <p style="font-family: 'Fraunces', serif; font-size: 14px; line-height: 1.4; margin: 0; color: inherit;">${escapeHTML(d.outcomeCallout)}</p>
+      </div>`;
+    } else if (style === 'bold') {
+      return `<div style="border-left: 3px solid #D4FF3F; padding-left: 14px; margin-bottom: 14px;">
+        <p style="font-size: 13px; line-height: 1.45; margin: 0; font-weight: 500;">${escapeHTML(d.outcomeCallout)}</p>
+      </div>`;
+    } else {
+      return `<div class="surface" style="padding: 10px 14px; border-radius: 6px; font-size: 11px; line-height: 1.5;">${escapeHTML(d.outcomeCallout)}</div>`;
+    }
+  }
+  // testimonial
+  if (style === 'editorial') {
+    return `<div style="border-top: 1px solid #E5E5E0; padding-top: 14px; margin-bottom: 14px;">
+      <p style="font-family: 'Fraunces', serif; font-size: 14px; font-style: italic; line-height: 1.4; margin: 0;">"${escapeHTML(d.testimonial)}"</p>
+      <div style="font-size: 10px; color: #666; margin-top: 8px; font-weight: 500;">— ${escapeHTML(d.testimonialAuthor)}</div>
+    </div>`;
+  } else if (style === 'bold') {
+    return `<div style="border-left: 3px solid #D4FF3F; padding-left: 14px; margin-bottom: 14px;">
+      <p style="font-size: 13px; line-height: 1.45; margin: 0; font-weight: 500;">"${escapeHTML(d.testimonial)}"</p>
+      <div style="font-size: 10px; color: #999; margin-top: 6px; font-weight: 600;">— ${escapeHTML(d.testimonialAuthor)}</div>
+    </div>`;
+  } else {
+    return `<div class="surface" style="padding: 10px 14px; border-radius: 6px; font-size: 11px;">
+      <span style="font-style: italic;">"${escapeHTML(d.testimonial)}"</span>
+      <span class="muted" style="margin-left: 8px; font-size: 9px;">— ${escapeHTML(d.testimonialAuthor)}</span>
+    </div>`;
+  }
+}
+
+function escapeHTML(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function comparisonBarsHTML(d, c) {
+  if (d.noBaseline) return '<p style="font-size:11px; color:#5A6B82;">Built from scratch — no baseline to compare against.</p>';
+  const items = d.type === 'ecommerce'
+    ? [
+        !d.hideRevenue && { label: 'Revenue', baseline: Number(d.baseRevenue), current: c.revenue, fmt: v => fmtCurrency(v, d.currency) },
+        !d.hideRevenue && { label: 'ROAS', baseline: c.baseROAS, current: c.roas, fmt: v => fmtROAS(v) },
+        { label: 'Conversions', baseline: Number(d.baseConversions), current: c.conversions, fmt: v => fmtNumber(v) },
+      ].filter(Boolean)
+    : [
+        { label: 'Leads', baseline: Number(d.baseLeads), current: c.leads, fmt: v => fmtNumber(v) },
+        { label: 'Closed deals', baseline: Number(d.baseClosedDeals), current: c.closedDeals, fmt: v => fmtNumber(v) },
+        !d.hideRevenue && { label: 'Pipeline', baseline: 0, current: c.pipelineRevenue, fmt: v => fmtCurrency(v, d.currency) },
+      ].filter(Boolean);
+  return `<div style="display:flex; flex-direction:column; gap:10px;">${
+    items.map(item => {
+      const max = Math.max(item.baseline, item.current, 1);
+      const bP = (item.baseline / max) * 100;
+      const cP = (item.current / max) * 100;
+      return `<div>
+        <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px;">
+          <span class="muted" style="font-weight:600;">${item.label}</span>
+          <span style="font-weight:600;">${item.fmt(item.current)}</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:3px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:8px; width:38px;" class="muted">BEFORE</span>
+            <div style="flex:1; height:8px; background:#E0E5EC; border-radius:2px; overflow:hidden;"><div style="width:${bP}%; height:100%; background:#9CA3AF;"></div></div>
+            <span style="font-size:9px; width:70px; text-align:right;" class="muted">${item.fmt(item.baseline)}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:8px; width:38px;" class="muted">AFTER</span>
+            <div style="flex:1; height:8px; background:#E0E5EC; border-radius:2px; overflow:hidden;"><div style="width:${cP}%; height:100%; background:#0066FF;"></div></div>
+            <span style="font-size:9px; width:70px; text-align:right; font-weight:600;">${item.fmt(item.current)}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('')
+  }</div>`;
+}
+
+/* ---------- LAYOUTS ---------- */
+function editorialLayout(d, c, heroStats, strategyLines, clientLabel) {
+  return `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:12px; border-bottom: 1px solid #E5E5E0;">
+      <div>
+        <div class="eyebrow muted">Case Study · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
+        <div class="display" style="font-size: 22px; font-weight: 500; margin-top: 4px; letter-spacing: -0.02em;">${escapeHTML(clientLabel)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size: 11px; font-weight: 600;">${escapeHTML(d.agencyName)}</div>
+        <div style="font-size: 9px; color: #666; margin-top: 2px;">${escapeHTML(d.agencyTagline)}</div>
+        <div style="font-size: 9px; color: #666; margin-top: 4px;">${escapeHTML(d.period)}</div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 0 18px;">
+      <h1 class="display page-h1" style="max-width: 95%;">${escapeHTML(d.headline)}</h1>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:0; border-top:1px solid #E5E5E0; border-bottom:1px solid #E5E5E0; padding: 16px 0; margin-bottom: 18px;">
+      ${heroStats.map((h, i) => `
+        <div style="padding-left:${i === 0 ? 0 : 16}px; padding-right:${i < heroStats.length-1 ? 16 : 0}px; ${i < heroStats.length-1 ? 'border-right:1px solid #E5E5E0;' : ''}">
+          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.label)}</div>
+          <div class="display stat-value">${h.value}</div>
+          ${liftHTML(h)}
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:18px;">
+      <div>
+        <div class="stat-label muted" style="margin-bottom:8px;">The challenge</div>
+        <p style="font-size:11px; line-height:1.6; margin:0;">${escapeHTML(d.challenge)}</p>
+        <div class="stat-label muted" style="margin-bottom:8px; margin-top:16px;">Channels</div>
+        <p style="font-size:11px; line-height:1.6; margin:0;">${escapeHTML(d.channels)}</p>
+      </div>
+      <div>
+        <div class="stat-label muted" style="margin-bottom:8px;">What we did</div>
+        <ul style="margin:0; padding-left:16px; font-size:11px; line-height:1.6;">
+          ${strategyLines.map(l => `<li style="margin-bottom:4px;">${escapeHTML(l)}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-bottom:18px;">
+      <div class="stat-label muted" style="margin-bottom:10px;">Detailed results</div>
+      ${buildResultsTableHTML(d, c, true)}
+    </div>
+
+    ${endorsementHTML(d, 'editorial')}
+
+    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#666; padding-top:8px; border-top:1px solid #E5E5E0;">
+      <div>${escapeHTML(d.agencyName)} · ${escapeHTML(d.agencyTagline)}</div>
+      <div>Prepared ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+    </div>
+  `;
+}
+
+function boldLayout(d, c, heroStats, strategyLines, clientLabel) {
+  return `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:28px; height:28px; background:#D4FF3F; border-radius:6px;"></div>
+        <div>
+          <div style="font-size:13px; font-weight:700;">${escapeHTML(d.agencyName)}</div>
+          <div style="font-size:9px; color:#999; text-transform:uppercase; letter-spacing:0.12em;">${escapeHTML(d.agencyTagline)}</div>
+        </div>
+      </div>
+      <div style="font-size:10px; color:#999; text-transform:uppercase; letter-spacing:0.14em;">${escapeHTML(d.period)}</div>
+    </div>
+
+    <div style="padding:14px 0 18px; border-top:1px solid #2A2A2A; border-bottom:1px solid #2A2A2A;">
+      <div class="accent-text eyebrow" style="margin-bottom:8px;">${escapeHTML(clientLabel)} · ${escapeHTML(d.industry)}</div>
+      <h1 class="page-h1 display">${escapeHTML(d.headline)}</h1>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:8px; margin:18px 0;">
+      ${heroStats.map((h, i) => `
+        <div style="background: ${i === 0 ? '#D4FF3F' : '#1A1A1A'}; color: ${i === 0 ? '#0F0F0F' : '#FFFFFF'}; padding:14px; border-radius:8px;">
+          <div class="stat-label" style="font-weight:700; opacity:0.7; margin-bottom:8px;">${escapeHTML(h.label)}</div>
+          <div class="display" style="font-size:28px; font-weight:700; line-height:1; letter-spacing:-0.02em;">${h.value}</div>
+          ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:9px; font-weight:600; margin-top:6px; opacity:0.85;">${h.inverted ? '↓' : '↑'} ${Math.abs(h.lift).toFixed(0)}% ${escapeHTML(h.liftLabel)}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:14px;">
+      <div style="background:#1A1A1A; padding:16px; border-radius:8px;">
+        <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">Challenge</div>
+        <p style="font-size:11px; line-height:1.5; margin:0;">${escapeHTML(d.challenge)}</p>
+      </div>
+      <div style="background:#1A1A1A; padding:16px; border-radius:8px;">
+        <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">What we did</div>
+        <ul style="margin:0; padding-left:16px; font-size:11px; line-height:1.5;">${strategyLines.map(l => `<li style="margin-bottom:4px;">${escapeHTML(l)}</li>`).join('')}</ul>
+      </div>
+    </div>
+
+    <div style="background:#1A1A1A; border-radius:8px; padding:12px 14px; margin-bottom:14px;">
+      <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">Channel metrics</div>
+      ${buildResultsTableHTML(d, c, false)}
+    </div>
+
+    ${endorsementHTML(d, 'bold')}
+
+    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#999; padding-top:10px; border-top:1px solid #2A2A2A;">
+      <div>Channels: ${escapeHTML(d.channels)}</div>
+      <div>${escapeHTML(d.agencyName)}</div>
+    </div>
+  `;
+}
+
+function dataLayout(d, c, heroStats, strategyLines, clientLabel) {
+  return `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #0066FF;">
+      <div>
+        <div class="stat-label muted">Performance Marketing Report</div>
+        <div style="font-size:18px; font-weight:600; margin-top:4px; letter-spacing:-0.01em;">${escapeHTML(clientLabel)} · ${escapeHTML(d.industry)}</div>
+        <div style="font-size:10px; color:#5A6B82; margin-top:2px;">Reporting period: ${escapeHTML(d.period)} · Size: ${escapeHTML(d.size)} · Channels: ${escapeHTML(d.channels)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:12px; font-weight:600;">${escapeHTML(d.agencyName)}</div>
+        <div style="font-size:9px; color:#5A6B82;">${escapeHTML(d.agencyTagline)}</div>
+      </div>
+    </div>
+
+    <div style="background:#F7F8FA; border-left:4px solid #0066FF; padding:12px 14px; margin-bottom:14px; border-radius:4px;">
+      <div class="stat-label muted" style="margin-bottom:4px;">Executive summary</div>
+      <div style="font-size:16px; font-weight:600; line-height:1.3;">${escapeHTML(d.headline)}</div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:6px; margin-bottom:14px;">
+      ${heroStats.map(h => `
+        <div style="background:#F7F8FA; padding:12px; border-radius:6px; border-top:2px solid #0066FF;">
+          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.label)}</div>
+          <div style="font-size:22px; font-weight:600; line-height:1; letter-spacing:-0.02em;">${h.value}</div>
+          ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:10px; color:#0F7A3D; margin-top:6px; font-weight:600;">${h.inverted ? '▼' : '▲'} ${Math.abs(h.lift).toFixed(1)}% ${escapeHTML(h.liftLabel)}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <div class="stat-label muted" style="margin-bottom:8px;">Detailed performance${d.noBaseline ? '' : ' — baseline vs achieved'}</div>
+      ${buildResultsTableHTML(d, c, true)}
+    </div>
+
+    <div style="margin-bottom:14px; background:#F7F8FA; padding:12px; border-radius:6px;">
+      <div class="stat-label muted" style="margin-bottom:10px;">${d.noBaseline ? 'Achieved metrics' : 'Key metric lift'}</div>
+      ${comparisonBarsHTML(d, c)}
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;">
+      <div>
+        <div class="stat-label muted" style="margin-bottom:6px;">Challenge</div>
+        <p style="font-size:10.5px; line-height:1.5; margin:0;">${escapeHTML(d.challenge)}</p>
+      </div>
+      <div>
+        <div class="stat-label muted" style="margin-bottom:6px;">Approach</div>
+        <ul style="margin:0; padding-left:14px; font-size:10.5px; line-height:1.5;">${strategyLines.map(l => `<li style="margin-bottom:2px;">${escapeHTML(l)}</li>`).join('')}</ul>
+      </div>
+    </div>
+
+    ${endorsementHTML(d, 'data')}
+
+    <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#5A6B82; padding-top:8px; border-top:1px solid #E1E5EC;">
+      <div>${escapeHTML(d.agencyName)} · ${escapeHTML(d.agencyTagline)}</div>
+      <div>Generated ${new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   EVENT WIRING
+   ============================================================ */
+function bindAllInputs() {
+  // Type toggle
+  document.querySelectorAll('[data-type]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.type = btn.dataset.type;
+      renderPerfFields();
+      renderBaselineFields();
+      renderComputed();
     });
-
-    document.getElementById("downloadDoc").addEventListener("click", () => downloadCaseStudy("doc"));
-    document.getElementById("downloadHtml").addEventListener("click", () => downloadCaseStudy("html"));
-    document.getElementById("printPdf").addEventListener("click", () => window.print());
-    document.getElementById("resetDemo").addEventListener("click", () => {
-      fields.forEach((field) => {
-        field.value = defaults[field.dataset.field];
-      });
-      render();
+  });
+  // Style + currency
+  document.getElementById('f-style').addEventListener('change', e => { state.style = e.target.value; });
+  document.getElementById('f-currency').addEventListener('change', e => {
+    state.currency = e.target.value;
+    renderPerfFields(); renderBaselineFields(); renderComputed();
+  });
+  // Privacy switches
+  document.getElementById('t-hideName').addEventListener('change', e => { state.hideName = e.target.checked; });
+  document.getElementById('t-hideRevenue').addEventListener('change', e => {
+    state.hideRevenue = e.target.checked;
+    renderPerfFields(); renderBaselineFields(); renderComputed();
+  });
+  document.getElementById('t-noBaseline').addEventListener('change', e => {
+    state.noBaseline = e.target.checked;
+    renderBaselineFields(); renderComputed();
+  });
+  // Endorsement tabs
+  document.querySelectorAll('.ai-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ai-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.endorsement = btn.dataset.endorsement;
+      document.getElementById('endorsement-outcome').style.display = state.endorsement === 'outcome' ? 'block' : 'none';
+      document.getElementById('endorsement-testimonial').style.display = state.endorsement === 'testimonial' ? 'block' : 'none';
     });
+  });
+  // Text inputs (sync to state)
+  const textFields = [
+    'agencyName','agencyTagline','descriptor','industry','size','period','channels',
+    'headline','challenge','strategy','outcomeCallout','testimonial','testimonialAuthor'
+  ];
+  textFields.forEach(k => {
+    const el = document.getElementById('f-' + k);
+    if (el) el.addEventListener('input', e => { state[k] = e.target.value; });
+  });
 
-    function getData() {
-      return fields.reduce((data, field) => {
-        data[field.dataset.field] = field.value;
-        return data;
-      }, {});
-    }
+  // AI drafters
+  document.getElementById('ai-headline').addEventListener('click', () => {
+    const h = draftHeadline();
+    state.headline = h;
+    document.getElementById('f-headline').value = h;
+  });
+  document.getElementById('ai-outcome').addEventListener('click', () => {
+    const o = draftOutcomeCallout();
+    state.outcomeCallout = o;
+    document.getElementById('f-outcomeCallout').value = o;
+  });
+  document.getElementById('ai-testimonial').addEventListener('click', () => {
+    const t = draftTestimonial();
+    state.testimonial = t;
+    document.getElementById('f-testimonial').value = t;
+  });
 
-    function num(value) {
-      const clean = Number.parseFloat(value);
-      return Number.isFinite(clean) ? clean : 0;
-    }
+  // Tabs
+  document.getElementById('tab-input').addEventListener('click', () => switchView('input'));
+  document.getElementById('tab-preview').addEventListener('click', () => switchView('preview'));
 
-    function pctChange(before, after, inverted = false) {
-      if (!before) return 0;
-      const raw = inverted ? ((before - after) / before) * 100 : ((after - before) / before) * 100;
-      return Math.round(raw);
-    }
+  // Export
+  document.getElementById('export-btn').addEventListener('click', exportPDF);
 
-    function rate(part, whole) {
-      return whole ? (part / whole) * 100 : 0;
-    }
+  // Reset
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    if (confirm('Reset all fields to defaults?')) location.reload();
+  });
+}
 
-    function divide(part, whole) {
-      return whole ? part / whole : 0;
-    }
+function switchView(v) {
+  document.getElementById('view-input').style.display = v === 'input' ? 'block' : 'none';
+  document.getElementById('view-preview').style.display = v === 'preview' ? 'block' : 'none';
+  document.getElementById('tab-input').classList.toggle('active', v === 'input');
+  document.getElementById('tab-preview').classList.toggle('active', v === 'preview');
+  if (v === 'preview') renderPreview();
+}
 
-    function setField(key, value, decimals = 2) {
-      const field = document.querySelector(`[data-field="${key}"]`);
-      if (!field) return;
-      field.value = Number.isFinite(value) ? value.toFixed(decimals) : "0.00";
-    }
+/* ============================================================
+   EXPORT PDF (opens print dialog in new window with just the page)
+   ============================================================ */
+function exportPDF() {
+  renderPreview();
+  const pageHTML = document.getElementById('case-page-mount').innerHTML;
+  const win = window.open('', '_blank');
+  if (!win) { alert('Please allow pop-ups to export the PDF.'); return; }
 
-    function money(value, currency) {
-      const amount = num(value).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-      return currency === "$" ? `$${amount}` : `${amount} ${currency}`;
-    }
+  const styleTag = document.querySelector('style').outerHTML;
+  const fonts = document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
 
-    function setText(key, value) {
-      document.querySelectorAll(`[data-out="${key}"]`).forEach((node) => {
-        node.textContent = value;
-      });
-    }
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>${escapeHTML(state.descriptor)} — Case Study</title>
+    ${fonts}
+    ${styleTag}
+    <style>
+      body { background: white; }
+      @page { size: A4; margin: 0; }
+      .case-page { box-shadow: none; margin: 0; }
+    </style>
+  </head><body>${pageHTML}
+    <script>window.addEventListener('load', () => { setTimeout(() => window.print(), 600); });<\/script>
+  </body></html>`);
+  win.document.close();
+}
 
-    function setList(key, value) {
-      const lines = value.split("\n").map((line) => line.trim()).filter(Boolean);
-      document.querySelectorAll(`[data-list="${key}"]`).forEach((list) => {
-        list.innerHTML = "";
-        lines.forEach((line) => {
-          const item = document.createElement("li");
-          item.textContent = line;
-          list.appendChild(item);
-        });
-      });
-    }
-
-    function render() {
-      const data = getData();
-      const beforeSpend = num(data.beforeSpend);
-      const afterSpend = num(data.afterSpend);
-      const beforeResults = num(data.beforeResults);
-      const afterResults = num(data.afterResults);
-      const beforeRevenue = num(data.beforeRevenue);
-      const afterRevenue = num(data.afterRevenue);
-      const beforeClicks = num(data.beforeClicks);
-      const afterClicks = num(data.afterClicks);
-      const beforeImpressions = num(data.beforeImpressions);
-      const afterImpressions = num(data.afterImpressions);
-      const beforeQualifiedLeads = num(data.beforeQualifiedLeads);
-      const afterQualifiedLeads = num(data.afterQualifiedLeads);
-      const calculatedBeforeCpa = divide(beforeSpend, beforeResults);
-      const calculatedAfterCpa = divide(afterSpend, afterResults);
-      const calculatedBeforeConversion = rate(beforeResults, beforeClicks);
-      const calculatedAfterConversion = rate(afterResults, afterClicks);
-      const calculatedBeforeRoas = divide(beforeRevenue, beforeSpend);
-      const calculatedAfterRoas = divide(afterRevenue, afterSpend);
-      const calculatedBeforeCpl = divide(beforeSpend, beforeQualifiedLeads);
-      const calculatedAfterCpl = divide(afterSpend, afterQualifiedLeads);
-      const calculatedCtr = rate(afterClicks, afterImpressions);
-      const reduction = Math.max(0, pctChange(calculatedBeforeCpa, calculatedAfterCpa, true));
-      const conversionLift = pctChange(calculatedBeforeConversion, calculatedAfterConversion);
-      const roasLift = pctChange(calculatedBeforeRoas, calculatedAfterRoas);
-      const leadLift = pctChange(beforeQualifiedLeads, afterQualifiedLeads);
-      const cplReduction = Math.max(0, pctChange(calculatedBeforeCpl, calculatedAfterCpl, true));
-      const days = Math.max(1, Math.round(num(data.days) || 1));
-      const beforeCpa = calculatedBeforeCpa;
-      const afterCpa = calculatedAfterCpa;
-      const ratio = beforeCpa ? Math.max(.25, Math.min(1, afterCpa / beforeCpa)) : .6;
-      const beforeHeight = 210;
-      const afterHeight = Math.round(beforeHeight * ratio);
-
-      setField("beforeCpa", calculatedBeforeCpa);
-      setField("afterCpa", calculatedAfterCpa);
-      setField("beforeConversion", calculatedBeforeConversion);
-      setField("afterConversion", calculatedAfterConversion);
-      setField("beforeRoas", calculatedBeforeRoas);
-      setField("afterRoas", calculatedAfterRoas);
-      setField("beforeCpl", calculatedBeforeCpl);
-      setField("afterCpl", calculatedAfterCpl);
-      setField("landingCvr", calculatedAfterConversion);
-      setField("ctr", calculatedCtr);
-
-      setText("reduction", `${reduction}%`);
-      setText("reductionBadge", `${reduction}%`);
-      setText("resultReduction", `${reduction}%`);
-      setText("daysText", `${days} days`);
-      setText("daysShort", days);
-      setText("daysLower", `${days} days`);
-      setText("timeframe", `${days} days`);
-      setText("beforeCpa", money(calculatedBeforeCpa, data.currency));
-      setText("afterCpa", money(calculatedAfterCpa, data.currency));
-      setText("intro", data.intro);
-      setText("takeaway", data.takeaway);
-      setText("conversionLift", `${Math.max(0, conversionLift)}%`);
-      setText("roasLift", `${Math.max(0, roasLift)}%`);
-      setText("relevanceScore", num(data.relevanceScore).toFixed(1));
-      setText("leadSummary", `${Math.max(leadLift, cplReduction)}%`);
-      setText("calcCpaReduction", `${reduction}%`);
-      setText("calcConversionLift", `${Math.max(0, conversionLift)}%`);
-      setText("calcRoasLift", `${Math.max(0, roasLift)}%`);
-      setText("calcLeadLift", `${Math.max(0, leadLift)}%`);
-      setText("calcCplReduction", `${cplReduction}%`);
-      setText("calcCtr", `${calculatedCtr.toFixed(2)}%`);
-
-      document.getElementById("chartStage").style.setProperty("--before-height", `${beforeHeight}px`);
-      document.getElementById("chartStage").style.setProperty("--after-height", `${afterHeight}px`);
-
-      setList("strategyAudience", data.strategyAudience);
-      setList("strategyCreative", data.strategyCreative);
-      setList("strategyLanding", data.strategyLanding);
-      setList("strategyBudget", data.strategyBudget);
-    }
-
-    function filename(extension) {
-      const data = getData();
-      const client = (data.clientName || "client").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-      return `${client || "client"}-case-study.${extension}`;
-    }
-
-    function downloadCaseStudy(type) {
-      const caseStudy = document.getElementById("caseStudy").cloneNode(true);
-      const styles = Array.from(document.querySelectorAll("style")).map((style) => style.textContent).join("\n");
-      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Case Study</title><style>${styles}</style></head><body><main class="preview-wrap">${caseStudy.outerHTML}</main></body></html>`;
-      const blob = new Blob([html], {
-        type: type === "doc" ? "application/msword;charset=utf-8" : "text/html;charset=utf-8"
-      });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = filename(type === "doc" ? "doc" : "html");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(link.href);
-    }
-
-    render();
-  </script>
+/* ============================================================
+   INIT
+   ============================================================ */
+bindAllInputs();
+renderPerfFields();
+renderBaselineFields();
+renderComputed();
+</script>
 </body>
 </html>
