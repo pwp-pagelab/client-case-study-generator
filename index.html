@@ -8,38 +8,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ============================================
-     RESET + BASE
-     ============================================ */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #F5F5F2; color: #1A1A1A; line-height: 1.5; }
   button { font-family: inherit; cursor: pointer; }
   input, textarea, select { font-family: inherit; font-size: 13px; }
 
-  /* ============================================
-     APP CHROME
-     ============================================ */
-  .topbar {
-    background: white; border-bottom: 1px solid #ECECE7;
-    padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; z-index: 100;
-  }
+  .topbar { background: white; border-bottom: 1px solid #ECECE7; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .brand { display: flex; align-items: center; gap: 10px; }
   .brand-mark { width: 30px; height: 30px; background: #1A1A1A; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
   .brand-name { font-size: 14px; font-weight: 600; }
   .brand-sub { font-size: 11px; color: #888; }
   .topbar-actions { display: flex; gap: 8px; }
-  .btn {
-    background: white; color: #333; border: 1px solid #E0E0DC;
-    padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 500;
-    display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;
-  }
+  .btn { background: white; color: #333; border: 1px solid #E0E0DC; padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
   .btn:hover { border-color: #1A1A1A; }
   .btn.active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
   .btn-primary { background: #0F7A3D; color: white; border-color: #0F7A3D; font-weight: 600; }
   .btn-primary:hover { background: #0c6432; border-color: #0c6432; }
-  .btn-pwp { background: #1A1A1A; color: white; border-color: #1A1A1A; font-weight: 600; }
-  .btn-pwp:hover { background: #0F7A3D; border-color: #0F7A3D; }
   .btn-ai { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; border-color: transparent; font-weight: 600; }
   .btn-ai:hover { opacity: 0.9; }
 
@@ -53,24 +37,23 @@
   .card { background: white; border-radius: 10px; padding: 20px; border: 1px solid #ECECE7; margin-bottom: 14px; }
   .card-dark { background: #1A1A1A; color: white; }
   .card-title { font-size: 13px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .card-title svg { width: 14px; height: 14px; }
 
   .label { display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #666; margin-bottom: 5px; }
   .field { margin-bottom: 10px; }
-  .input, textarea.input, select.input {
-    width: 100%; padding: 9px 12px; border: 1px solid #E0E0DC; border-radius: 6px;
-    background: white; transition: border-color 0.15s;
-  }
+  .input, textarea.input, select.input { width: 100%; padding: 9px 12px; border: 1px solid #E0E0DC; border-radius: 6px; background: white; transition: border-color 0.15s; }
   .input:focus { outline: none; border-color: #1A1A1A; }
   textarea.input { resize: vertical; min-height: 60px; }
 
   .numfield { display: grid; grid-template-columns: 1fr 130px; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .numfield > div:first-child { display: flex; flex-direction: column; }
   .numfield label { font-size: 12px; color: #333; font-weight: 500; }
   .numfield .currency { color: #999; margin-left: 6px; font-size: 11px; }
   .numfield input { text-align: right; font-variant-numeric: tabular-nums; }
+  .numfield input::placeholder { color: #C5C5C0; font-style: italic; font-size: 11px; }
+  .field-hint { font-size: 10px; color: #999; margin-top: 2px; font-style: italic; }
 
-  .toggle-group { display: flex; gap: 6px; }
-  .toggle-btn { flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid #E0E0DC; background: white; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+  .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .toggle-btn { padding: 8px 10px; border-radius: 6px; border: 1px solid #E0E0DC; background: white; font-size: 12px; font-weight: 500; transition: all 0.15s; flex: 1; min-width: 90px; }
   .toggle-btn.active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
 
   .switch { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FAFAF7; border-radius: 7px; margin-bottom: 8px; }
@@ -88,54 +71,32 @@
   .ch-up { color: #7EFFA0; }
   .ch-down { color: #FF8888; }
 
-  .ai-output-box { background: #F5F3FF; border: 1px solid #DDD6FE; border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 12px; line-height: 1.5; color: #4C1D95; }
-  .ai-output-box .label-pill { display: inline-block; background: #6366F1; color: white; font-size: 9px; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 6px; }
-  .ai-tab-bar { display: flex; gap: 4px; margin-bottom: 10px; }
-  .ai-tab-bar button { padding: 5px 10px; font-size: 11px; border-radius: 5px; border: 1px solid #E0E0DC; background: white; color: #555; }
-  .ai-tab-bar button.active { background: #6366F1; color: white; border-color: #6366F1; }
+  .ai-tab-bar { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ai-tab { padding: 5px 10px; font-size: 11px; border-radius: 5px; border: 1px solid #E0E0DC; background: white; color: #555; }
+  .ai-tab.active { background: #6366F1; color: white; border-color: #6366F1; }
 
   .hint-text { font-size: 11px; color: #888; margin: 4px 0 12px; line-height: 1.5; }
+  .warn-text { font-size: 11px; color: #B45309; background: #FEF3C7; padding: 8px; border-radius: 6px; margin: 6px 0; line-height: 1.5; }
 
-  .share-preview { background: #FAFAF7; border: 1px solid #ECECE7; border-radius: 8px; padding: 12px; font-size: 12px; line-height: 1.6; white-space: pre-wrap; color: #333; max-height: 280px; overflow: auto; }
-  .pwp-note { border-left: 3px solid #0F7A3D; background: #F6FBF7; padding: 10px 12px; border-radius: 6px; font-size: 12px; color: #234B31; line-height: 1.5; }
+  .detection-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #E0F2FE; color: #075985; border-radius: 12px; font-size: 11px; font-weight: 600; margin-left: 6px; }
 
-  /* ============================================
-     1-PAGER PREVIEW (A4)
-     ============================================ */
   .preview-stage { display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
-  .case-page {
-    width: 210mm; min-height: 297mm; background: white; padding: 14mm 14mm;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.08); position: relative; overflow: hidden;
-  }
+  .case-page { width: 210mm; min-height: 297mm; background: white; padding: 14mm; box-shadow: 0 8px 32px rgba(0,0,0,0.08); position: relative; overflow: hidden; }
 
-  /* === Style: Editorial === */
   .s-editorial { background: #FAFAF7; color: #1A1A1A; font-family: 'Inter', sans-serif; }
   .s-editorial .display { font-family: 'Fraunces', Georgia, serif; }
-  .s-editorial .accent { color: #1A1A1A; }
-  .s-editorial .border-c { border-color: #E5E5E0; }
   .s-editorial .muted { color: #666; }
-  .s-editorial .surface { background: #FFFFFF; }
 
-  /* === Style: Bold === */
   .s-bold { background: #0F0F0F; color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; }
   .s-bold .display { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
-  .s-bold .accent-fill { background: #D4FF3F; color: #0F0F0F; }
   .s-bold .accent-text { color: #D4FF3F; }
-  .s-bold .border-c { border-color: #2A2A2A; }
   .s-bold .muted { color: #999; }
-  .s-bold .surface { background: #1A1A1A; }
 
-  /* === Style: Data === */
   .s-data { background: #FFFFFF; color: #0A1628; font-family: 'IBM Plex Sans', sans-serif; }
   .s-data .display { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; }
-  .s-data .accent-fill { background: #0066FF; color: #FFFFFF; }
   .s-data .accent-text { color: #0066FF; }
-  .s-data .accent-border { border-color: #0066FF; }
-  .s-data .border-c { border-color: #E1E5EC; }
   .s-data .muted { color: #5A6B82; }
-  .s-data .surface { background: #F7F8FA; }
 
-  /* shared page elements */
   .page-h1 { font-size: 32px; line-height: 1.06; letter-spacing: -0.025em; margin: 0; font-weight: 500; }
   .s-bold .page-h1 { font-weight: 700; }
   .s-data .page-h1 { font-weight: 600; font-size: 26px; }
@@ -144,93 +105,60 @@
   .stat-label { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; }
   .stat-value { font-size: 28px; line-height: 1; letter-spacing: -0.02em; font-weight: 500; }
   .s-bold .stat-value { font-weight: 700; }
-  .stat-lift { font-size: 10px; margin-top: 4px; font-weight: 600; color: #0F7A3D; }
-  .s-bold .stat-lift { color: inherit; opacity: 0.85; }
+  .stat-lift { font-size: 10px; margin-top: 4px; font-weight: 600; }
 
   .results-table { width: 100%; border-collapse: collapse; font-size: 11px; }
   .results-table th { text-align: left; padding: 5px 6px; font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; }
   .results-table td { padding: 5px 6px; }
   .results-table .num { text-align: right; font-variant-numeric: tabular-nums; }
-  .results-table tr { border-top: 1px solid currentColor; border-color: inherit; }
+  .results-table tr { border-top: 1px solid; }
+  .s-editorial .results-table tr { border-color: #E5E5E0; }
+  .s-bold .results-table tr { border-color: #2A2A2A; }
+  .s-data .results-table tr { border-color: #E1E5EC; }
   .results-table tr:first-child { border-top: none; }
 
-  .pwp-signature { letter-spacing: 0.12em; text-transform: uppercase; font-size: 8px; font-weight: 700; }
-
-  /* ============================================
-     LINKEDIN CAROUSEL
-     ============================================ */
-  .carousel-export { background: #F5F5F2; padding: 0; }
-  .carousel-slide {
-    width: 1080px; height: 1080px; background: #FAFAF7; color: #1A1A1A;
-    padding: 74px; page-break-after: always; position: relative; overflow: hidden;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  }
-  .carousel-slide.dark { background: #111; color: white; }
-  .carousel-slide .kicker { font-size: 18px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: #0F7A3D; margin-bottom: 24px; }
-  .carousel-slide.dark .kicker { color: #7EFFA0; }
-  .carousel-slide h1 { font-family: 'Fraunces', Georgia, serif; font-size: 78px; line-height: 0.98; letter-spacing: -0.04em; max-width: 880px; font-weight: 600; }
-  .carousel-slide h2 { font-family: 'Fraunces', Georgia, serif; font-size: 58px; line-height: 1.04; letter-spacing: -0.035em; max-width: 860px; font-weight: 600; margin-bottom: 28px; }
-  .carousel-slide p, .carousel-slide li { font-size: 30px; line-height: 1.35; color: inherit; }
-  .carousel-slide ul { margin: 0; padding-left: 34px; display: grid; gap: 18px; }
-  .carousel-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 42px; }
-  .carousel-stat { border: 1px solid rgba(26,26,26,.16); border-radius: 18px; padding: 28px; background: white; }
-  .carousel-slide.dark .carousel-stat { border-color: rgba(255,255,255,.16); background: #1A1A1A; }
-  .carousel-stat span { display: block; font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; color: #666; font-weight: 700; margin-bottom: 12px; }
-  .carousel-slide.dark .carousel-stat span { color: #AAA; }
-  .carousel-stat strong { display: block; font-size: 54px; line-height: 1; letter-spacing: -0.03em; }
-  .carousel-footer { position: absolute; left: 74px; right: 74px; bottom: 54px; display: flex; justify-content: space-between; align-items: center; font-size: 18px; color: #666; border-top: 1px solid rgba(26,26,26,.12); padding-top: 24px; }
-  .carousel-slide.dark .carousel-footer { color: #AAA; border-color: rgba(255,255,255,.16); }
-  .pwp-mark { font-weight: 800; color: inherit; }
-
-  /* ============================================
-     PRINT
-     ============================================ */
   @media print {
     body { background: white; margin: 0; padding: 0; }
     .no-print { display: none !important; }
     .case-page { box-shadow: none; width: 210mm; min-height: 297mm; padding: 14mm; page-break-after: avoid; }
-    .carousel-slide { width: 1080px; height: 1080px; box-shadow: none; }
     @page { size: A4; margin: 0; }
   }
 </style>
 </head>
 <body>
 
-<!-- ========== TOP BAR ========== -->
 <div class="topbar no-print">
   <div class="brand">
     <div class="brand-mark">⌬</div>
     <div>
       <div class="brand-name">Case Study Generator</div>
-      <div class="brand-sub">Post With Passion · Real voices · PDF + LinkedIn</div>
+      <div class="brand-sub">Smart · Anonymized · 1-pager PDF</div>
     </div>
   </div>
   <div class="topbar-actions">
     <button class="btn active" id="tab-input">Inputs</button>
     <button class="btn" id="tab-preview">Preview</button>
     <button class="btn btn-primary" id="export-btn">↓ Export PDF</button>
-    <button class="btn btn-pwp" id="linkedin-post-btn">Copy LinkedIn Post</button>
-    <button class="btn btn-pwp" id="carousel-btn">Export Carousel</button>
   </div>
 </div>
 
 <div class="main">
-
-  <!-- ============================================
-       INPUT VIEW
-       ============================================ -->
   <div id="view-input">
 
-    <!-- SETUP -->
     <div class="card">
       <div class="card-title">⚙️ Setup</div>
       <div class="grid-4">
         <div>
-          <label class="label">Client Type</label>
-          <div class="toggle-group">
-            <button class="toggle-btn" data-type="ecommerce">Ecommerce</button>
-            <button class="toggle-btn active" data-type="leadgen">Lead-gen</button>
-          </div>
+          <label class="label">Engagement Focus</label>
+          <select class="input" id="f-focus">
+            <option value="auto">Auto-detect from data (recommended)</option>
+            <option value="leadgen">Lead generation</option>
+            <option value="ecommerce">Ecommerce / DTC</option>
+            <option value="creative">Creative & UGC</option>
+            <option value="awareness">Awareness & reach</option>
+            <option value="fullfunnel">Full-funnel</option>
+          </select>
+          <div id="auto-detected" class="field-hint" style="display:none; color:#075985; font-weight:600; font-style:normal; margin-top:4px;"></div>
         </div>
         <div>
           <label class="label">Style</label>
@@ -243,7 +171,7 @@
         <div>
           <label class="label">Currency</label>
           <select class="input" id="f-currency">
-            <option>SAR</option><option>USD</option><option>EUR</option><option>GBP</option><option>AED</option>
+            <option>USD</option><option>EUR</option><option>GBP</option><option selected>SAR</option><option>AED</option>
           </select>
         </div>
         <div>
@@ -254,40 +182,25 @@
     </div>
 
     <div class="card">
-      <div class="card-title">✦ Post With Passion output</div>
-      <p class="pwp-note">The final assets are designed to be shareable as a polished PDF case study, a ready LinkedIn caption, and a square LinkedIn carousel. The voice uses PWP themes: real people, local Saudi context, story-led creative, and performance numbers that still feel human.</p>
-      <div class="grid-3" style="margin-top: 14px;">
-        <button class="btn btn-primary" id="export-btn-inline" style="justify-content:center;">Export 1-page PDF</button>
-        <button class="btn btn-pwp" id="linkedin-post-btn-inline" style="justify-content:center;">Copy LinkedIn Post</button>
-        <button class="btn btn-pwp" id="carousel-btn-inline" style="justify-content:center;">Export Carousel PDF</button>
-      </div>
-      <div class="field" style="margin-top:14px;">
-        <label class="label">LinkedIn post preview</label>
-        <div class="share-preview" id="linkedin-post-preview"></div>
-      </div>
-    </div>
-
-    <!-- PRIVACY TOGGLES -->
-    <div class="card">
       <div class="card-title">🔒 Privacy & data availability</div>
-      <p class="hint-text">These flags change how the case study presents the client and which numbers it features.</p>
+      <p class="hint-text">These flags reshape the case study to fit what you actually have. Empty performance fields are <strong>ignored</strong> — never shown as zeros.</p>
       <div class="grid-3">
         <div class="switch">
-          <input type="checkbox" id="t-hideName" checked>
-          <label for="t-hideName">Hide client name
-            <span class="hint">Show as anonymous descriptor (e.g. "US DTC skincare brand")</span>
-          </label>
-        </div>
-        <div class="switch">
-          <input type="checkbox" id="t-hideRevenue" checked>
-          <label for="t-hideRevenue">Hide absolute revenue
-            <span class="hint">Keep ROAS, lifts, ratios — hide dollar amounts</span>
+          <input type="checkbox" id="t-hideRevenue">
+          <label for="t-hideRevenue">Hide revenue / deal values
+            <span class="hint">Keep volumes and ratios; hide currency amounts beyond spend</span>
           </label>
         </div>
         <div class="switch">
           <input type="checkbox" id="t-noBaseline" checked>
-          <label for="t-noBaseline">Built from scratch (no baseline)
-            <span class="hint">Frame as "0 → achieved" instead of "before → after"</span>
+          <label for="t-noBaseline">No prior baseline
+            <span class="hint">First time with us, or new channel from scratch</span>
+          </label>
+        </div>
+        <div class="switch">
+          <input type="checkbox" id="t-strictAnon" checked>
+          <label for="t-strictAnon">Strict anonymization
+            <span class="hint">Never store or display real client names</span>
           </label>
         </div>
       </div>
@@ -295,30 +208,29 @@
 
     <div class="grid-2">
 
-      <!-- ANONYMIZED CLIENT -->
       <div class="card">
-        <div class="card-title">👤 Anonymized client profile</div>
-        <p class="hint-text">No client names anywhere. Build a descriptor sharp enough that prospects in similar situations recognize themselves.</p>
+        <div class="card-title">👤 Anonymized profile</div>
+        <p class="hint-text">No client names. Build a descriptor sharp enough that similar prospects recognize themselves.</p>
 
         <div class="field">
           <label class="label">Your Agency Name</label>
-          <input class="input" id="f-agencyName" value="Post With Passion">
+          <input class="input" id="f-agencyName" value="Your Agency">
         </div>
         <div class="field">
           <label class="label">Agency Tagline</label>
-          <input class="input" id="f-agencyTagline" value="UGC · Real Voices · Riyadh">
+          <input class="input" id="f-agencyTagline" value="Performance Marketing">
         </div>
 
         <div class="field">
-          <label class="label">Anonymous Descriptor (replaces client name)</label>
-          <input class="input" id="f-descriptor" value="A Saudi ecommerce brand built around community trust">
-          <p class="hint-text" style="margin: 4px 0 0;">Format: "[geography] [model] [vertical]" — e.g. "A UK B2B SaaS company in HR tech"</p>
+          <label class="label">Anonymous Descriptor</label>
+          <input class="input" id="f-descriptor" value="A 40-year-old Saudi construction material manufacturer">
+          <div class="field-hint">e.g. "A US DTC skincare brand", "A UK B2B SaaS company"</div>
         </div>
 
         <div class="grid-2" style="gap: 10px;">
           <div class="field">
             <label class="label">Industry / Vertical</label>
-            <input class="input" id="f-industry" value="Saudi Ecommerce">
+            <input class="input" id="f-industry" value="Construction materials">
           </div>
           <div class="field">
             <label class="label">Company Size</label>
@@ -328,98 +240,90 @@
               <option selected>$1M – $10M revenue</option>
               <option>$10M – $50M revenue</option>
               <option>$50M+ revenue</option>
-              <option>SMB (1-50 employees)</option>
-              <option>Mid-market (50-500 employees)</option>
-              <option>Enterprise (500+ employees)</option>
+              <option>Established (10+ years)</option>
+              <option>Legacy / heritage brand</option>
             </select>
           </div>
         </div>
 
         <div class="field">
           <label class="label">Engagement Period</label>
-          <input class="input" id="f-period" value="Jan – Jun 2026">
+          <input class="input" id="f-period" value="May – Dec 2025">
         </div>
         <div class="field">
           <label class="label">Channels Used</label>
-          <input class="input" id="f-channels" value="Meta Ads, TikTok, UGC Creators, Google Ads">
+          <input class="input" id="f-channels" value="Meta Ads, TikTok, UGC creators">
         </div>
       </div>
 
-      <!-- NARRATIVE + AI -->
       <div class="card">
         <div class="card-title">✨ Narrative</div>
 
         <div class="field">
           <label class="label">Headline Result</label>
-          <input class="input" id="f-headline" value="Generated 5,258 leads at SAR 3 CPL through creator-led campaigns">
-          <button class="btn btn-ai" id="ai-headline" style="margin-top: 6px; width: 100%;">🤖 Generate headline from metrics</button>
+          <input class="input" id="f-headline" value="" placeholder="Leave empty to auto-generate from data">
+          <button class="btn btn-ai" id="ai-headline" style="margin-top: 6px; width: 100%;">🤖 Generate smart headline from actual data</button>
+          <div class="field-hint">Looks at which metrics have data and what's impressive about them</div>
         </div>
 
         <div class="field">
           <label class="label">The Challenge (1–2 sentences)</label>
           <textarea class="input" id="f-challenge" rows="3">The brand had attention, but the message felt too polished to move local audiences. They needed creative that sounded like people, not ads, while keeping performance accountable.</textarea>
+          <button class="btn btn-ai" id="ai-challenge" style="margin-top: 6px; width: 100%;">🤖 Draft challenge from focus + descriptor</button>
         </div>
 
         <div class="field">
           <label class="label">What We Did (one line per bullet)</label>
-          <textarea class="input" id="f-strategy" rows="4">Mapped audience moments around Saudi buying behavior
+          <textarea class="input" id="f-strategy" rows="5">Mapped audience moments around Saudi buying behavior
 Produced UGC scripts built on real customer language
 Tested creator-led hooks across Meta and TikTok
 Reallocated budget toward the stories that converted
 Connected creative learnings back to paid media reporting</textarea>
         </div>
 
-        <!-- ENDORSEMENT MODE -->
         <div class="field">
           <label class="label">Endorsement Style</label>
           <div class="ai-tab-bar">
-            <button class="ai-tab active" data-endorsement="outcome">Outcome callout (recommended)</button>
-            <button class="ai-tab" data-endorsement="testimonial">Quote (needs client approval)</button>
+            <button class="ai-tab active" data-endorsement="outcome">Outcome callout</button>
+            <button class="ai-tab" data-endorsement="testimonial">Quote (needs approval)</button>
             <button class="ai-tab" data-endorsement="none">None</button>
           </div>
 
           <div id="endorsement-outcome">
-            <textarea class="input" id="f-outcomeCallout" rows="2">Mapped audience moments around Saudi buying behavior. The result was 5,258 leads at SAR 3 CPL — proof that UGC can carry both the story and the performance target.</textarea>
-            <button class="btn btn-ai" id="ai-outcome" style="margin-top: 6px; width: 100%;">🤖 Draft outcome callout from inputs</button>
-            <p class="hint-text">Spoken in your agency's voice. No fake quotes, no attribution. Always safe to publish.</p>
+            <textarea class="input" id="f-outcomeCallout" rows="2">We turned spontaneous, locally-rooted creative into a performance engine — proving that authenticity and accountability aren't trade-offs.</textarea>
+            <button class="btn btn-ai" id="ai-outcome" style="margin-top: 6px; width: 100%;">🤖 Draft outcome callout from strategy + channels</button>
+            <div class="field-hint">Spoken in your agency's voice. No fake quotes. Always safe to publish.</div>
           </div>
 
           <div id="endorsement-testimonial" style="display:none;">
-            <textarea class="input" id="f-testimonial" rows="2">The work felt like our audience was finally speaking for the brand, not just watching another ad.</textarea>
-            <input class="input" id="f-testimonialAuthor" style="margin-top: 6px;" placeholder="Attribution (e.g. 'Head of Growth, anonymous client')" value="Marketing Lead, anonymous client">
+            <textarea class="input" id="f-testimonial" rows="2"></textarea>
+            <input class="input" id="f-testimonialAuthor" style="margin-top: 6px;" placeholder="Attribution (e.g. 'Head of Marketing, anonymous client')" value="Head of Marketing, client">
             <button class="btn btn-ai" id="ai-testimonial" style="margin-top: 6px; width: 100%;">🤖 Draft testimonial (for client to approve)</button>
-            <p class="hint-text" style="color: #B45309; background: #FEF3C7; padding: 8px; border-radius: 6px;">
-              ⚠️ <strong>Important:</strong> AI generates a draft only. You must send it to your client for explicit written approval before publishing. Fabricating attributed quotes is false advertising in most jurisdictions.
-            </p>
+            <div class="warn-text">⚠️ AI generates a draft only. You must send it to your client for written approval before publishing.</div>
           </div>
         </div>
       </div>
 
-      <!-- PERFORMANCE INPUTS -->
       <div class="card">
-        <div class="card-title">🎯 Performance (engagement period)</div>
+        <div class="card-title">🎯 Performance data <span id="detection-display"></span></div>
+        <p class="hint-text">Enter only what you have. Empty fields are <strong>ignored</strong> — they won't show as zeros on the case study.</p>
         <div id="perf-fields"></div>
       </div>
 
-      <!-- BASELINE -->
       <div class="card" id="baseline-card">
         <div class="card-title">📈 Baseline (pre-engagement)</div>
-        <p class="hint-text">Used to auto-calculate % lift. Leave blank if a baseline doesn't apply — lift figures will simply hide. (If you toggled "Built from scratch" above, this section is bypassed.)</p>
+        <p class="hint-text">Disabled by default. Toggle off "No prior baseline" above to enable.</p>
         <div id="baseline-fields"></div>
       </div>
 
-      <!-- COMPUTED METRICS -->
       <div class="card card-dark full">
-        <div class="card-title" style="color:white;">⚡ Auto-calculated metrics</div>
+        <div class="card-title" style="color:white;">⚡ Auto-calculated metrics <span style="font-weight:400; color:#999; margin-left:8px;">(only ones with usable data)</span></div>
         <div class="grid-6" id="computed-chips"></div>
       </div>
 
     </div>
   </div>
 
-  <!-- ============================================
-       PREVIEW VIEW
-       ============================================ -->
   <div id="view-preview" style="display:none;">
     <div class="preview-stage">
       <div id="case-page-mount"></div>
@@ -429,268 +333,388 @@ Connected creative learnings back to paid media reporting</textarea>
 </div>
 
 <script>
-/* ============================================================
-   STATE
-   ============================================================ */
 const state = {
-  type: 'leadgen',            // 'ecommerce' | 'leadgen'
-  style: 'editorial',         // 'editorial' | 'bold' | 'data'
-  currency: 'SAR',
-  hideName: true,
-  hideRevenue: true,
-  noBaseline: true,
-  endorsement: 'outcome',     // 'outcome' | 'testimonial' | 'none'
-  agencyName: 'Post With Passion',
-  agencyTagline: 'UGC · Real Voices · Riyadh',
-  descriptor: 'A Saudi ecommerce brand built around community trust',
-  industry: 'Saudi Ecommerce',
-  size: '$1M – $10M revenue',
-  period: 'Jan – Jun 2026',
-  channels: 'Meta Ads, TikTok, UGC Creators, Google Ads',
-  headline: 'Generated 5,258 leads at SAR 3 CPL through creator-led campaigns',
+  focus: 'auto', detectedFocus: null,
+  style: 'editorial', currency: 'SAR',
+  hideRevenue: false, noBaseline: true, strictAnon: true,
+  endorsement: 'outcome',
+  agencyName: 'Your Agency', agencyTagline: 'Performance Marketing',
+  descriptor: 'A 40-year-old Saudi construction material manufacturer',
+  industry: 'Construction materials', size: '$1M – $10M revenue',
+  period: 'May – Dec 2025', channels: 'Meta Ads, TikTok, UGC creators',
+  headline: '',
   challenge: 'The brand had attention, but the message felt too polished to move local audiences. They needed creative that sounded like people, not ads, while keeping performance accountable.',
   strategy: 'Mapped audience moments around Saudi buying behavior\nProduced UGC scripts built on real customer language\nTested creator-led hooks across Meta and TikTok\nReallocated budget toward the stories that converted\nConnected creative learnings back to paid media reporting',
-  outcomeCallout: 'Mapped audience moments around Saudi buying behavior. The result was 5,258 leads at SAR 3 CPL — proof that UGC can carry both the story and the performance target.',
-  testimonial: 'The work felt like our audience was finally speaking for the brand, not just watching another ad.',
-  testimonialAuthor: 'Marketing Lead, anonymous client',
-  // perf
-  spend: 15774, revenue: '', impressions: '', clicks: '', conversions: '', aov: '',
+  outcomeCallout: 'We turned spontaneous, locally-rooted creative into a performance engine — proving that authenticity and accountability aren\'t trade-offs.',
+  testimonial: '', testimonialAuthor: 'Head of Marketing, client',
+  spend: 14000, impressions: '', clicks: '', conversions: '', revenue: '', aov: '',
   leads: 5258, sql: '', closedDeals: '', avgDealValue: '',
-  // baseline
-  baseSpend: '', baseRevenue: '', baseImpressions: '', baseClicks: '', baseConversions: '',
+  videoViews: '', reach: '', engagements: '',
+  baseSpend: '', baseImpressions: '', baseClicks: '', baseConversions: '', baseRevenue: '',
   baseLeads: '', baseSql: '', baseClosedDeals: '',
 };
-let headlineTouched = false;
-let outcomeTouched = false;
 
-function refreshSmartCopy() {
-  if (!headlineTouched) {
-    const h = draftHeadline();
-    state.headline = h;
-    const headlineField = document.getElementById('f-headline');
-    if (headlineField) headlineField.value = h;
-  }
-  if (!outcomeTouched) {
-    const o = draftOutcomeCallout();
-    state.outcomeCallout = o;
-    const outcomeField = document.getElementById('f-outcomeCallout');
-    if (outcomeField) outcomeField.value = o;
-  }
-}
+// === HELPERS — distinguish empty from zero ===
+const hasValue = (v) => v !== '' && v !== null && v !== undefined && !isNaN(Number(v)) && Number(v) > 0;
+const num = (k) => hasValue(state[k]) ? Number(state[k]) : null;
+const numOrZero = (k) => hasValue(state[k]) ? Number(state[k]) : 0;
 
-/* ============================================================
-   FORMATTERS
-   ============================================================ */
 const fmtCurrency = (n, c = 'USD') => {
-  if (n === '' || n === null || n === undefined || isNaN(n)) return '—';
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(Number(n));
+  if (n === null || n === undefined || isNaN(n)) return null;
+  if (c === 'SAR') return 'SAR ' + Math.round(n).toLocaleString('en-US');
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(n);
 };
 const fmtNumber = (n, d = 0) => {
-  if (n === '' || n === null || n === undefined || isNaN(n)) return '—';
-  return Number(n).toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+  if (n === null || n === undefined || isNaN(n)) return null;
+  return Number(n).toLocaleString('en-US', { maximumFractionDigits: d });
 };
 const fmtPct = (n, d = 1) => {
-  if (n === '' || n === null || n === undefined || isNaN(n)) return '—';
-  return Number(n).toFixed(d) + '%';
+  if (n === null || n === undefined || isNaN(n)) return null;
+  return n.toFixed(d) + '%';
 };
 const fmtROAS = (n) => {
-  if (n === '' || n === null || n === undefined || isNaN(n) || !isFinite(n)) return '—';
-  return Number(n).toFixed(2) + 'x';
+  if (n === null || n === undefined || isNaN(n) || !isFinite(n)) return null;
+  return n.toFixed(2) + 'x';
 };
-const hasInput = (k) => state[k] !== '' && state[k] !== null && state[k] !== undefined && !isNaN(Number(state[k])) && Number(state[k]) > 0;
-const valueOf = (k) => hasInput(k) ? Number(state[k]) : null;
-const hasMetric = (v) => v !== null && v !== undefined && !isNaN(v) && isFinite(v) && Number(v) > 0;
-const calcRatio = (top, bottom, multiplier = 1) => hasMetric(top) && hasMetric(bottom) ? (top / bottom) * multiplier : null;
 const lift = (current, baseline) => {
-  const c = Number(current), b = Number(baseline);
-  if (!b || isNaN(c) || isNaN(b)) return null;
-  return ((c - b) / b) * 100;
+  if (!hasValue(baseline) || current === null || current === undefined || isNaN(current)) return null;
+  return ((current - Number(baseline)) / Number(baseline)) * 100;
 };
 const liftInverse = (current, baseline) => {
-  const c = Number(current), b = Number(baseline);
-  if (!b || isNaN(c) || isNaN(b)) return null;
-  return ((b - c) / b) * 100;
+  if (!hasValue(baseline) || current === null || current === undefined || isNaN(current)) return null;
+  return ((Number(baseline) - current) / Number(baseline)) * 100;
 };
 
-/* ============================================================
-   CALCULATIONS
-   ============================================================ */
 function calc() {
   const d = state;
-  const spend = valueOf('spend'), revenue = valueOf('revenue'),
-        impressions = valueOf('impressions'), clicks = valueOf('clicks'),
-        conversions = valueOf('conversions'),
-        leads = valueOf('leads'), sql = valueOf('sql'),
-        closedDeals = valueOf('closedDeals'), avgDealValue = valueOf('avgDealValue');
-
-  const pipelineRevenue = hasMetric(closedDeals) && hasMetric(avgDealValue) ? closedDeals * avgDealValue : null;
+  const spend = num('spend'), impressions = num('impressions'), clicks = num('clicks'),
+        conversions = num('conversions'), revenue = num('revenue'),
+        leads = num('leads'), sql = num('sql'),
+        closedDeals = num('closedDeals'), avgDealValue = num('avgDealValue'),
+        videoViews = num('videoViews'), reach = num('reach'), engagements = num('engagements');
 
   const out = {
-    spend, revenue, impressions, clicks, conversions, leads, sql, closedDeals, pipelineRevenue, avgDealValue,
-    ctr: calcRatio(clicks, impressions, 100),
-    cpc: calcRatio(spend, clicks),
-    cpm: calcRatio(spend, impressions, 1000),
-    cvr: calcRatio(conversions, clicks, 100),
-    cpa: calcRatio(spend, conversions),
-    roas: calcRatio(revenue, spend),
-    netROI: hasMetric(spend) && hasMetric(revenue) ? ((revenue - spend) / spend) * 100 : null,
-    cpl: calcRatio(spend, leads),
-    leadToSQL: calcRatio(sql, leads, 100),
-    sqlToClose: calcRatio(closedDeals, sql, 100),
-    cac: calcRatio(spend, closedDeals),
-    pipelineROAS: calcRatio(pipelineRevenue, spend),
+    spend, impressions, clicks, conversions, revenue,
+    leads, sql, closedDeals, avgDealValue, videoViews, reach, engagements,
+    pipelineRevenue: (closedDeals !== null && avgDealValue !== null) ? closedDeals * avgDealValue : null,
+    ctr: (impressions && clicks) ? (clicks / impressions) * 100 : null,
+    cpc: (spend && clicks) ? spend / clicks : null,
+    cpm: (spend && impressions) ? (spend / impressions) * 1000 : null,
+    cvr: (clicks && conversions) ? (conversions / clicks) * 100 : null,
+    cpa: (spend && conversions) ? spend / conversions : null,
+    roas: (spend && revenue) ? revenue / spend : null,
+    netROI: (spend && revenue) ? ((revenue - spend) / spend) * 100 : null,
+    cpl: (spend && leads) ? spend / leads : null,
+    leadToSQL: (leads && sql) ? (sql / leads) * 100 : null,
+    sqlToClose: (sql && closedDeals) ? (closedDeals / sql) * 100 : null,
+    cac: (spend && closedDeals) ? spend / closedDeals : null,
+    pipelineROAS: null,
+    costPerView: (spend && videoViews) ? spend / videoViews : null,
+    costPerEngagement: (spend && engagements) ? spend / engagements : null,
   };
+  if (out.pipelineRevenue !== null && spend) out.pipelineROAS = out.pipelineRevenue / spend;
 
   if (!d.noBaseline) {
-    const baseSpend = valueOf('baseSpend'), baseRevenue = valueOf('baseRevenue'),
-          baseClicks = valueOf('baseClicks'), baseImpressions = valueOf('baseImpressions'),
-          baseConversions = valueOf('baseConversions'),
-          baseLeads = valueOf('baseLeads'), baseClosedDeals = valueOf('baseClosedDeals');
+    const baseSpend = num('baseSpend');
+    out.baseROAS = (baseSpend && num('baseRevenue')) ? num('baseRevenue') / baseSpend : null;
+    out.baseCTR = (num('baseImpressions') && num('baseClicks')) ? (num('baseClicks') / num('baseImpressions')) * 100 : null;
+    out.baseCPA = (baseSpend && num('baseConversions')) ? baseSpend / num('baseConversions') : null;
+    out.baseCPL = (baseSpend && num('baseLeads')) ? baseSpend / num('baseLeads') : null;
+    out.baseCAC = (baseSpend && num('baseClosedDeals')) ? baseSpend / num('baseClosedDeals') : null;
 
-    out.baseSpend = baseSpend;
-    out.baseRevenue = baseRevenue;
-    out.baseImpressions = baseImpressions;
-    out.baseClicks = baseClicks;
-    out.baseConversions = baseConversions;
-    out.baseLeads = baseLeads;
-    out.baseClosedDeals = baseClosedDeals;
-    out.baseROAS = calcRatio(baseRevenue, baseSpend);
-    out.baseCTR = calcRatio(baseClicks, baseImpressions, 100);
-    out.baseCVR = calcRatio(baseConversions, baseClicks, 100);
-    out.baseCPA = calcRatio(baseSpend, baseConversions);
-    out.baseCPL = calcRatio(baseSpend, baseLeads);
-    out.baseCAC = calcRatio(baseSpend, baseClosedDeals);
-
-    out.revenueLift = lift(revenue, baseRevenue);
+    out.revenueLift = lift(revenue, num('baseRevenue'));
     out.roasLift = lift(out.roas, out.baseROAS);
     out.ctrLift = lift(out.ctr, out.baseCTR);
-    out.cvrLift = lift(out.cvr, out.baseCVR);
     out.cpaLift = liftInverse(out.cpa, out.baseCPA);
     out.cplLift = liftInverse(out.cpl, out.baseCPL);
     out.cacLift = liftInverse(out.cac, out.baseCAC);
-    out.leadsLift = lift(leads, baseLeads);
-    out.dealsLift = lift(closedDeals, baseClosedDeals);
-    out.conversionsLift = lift(conversions, baseConversions);
+    out.leadsLift = lift(leads, num('baseLeads'));
+    out.dealsLift = lift(closedDeals, num('baseClosedDeals'));
+    out.conversionsLift = lift(conversions, num('baseConversions'));
   }
-
   return out;
 }
 
-function storyType(c, d) {
-  const channels = `${d.channels} ${d.strategy}`.toLowerCase();
-  const creativeLed = /(ugc|creator|influencer|tiktok|content|creative|hook|script)/.test(channels);
-  if (hasMetric(c.leads) && hasMetric(c.cpl) && creativeLed) return 'creative-leadgen';
-  if (hasMetric(c.leads) && hasMetric(c.cpl)) return 'leadgen';
-  if (hasMetric(c.roas) || hasMetric(c.revenue)) return 'ecommerce';
-  if (hasMetric(c.impressions) && (hasMetric(c.cpm) || hasMetric(c.ctr))) return 'awareness';
-  if (hasMetric(c.closedDeals) || hasMetric(c.pipelineRevenue)) return 'full-funnel';
-  return 'performance';
+// === SMART DETECTION ===
+function detectFocus() {
+  const has = (k) => hasValue(state[k]);
+  const channelLower = state.channels.toLowerCase();
+  const creativeChannels = /ugc|creator|tiktok|reels|influenc/.test(channelLower);
+
+  if (has('closedDeals') && has('leads')) return 'fullfunnel';
+  if (has('closedDeals') && has('avgDealValue')) return 'leadgen';
+  if (has('revenue') && has('conversions')) return 'ecommerce';
+  if (has('leads') && creativeChannels) return 'creative';
+  if (has('leads')) return 'leadgen';
+  if (has('conversions') && has('aov')) return 'ecommerce';
+  if (has('videoViews') || has('engagements')) return 'creative';
+  if (has('reach') || has('impressions')) return 'awareness';
+  return 'leadgen';
 }
 
-function metric(label, value, liftValue = null, liftLabel = '', inverted = false) {
-  if (!hasMetric(value)) return null;
-  return { label, value, lift: liftValue, liftLabel, inverted };
+function getActiveFocus() {
+  return state.focus !== 'auto' ? state.focus : (state.detectedFocus || detectFocus());
 }
 
-/* ============================================================
-   AI-LIKE DRAFTERS (deterministic, template-based; can be swapped for real LLM call later)
-   ============================================================ */
+// === SMART METRIC RANKING ===
+function getAvailableMetrics(c) {
+  const focus = getActiveFocus();
+  const allowedByFocus = {
+    ecommerce: ['ROAS', 'Net ROI', 'Revenue', 'Conversions', 'CPA', 'CTR', 'CVR', 'CPC', 'CPM', 'Impressions', 'Ad spend'],
+    leadgen: ['Qualified leads', 'Cost per lead', 'SQLs', 'Lead → SQL', 'Closed deals', 'CAC', 'SQL → Close', 'CTR', 'CPC', 'CPM', 'Impressions', 'Ad spend'],
+    creative: ['Video views', 'Engagements', 'Cost / view', 'Cost / engagement', 'Reach', 'Impressions', 'CTR', 'CPM', 'CPC', 'Qualified leads', 'Cost per lead', 'Conversions', 'CPA', 'Ad spend'],
+    awareness: ['Reach', 'Impressions', 'CPM', 'CTR', 'CPC', 'Video views', 'Engagements', 'Cost / view', 'Cost / engagement', 'Ad spend'],
+    fullfunnel: null,
+  };
+  const allowed = allowedByFocus[focus] || allowedByFocus.leadgen;
+  const m = [];
+  if (c.roas !== null) m.push({ k: 'ROAS', v: fmtROAS(c.roas), lift: c.roasLift, importance: 10 });
+  if (c.netROI !== null) m.push({ k: 'Net ROI', v: fmtPct(c.netROI, 0), importance: 7 });
+  if (c.revenue !== null && !state.hideRevenue) m.push({ k: 'Revenue', v: fmtCurrency(c.revenue, state.currency), lift: c.revenueLift, importance: 9 });
+  if (c.conversions !== null) m.push({ k: 'Conversions', v: fmtNumber(c.conversions), lift: c.conversionsLift, importance: 7 });
+  if (c.cpa !== null) m.push({ k: 'CPA', v: fmtCurrency(c.cpa, state.currency), lift: c.cpaLift, inverted: true, importance: 7 });
+  if (c.leads !== null) m.push({ k: 'Qualified leads', v: fmtNumber(c.leads), lift: c.leadsLift, importance: 9 });
+  if (c.cpl !== null) m.push({ k: 'Cost per lead', v: fmtCurrency(c.cpl, state.currency), lift: c.cplLift, inverted: true, importance: 9 });
+  if (c.sql !== null) m.push({ k: 'SQLs', v: fmtNumber(c.sql), importance: 6 });
+  if (c.leadToSQL !== null) m.push({ k: 'Lead → SQL', v: fmtPct(c.leadToSQL), importance: 5 });
+  if (c.closedDeals !== null) m.push({ k: 'Closed deals', v: fmtNumber(c.closedDeals), lift: c.dealsLift, importance: 10 });
+  if (c.cac !== null) m.push({ k: 'CAC', v: fmtCurrency(c.cac, state.currency), lift: c.cacLift, inverted: true, importance: 8 });
+  if (c.sqlToClose !== null) m.push({ k: 'SQL → Close', v: fmtPct(c.sqlToClose), importance: 5 });
+  if (c.pipelineRevenue !== null && !state.hideRevenue) m.push({ k: 'Pipeline', v: fmtCurrency(c.pipelineRevenue, state.currency), importance: 8 });
+  if (c.ctr !== null) m.push({ k: 'CTR', v: fmtPct(c.ctr, 2), lift: c.ctrLift, importance: 4 });
+  if (c.cvr !== null) m.push({ k: 'CVR', v: fmtPct(c.cvr, 2), importance: 4 });
+  if (c.cpc !== null) m.push({ k: 'CPC', v: fmtCurrency(c.cpc, state.currency), importance: 3 });
+  if (c.cpm !== null) m.push({ k: 'CPM', v: fmtCurrency(c.cpm, state.currency), importance: 3 });
+  if (c.impressions !== null) m.push({ k: 'Impressions', v: fmtNumber(c.impressions), importance: 4 });
+  if (c.reach !== null) m.push({ k: 'Reach', v: fmtNumber(c.reach), importance: 5 });
+  if (c.videoViews !== null) m.push({ k: 'Video views', v: fmtNumber(c.videoViews), importance: 5 });
+  if (c.engagements !== null) m.push({ k: 'Engagements', v: fmtNumber(c.engagements), importance: 4 });
+  if (c.costPerView !== null) m.push({ k: 'Cost / view', v: fmtCurrency(c.costPerView, state.currency), importance: 4 });
+  if (c.spend !== null) m.push({ k: 'Ad spend', v: fmtCurrency(c.spend, state.currency), importance: 2 });
+  return m
+    .filter(metric => !allowed || allowed.includes(metric.k))
+    .sort((a, b) => b.importance - a.importance);
+}
+
+function buildHeroStats(c) {
+  const all = getAvailableMetrics(c);
+  if (all.length === 0) return [];
+  return all.slice(0, 4);
+}
+
+// === SMART HEADLINE ===
 function draftHeadline() {
   const c = calc();
-  const d = state;
-  const story = storyType(c, d);
+  const focus = getActiveFocus();
+  const candidates = [];
 
-  if ((story === 'creative-leadgen' || story === 'leadgen') && hasMetric(c.leads) && hasMetric(c.cpl)) {
-    return `Generated ${fmtNumber(c.leads)} leads at ${fmtCurrency(c.cpl, d.currency)} CPL through creator-led campaigns`;
+  // Lead-gen wins
+  if (c.leads !== null && c.cpl !== null) {
+    const cplStr = fmtCurrency(c.cpl, state.currency);
+    if (c.leads >= 1000 && c.cpl <= 30) {
+      candidates.push({ score: 95, text: `Generated ${fmtNumber(c.leads)} qualified leads at ${cplStr} per lead${state.noBaseline ? ' from a standing start' : ''}` });
+    } else {
+      candidates.push({ score: 82, text: `Delivered ${fmtNumber(c.leads)} qualified leads at ${cplStr} per lead` });
+    }
   }
-  if (hasMetric(c.leads) && hasMetric(c.leadsLift)) {
-    return `Generated ${fmtNumber(c.leads)} leads with ${Math.round(c.leadsLift)}% lift in volume`;
+  if (c.leads !== null && c.cpl === null && c.spend !== null) {
+    candidates.push({ score: 80, text: `Generated ${fmtNumber(c.leads)} qualified leads on ${fmtCurrency(c.spend, state.currency)} in spend` });
   }
-  if (hasMetric(c.roas) && hasMetric(c.cpaLift)) {
-    return `Reached ${fmtROAS(c.roas)} ROAS while cutting CPA by ${Math.round(c.cpaLift)}%`;
+  if (c.leads !== null && c.leadsLift !== null && c.leadsLift > 50) {
+    candidates.push({ score: 90, text: `Grew qualified lead volume ${Math.round(c.leadsLift)}% while ${c.cplLift > 0 ? `cutting CPL by ${Math.round(c.cplLift)}%` : 'maintaining unit economics'}` });
   }
-  if (hasMetric(c.roas)) {
-    return `Reached ${fmtROAS(c.roas)} ROAS across ${d.channels}`;
+
+  // Ecommerce wins
+  if (c.roas !== null && c.roas >= 2) {
+    if (!state.noBaseline && c.roasLift !== null && c.roasLift >= 30) {
+      candidates.push({ score: 95, text: `Lifted ROAS from ${fmtROAS(c.baseROAS)} to ${fmtROAS(c.roas)} while scaling spend` });
+    } else if (state.noBaseline) {
+      candidates.push({ score: 90, text: `Built a ${fmtROAS(c.roas)} ROAS engine from scratch across ${state.channels.split(',')[0].trim()}` });
+    } else {
+      candidates.push({ score: 80, text: `Delivered ${fmtROAS(c.roas)} ROAS at scale` });
+    }
   }
-  if (hasMetric(c.conversions) && hasMetric(c.cpa)) {
-    return `Generated ${fmtNumber(c.conversions)} conversions at ${fmtCurrency(c.cpa, d.currency)} CPA`;
+  if (c.revenue !== null && !state.hideRevenue && c.revenueLift !== null && c.revenueLift > 50) {
+    candidates.push({ score: 92, text: `Grew revenue ${Math.round(c.revenueLift)}% with the same channel mix and tighter unit economics` });
   }
-  if (story === 'awareness' && hasMetric(c.impressions) && hasMetric(c.cpm)) {
-    return `Reached ${fmtNumber(c.impressions)} impressions at ${fmtCurrency(c.cpm, d.currency)} CPM`;
+
+  // Full-funnel wins
+  if (c.closedDeals !== null && c.cac !== null && state.noBaseline) {
+    candidates.push({ score: 95, text: `Closed ${fmtNumber(c.closedDeals)} deals from a built-from-zero pipeline at ${fmtCurrency(c.cac, state.currency)} CAC` });
   }
-  if (hasMetric(c.closedDeals) && hasMetric(c.cac)) {
-    return `Generated ${fmtNumber(c.closedDeals)} closed deals at ${fmtCurrency(c.cac, d.currency)} CAC`;
+  if (c.closedDeals !== null && c.dealsLift !== null && c.dealsLift > 30) {
+    candidates.push({ score: 90, text: `Grew closed deals ${Math.round(c.dealsLift)}%${c.cacLift && c.cacLift > 0 ? ` while cutting CAC by ${Math.round(c.cacLift)}%` : ''}` });
   }
-  return `Turned real voices into measurable demand across ${d.channels}`;
+
+  // Creative wins
+  if (focus === 'creative' || (c.videoViews !== null && c.leads === null && c.conversions === null)) {
+    if (c.videoViews !== null && c.engagements !== null) {
+      candidates.push({ score: 88, text: `Drove ${fmtNumber(c.videoViews)} video views and ${fmtNumber(c.engagements)} engagements with locally-rooted creative` });
+    } else if (c.videoViews !== null) {
+      candidates.push({ score: 80, text: `Earned ${fmtNumber(c.videoViews)} video views with creator-led storytelling that felt native, not paid` });
+    }
+  }
+
+  // Awareness wins
+  if (focus === 'awareness' && c.reach !== null) {
+    candidates.push({ score: 75, text: `Reached ${fmtNumber(c.reach)} people${c.cpm !== null ? ` at ${fmtCurrency(c.cpm, state.currency)} CPM` : ''} with culturally-anchored creative` });
+  }
+
+  if (candidates.length === 0) {
+    return `Built ${state.descriptor.toLowerCase().replace(/^a\s+/, '')}'s performance marketing function from the ground up`;
+  }
+  candidates.sort((a, b) => b.score - a.score);
+  return candidates[0].text;
+}
+
+function draftChallenge() {
+  const focus = getActiveFocus();
+  const d = state;
+  const desc = d.descriptor.toLowerCase().replace(/^a\s+/, '');
+
+  if (focus === 'creative') {
+    return `${capitalize(desc)} had reach but not resonance. Polished, brand-led creative wasn't moving the audiences that mattered, and the team needed performance accountability without losing brand consistency.`;
+  }
+  if (focus === 'leadgen' && d.noBaseline) {
+    return `${capitalize(desc)} had no structured paid acquisition motion. Growth depended on referrals and inbound — unpredictable and unscalable. They needed a repeatable lead engine built from the ground up.`;
+  }
+  if (focus === 'leadgen') {
+    return `Lead volume was inconsistent and cost-per-lead had been climbing. Sales couldn't forecast pipeline reliably, and the acquisition setup wasn't matched to how qualified prospects actually behave.`;
+  }
+  if (focus === 'ecommerce' && d.noBaseline) {
+    return `${capitalize(desc)} was launching paid acquisition for the first time. They needed a profitable channel mix from day one, with creative that worked in-market and infrastructure to measure it cleanly.`;
+  }
+  if (focus === 'ecommerce') {
+    return `Performance had plateaued. ROAS was drifting quarter over quarter, creative fatigue was setting in, and the account structure was no longer matched to where efficient growth actually lived.`;
+  }
+  if (focus === 'awareness') {
+    return `${capitalize(desc)} needed to build category presence in a crowded market — but couldn't justify awareness spend without performance-grade measurement attached to it.`;
+  }
+  return `${capitalize(desc)} needed a partner who could combine commercial accountability with creative work that resonated in-market.`;
 }
 
 function draftOutcomeCallout() {
+  const focus = getActiveFocus();
   const c = calc();
   const d = state;
-  const story = storyType(c, d);
-  const firstStrategy = d.strategy.split('\n').map(s => s.trim()).filter(Boolean)[0] || 'Built the campaign around the audience language';
+  const strategyText = d.strategy.toLowerCase();
+  const channelLower = d.channels.toLowerCase();
+  const hasUGC = strategyText.includes('ugc') || strategyText.includes('creator') || channelLower.includes('ugc') || channelLower.includes('creator');
+  const hasLocal = strategyText.includes('saudi') || strategyText.includes('local') || strategyText.includes('arabic') || d.descriptor.toLowerCase().includes('saudi');
 
-  if ((story === 'creative-leadgen' || story === 'leadgen') && hasMetric(c.leads) && hasMetric(c.cpl)) {
-    return `${firstStrategy}. The result was ${fmtNumber(c.leads)} leads at ${fmtCurrency(c.cpl, d.currency)} CPL — proof that UGC can carry both the story and the performance target.`;
+  const parts = [];
+
+  if (focus === 'creative' || hasUGC) {
+    if (hasLocal) {
+      parts.push(`We turned local, creator-driven storytelling into a performance system — not a brand campaign with metrics attached, but a measurable engine where every piece of creative is tied to outcome.`);
+      parts.push(`Authentic, culturally-rooted content can outperform polished brand work when it's wired into the same accountability loop as paid media. We built that loop.`);
+    } else {
+      parts.push(`Creator-led creative isn't a brand exercise here — it's a performance lever. We treat UGC the same way we treat any paid asset: hypothesize, test, measure, scale what works.`);
+    }
   }
-  if (story === 'awareness' && hasMetric(c.impressions)) {
-    return `${firstStrategy}. The campaign turned creator-led attention into ${fmtNumber(c.impressions)} measurable impressions without losing the local voice of the brand.`;
+
+  if (focus === 'leadgen') {
+    if (c.cpl !== null && c.leads !== null) {
+      parts.push(`We built a lead engine that produces volume and quality at a unit cost the business can plan around — moving acquisition from a wish-list item to a forecastable growth lever.`);
+    } else {
+      parts.push(`We architected a lead acquisition system the team can scale with confidence: predictable cost, predictable volume, clean signal back to sales.`);
+    }
   }
-  if (story === 'ecommerce' && hasMetric(c.roas)) {
-    return `${firstStrategy}. The work connected real customer language to paid performance, reaching ${fmtROAS(c.roas)} ROAS while keeping the creative grounded in local context.`;
+
+  if (focus === 'ecommerce') {
+    if (d.noBaseline) {
+      parts.push(`We stood up profitable paid acquisition from a blank slate — strategy, creative, tracking, reporting — and hit positive unit economics within the first reporting period.`);
+    } else {
+      parts.push(`We rebuilt the acquisition motion from a single-channel dependency into a diversified system with tighter unit economics and cleaner attribution.`);
+    }
   }
-  if (story === 'full-funnel' && hasMetric(c.closedDeals)) {
-    return `${firstStrategy}. The campaign carried the audience from attention to action, producing ${fmtNumber(c.closedDeals)} closed deals from a more human acquisition journey.`;
+
+  if (focus === 'awareness') {
+    parts.push(`We made awareness measurable — building reach and resonance in-market without separating the brand layer from the performance reporting that funds it.`);
   }
-  return `${firstStrategy}. The work translated audience insight into content people could recognize, trust, and act on.`;
+
+  if (parts.length === 0) {
+    parts.push(`We combined commercial accountability with work that resonates in-market — every creative decision shows up in the performance reporting that follows.`);
+  }
+  const seed = (numOrZero('spend') + numOrZero('leads') + numOrZero('clicks')) % parts.length;
+  return parts[seed];
 }
 
 function draftTestimonial() {
-  const c = calc();
-  const d = state;
-
-  const templates = d.type === 'ecommerce' ? [
-    `Our acquisition costs had been climbing for three quarters when we brought them in. They identified the structural issues in the first two weeks and rebuilt the account in a way that finally let us scale profitably.`,
-    `What separated them was the rigor. Every test had a hypothesis, every result was tied back to revenue, and the reporting was honest about what wasn't working as much as what was. We finally trust our paid numbers.`,
-    `They moved fast without being reckless. Within the first month we saw clear improvements in efficiency, and by the end of the engagement period our paid channels were the most predictable part of our business.`,
-  ] : [
-    `Our pipeline used to be feast or famine. They built us a predictable lead engine — qualified meetings every week, clean attribution, and a CAC that finally makes sense relative to our deal size.`,
-    `They took the time to understand our sales process before touching anything. That meant the leads they delivered actually converted, instead of just looking good on a dashboard.`,
-    `We've worked with three agencies before this one. This is the first time the dashboards, the spend, the SQLs, and our closed revenue have all told the same story.`,
-  ];
-  const seed = (d.spend + d.conversions + d.leads + d.closedDeals) % templates.length;
-  return templates[seed];
+  const focus = getActiveFocus();
+  const templates = {
+    leadgen: [
+      `We came in with no real acquisition function and walked out with a lead engine our sales team can actually plan around. The pace was fast, but nothing felt rushed.`,
+      `What surprised us was how much of the work was strategic before it was tactical. They asked the right questions about our sales process before touching any ad accounts.`,
+    ],
+    ecommerce: [
+      `Our acquisition costs had been climbing for three quarters when we brought them in. They identified the structural issues in the first two weeks and rebuilt the account in a way that finally let us scale profitably.`,
+      `Every test had a hypothesis, every result tied back to revenue, and the reporting was honest about what wasn't working. We finally trust our paid numbers.`,
+    ],
+    creative: [
+      `They understood our brand fast and translated it into creative that actually moved people in-market. The creator approach felt risky at first — but the data backed it up week after week.`,
+      `We'd worked with agencies who could either do brand or do performance. This was the first team that did both and tied them together in the reporting.`,
+    ],
+    awareness: [
+      `They built our presence in-market without ever letting us forget what it was costing us. The brand work felt confident; the reporting felt commercial.`,
+    ],
+    fullfunnel: [
+      `From first touch to closed deal, they connected the dots in our funnel that previous agencies left disconnected. The dashboards, the spend, the SQLs, and our closed revenue finally tell the same story.`,
+    ],
+  };
+  const pool = templates[focus] || templates.leadgen;
+  const seed = (numOrZero('spend') + numOrZero('leads')) % pool.length;
+  return pool[seed];
 }
 
-/* ============================================================
-   RENDER: INPUT FIELDS (dynamic based on type)
-   ============================================================ */
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// === RENDER INPUT FIELDS (dynamic per focus) ===
 function renderPerfFields() {
   const container = document.getElementById('perf-fields');
   const d = state;
-  const fields = [
-    ['spend', 'Ad Spend', true],
-    ['impressions', 'Impressions', false],
-    ['clicks', 'Clicks', false],
-  ];
-  if (d.type === 'ecommerce') {
-    if (!d.hideRevenue) fields.push(['revenue', 'Revenue', true]);
-    fields.push(['conversions', 'Conversions / Purchases', false]);
-    fields.push(['aov', 'Average Order Value', true]);
-  } else {
-    fields.push(['leads', 'Leads', false]);
-    fields.push(['sql', 'SQLs (qualified)', false]);
-    fields.push(['closedDeals', 'Closed / Won Deals', false]);
-    fields.push(['avgDealValue', 'Avg Deal Value', true]);
+  const focus = getActiveFocus();
+
+  const fields = [['spend', 'Ad spend', true, 'how much you spent total']];
+  fields.push(['impressions', 'Impressions', false, 'optional']);
+  fields.push(['clicks', 'Clicks', false, 'optional']);
+
+  if (focus === 'ecommerce' || focus === 'fullfunnel') {
+    if (!d.hideRevenue) fields.push(['revenue', 'Revenue generated', true, 'leave empty if not shared']);
+    fields.push(['conversions', 'Conversions / purchases', false, 'leave empty if N/A']);
+    if (!d.hideRevenue) fields.push(['aov', 'Average order value', true, 'optional']);
   }
-  container.innerHTML = fields.map(([k, l, isCurrency]) => `
+  if (focus === 'leadgen' || focus === 'fullfunnel') {
+    fields.push(['leads', 'Leads', false, 'main KPI for lead-gen']);
+    fields.push(['sql', 'SQLs (qualified)', false, 'leave empty if not tracked']);
+    fields.push(['closedDeals', 'Closed / won deals', false, 'leave empty if not tracked']);
+    if (!d.hideRevenue) fields.push(['avgDealValue', 'Avg deal value', true, 'for pipeline calc']);
+  }
+  if (focus === 'creative' || focus === 'awareness') {
+    fields.push(['videoViews', 'Video views', false, 'for video-led campaigns']);
+    fields.push(['reach', 'Unique reach', false, 'optional']);
+    fields.push(['engagements', 'Engagements', false, 'reactions, comments, shares, saves']);
+    if (focus === 'creative') {
+      fields.push(['leads', 'Leads (if any)', false, 'optional secondary KPI']);
+      fields.push(['conversions', 'Conversions (if any)', false, 'optional secondary KPI']);
+    }
+  }
+
+  container.innerHTML = fields.map(([k, l, isCurrency, hint]) => `
     <div class="numfield">
-      <label>${l}${isCurrency ? `<span class="currency">(${d.currency})</span>` : ''}</label>
-      <input type="number" class="input perf-input" data-key="${k}" value="${d[k] ?? ''}">
+      <div>
+        <label>${l}${isCurrency ? `<span class="currency">(${d.currency})</span>` : ''}</label>
+        ${hint ? `<div class="field-hint">${hint}</div>` : ''}
+      </div>
+      <input type="number" class="input perf-input" data-key="${k}" value="${d[k] ?? ''}" placeholder="not tracked">
     </div>
   `).join('');
   container.querySelectorAll('.perf-input').forEach(input => {
-    input.addEventListener('input', e => { state[e.target.dataset.key] = e.target.value; refreshSmartCopy(); renderComputed(); });
+    input.addEventListener('input', e => {
+      state[e.target.dataset.key] = e.target.value;
+      updateDetection();
+      renderComputed();
+    });
   });
 }
 
@@ -701,200 +725,156 @@ function renderBaselineFields() {
   if (d.noBaseline) {
     card.style.opacity = '0.4';
     card.style.pointerEvents = 'none';
-    container.innerHTML = '<p style="font-size:12px; color:#999; padding: 8px 0;">Disabled — "Built from scratch" toggle is on.</p>';
+    container.innerHTML = '<p style="font-size:12px; color:#999; padding: 8px 0;">Disabled — "No prior baseline" toggle is on.</p>';
     return;
   }
   card.style.opacity = '1';
   card.style.pointerEvents = 'auto';
-
-  const fields = [
-    ['baseSpend', 'Baseline Ad Spend', true],
-    ['baseImpressions', 'Baseline Impressions', false],
-    ['baseClicks', 'Baseline Clicks', false],
-  ];
-  if (d.type === 'ecommerce') {
-    if (!d.hideRevenue) fields.push(['baseRevenue', 'Baseline Revenue', true]);
-    fields.push(['baseConversions', 'Baseline Conversions', false]);
-  } else {
-    fields.push(['baseLeads', 'Baseline Leads', false]);
-    fields.push(['baseSql', 'Baseline SQLs', false]);
-    fields.push(['baseClosedDeals', 'Baseline Closed Deals', false]);
+  const focus = getActiveFocus();
+  const fields = [['baseSpend', 'Baseline ad spend', true]];
+  fields.push(['baseImpressions', 'Baseline impressions', false]);
+  fields.push(['baseClicks', 'Baseline clicks', false]);
+  if (focus === 'ecommerce' || focus === 'fullfunnel') {
+    if (!d.hideRevenue) fields.push(['baseRevenue', 'Baseline revenue', true]);
+    fields.push(['baseConversions', 'Baseline conversions', false]);
+  }
+  if (focus === 'leadgen' || focus === 'fullfunnel') {
+    fields.push(['baseLeads', 'Baseline leads', false]);
+    fields.push(['baseClosedDeals', 'Baseline closed deals', false]);
   }
   container.innerHTML = fields.map(([k, l, isCurrency]) => `
     <div class="numfield">
       <label>${l}${isCurrency ? `<span class="currency">(${d.currency})</span>` : ''}</label>
-      <input type="number" class="input base-input" data-key="${k}" value="${d[k] ?? ''}">
+      <input type="number" class="input base-input" data-key="${k}" value="${d[k] ?? ''}" placeholder="leave empty">
     </div>
   `).join('');
   container.querySelectorAll('.base-input').forEach(input => {
-    input.addEventListener('input', e => { state[e.target.dataset.key] = e.target.value; refreshSmartCopy(); renderComputed(); });
+    input.addEventListener('input', e => { state[e.target.dataset.key] = e.target.value; renderComputed(); });
   });
 }
 
-/* ============================================================
-   RENDER: COMPUTED METRICS STRIP
-   ============================================================ */
 function renderComputed() {
   const c = calc();
-  const d = state;
   const container = document.getElementById('computed-chips');
-
-  const chip = (label, value, change, inverted) => {
-    let chHTML = '';
-    if (change !== null && change !== undefined && !isNaN(change)) {
-      const isUp = change > 0;
-      const cls = (inverted ? !isUp : isUp) ? 'ch-up' : 'ch-down';
-      const arrow = (inverted ? (isUp ? '↓' : '↑') : (isUp ? '↑' : '↓'));
-      chHTML = `<div class="ch ${cls}">${arrow} ${Math.abs(change).toFixed(0)}%</div>`;
-    }
-    return `<div class="metric-chip"><div class="l">${label}</div><div class="v">${value}</div>${chHTML}</div>`;
-  };
-
-  let chips = [];
-  if (d.type === 'ecommerce') {
-    if (!d.hideRevenue && hasMetric(c.roas)) chips.push(chip('ROAS', fmtROAS(c.roas), c.roasLift));
-    if (hasMetric(c.cpa)) chips.push(chip('CPA', fmtCurrency(c.cpa, d.currency), c.cpaLift, true));
-    if (hasMetric(c.ctr)) chips.push(chip('CTR', fmtPct(c.ctr, 2), c.ctrLift));
-    if (hasMetric(c.cvr)) chips.push(chip('CVR', fmtPct(c.cvr, 2), c.cvrLift));
-    if (hasMetric(c.cpc)) chips.push(chip('CPC', fmtCurrency(c.cpc, d.currency), null));
-    if (hasMetric(c.conversions)) chips.push(chip('Conv.', fmtNumber(c.conversions), c.conversionsLift));
-  } else {
-    if (hasMetric(c.leads)) chips.push(chip('Leads', fmtNumber(c.leads), c.leadsLift));
-    if (hasMetric(c.cpl)) chips.push(chip('CPL', fmtCurrency(c.cpl, d.currency), c.cplLift, true));
-    if (hasMetric(c.cac)) chips.push(chip('CAC', fmtCurrency(c.cac, d.currency), c.cacLift, true));
-    if (!d.hideRevenue && hasMetric(c.pipelineROAS)) chips.push(chip('Pipe ROAS', fmtROAS(c.pipelineROAS), null));
-    if (hasMetric(c.leadToSQL)) chips.push(chip('Lead→SQL', fmtPct(c.leadToSQL), null));
-    if (hasMetric(c.sqlToClose)) chips.push(chip('SQL→Close', fmtPct(c.sqlToClose), null));
-    if (hasMetric(c.ctr)) chips.push(chip('CTR', fmtPct(c.ctr, 2), c.ctrLift));
-    if (hasMetric(c.cpm)) chips.push(chip('CPM', fmtCurrency(c.cpm, d.currency), null));
+  const metrics = getAvailableMetrics(c);
+  if (metrics.length === 0) {
+    container.innerHTML = '<div style="grid-column: 1/-1; color: #888; font-size: 12px; padding: 8px 0;">Enter at least one performance metric above to see calculations.</div>';
+    return;
   }
-  container.innerHTML = chips.length ? chips.join('') : '<p style="font-size:12px;color:#999;">Enter campaign numbers to calculate the story.</p>';
-  renderLinkedInPostPreview();
+  container.innerHTML = metrics.slice(0, 12).map(m => {
+    let chHTML = '';
+    if (m.lift !== null && m.lift !== undefined && !isNaN(m.lift)) {
+      const isUp = m.lift > 0;
+      const positive = m.inverted ? !isUp : isUp;
+      const cls = positive ? 'ch-up' : 'ch-down';
+      const arrow = m.inverted ? (isUp ? '↓' : '↑') : (isUp ? '↑' : '↓');
+      chHTML = `<div class="ch ${cls}">${arrow} ${Math.abs(m.lift).toFixed(0)}%</div>`;
+    }
+    return `<div class="metric-chip"><div class="l">${m.k}</div><div class="v">${m.v}</div>${chHTML}</div>`;
+  }).join('');
 }
 
-/* ============================================================
-   RENDER: 1-PAGER PREVIEW
-   ============================================================ */
+function updateDetection() {
+  state.detectedFocus = detectFocus();
+  if (state.focus === 'auto') {
+    const labels = { leadgen: 'Lead generation', ecommerce: 'Ecommerce / DTC', creative: 'Creative & UGC', awareness: 'Awareness & reach', fullfunnel: 'Full-funnel' };
+    const detectedLabel = labels[state.detectedFocus] || 'Lead generation';
+    document.getElementById('auto-detected').style.display = 'block';
+    document.getElementById('auto-detected').innerText = '✓ Detected: ' + detectedLabel;
+    document.getElementById('detection-display').innerHTML = `<span class="detection-pill">${detectedLabel}</span>`;
+  } else {
+    document.getElementById('auto-detected').style.display = 'none';
+    document.getElementById('detection-display').innerHTML = '';
+  }
+  renderPerfFields();
+  if (!state.noBaseline) renderBaselineFields();
+}
+
+// === PREVIEW ===
 function renderPreview() {
   const c = calc();
   const d = state;
   const mount = document.getElementById('case-page-mount');
-
-  const heroStats = buildHeroStats(c, d);
+  const heroStats = buildHeroStats(c);
   const strategyLines = d.strategy.split('\n').filter(s => s.trim());
-  const clientLabel = d.hideName ? d.descriptor : (d.descriptor); // descriptor is what shows either way; we never store a real name
 
-  const layoutHTML = d.style === 'editorial' ? editorialLayout(d, c, heroStats, strategyLines, clientLabel)
-                   : d.style === 'bold' ? boldLayout(d, c, heroStats, strategyLines, clientLabel)
-                   : dataLayout(d, c, heroStats, strategyLines, clientLabel);
+  const layoutHTML = d.style === 'editorial' ? editorialLayout(d, c, heroStats, strategyLines)
+                   : d.style === 'bold' ? boldLayout(d, c, heroStats, strategyLines)
+                   : dataLayout(d, c, heroStats, strategyLines);
 
   mount.innerHTML = `<div class="case-page s-${d.style}">${layoutHTML}</div>`;
 }
 
-function renderLinkedInPostPreview() {
-  const box = document.getElementById('linkedin-post-preview');
-  if (box) box.textContent = buildLinkedInPost();
-}
-
-function buildHeroStats(c, d) {
-  const candidates = [
-    metric('Leads', c.leads, c.leadsLift, 'lift'),
-    metric('CPL', c.cpl, c.cplLift, 'reduction', true),
-    !d.hideRevenue && metric('ROAS', c.roas, c.roasLift, 'lift'),
-    !d.hideRevenue && metric('Revenue', c.revenue, c.revenueLift, 'lift'),
-    metric('Conversions', c.conversions, c.conversionsLift, 'lift'),
-    metric('CPA', c.cpa, c.cpaLift, 'reduction', true),
-    metric('CTR', c.ctr, c.ctrLift, 'lift'),
-    metric('Impressions', c.impressions),
-    metric('CPM', c.cpm),
-    metric('Closed deals', c.closedDeals, c.dealsLift, 'lift'),
-    metric('CAC', c.cac, c.cacLift, 'reduction', true),
-    !d.hideRevenue && metric('Pipeline', c.pipelineRevenue),
-  ].filter(Boolean);
-
-  const formatters = {
-    Leads: v => fmtNumber(v),
-    CPL: v => fmtCurrency(v, d.currency),
-    ROAS: v => fmtROAS(v),
-    Revenue: v => fmtCurrency(v, d.currency),
-    Conversions: v => fmtNumber(v),
-    CPA: v => fmtCurrency(v, d.currency),
-    CTR: v => fmtPct(v, 2),
-    Impressions: v => fmtNumber(v),
-    CPM: v => fmtCurrency(v, d.currency),
-    'Closed deals': v => fmtNumber(v),
-    CAC: v => fmtCurrency(v, d.currency),
-    Pipeline: v => fmtCurrency(v, d.currency),
-  };
-
-  const priority = storyType(c, d).includes('leadgen')
-    ? ['Leads', 'CPL', 'CTR', 'Impressions', 'CPM', 'Lead→SQL']
-    : storyType(c, d) === 'awareness'
-      ? ['Impressions', 'CPM', 'CTR', 'CPC', 'Leads']
-      : ['ROAS', 'Revenue', 'Conversions', 'CPA', 'CTR', 'Leads', 'CPL'];
-
-  const rank = label => priority.includes(label) ? priority.indexOf(label) : 99;
-  const selected = candidates
-    .sort((a, b) => rank(a.label) - rank(b.label))
-    .filter((item, index, arr) => priority.includes(item.label) || index < 4)
-    .slice(0, 4)
-    .map(item => ({ ...item, value: formatters[item.label] ? formatters[item.label](item.value) : fmtNumber(item.value) }));
-  return selected.length ? selected : [{ label: 'Metrics', value: 'Add data', lift: null, liftLabel: '' }];
-}
-
 function liftHTML(s) {
   if (s.lift === null || s.lift === undefined || isNaN(s.lift)) return '';
+  const isUp = s.lift > 0;
+  const positive = s.inverted ? !isUp : isUp;
   const arrow = s.inverted ? '↓' : '↑';
-  return `<div class="stat-lift">${arrow} ${Math.abs(s.lift).toFixed(0)}% ${s.liftLabel}</div>`;
+  const text = s.inverted ? 'reduction' : 'lift';
+  const color = positive ? '#0F7A3D' : '#B33A3A';
+  return `<div class="stat-lift" style="color:${color};">${arrow} ${Math.abs(s.lift).toFixed(0)}% ${text}</div>`;
 }
 
 function buildResultsTableHTML(d, c, showBaseline) {
-  const makeRow = (label, current, formatter, baseline, change, inverted) => {
-    if (!hasMetric(current)) return null;
-    return [label, formatter(current), hasMetric(baseline) ? formatter(baseline) : '—', change, inverted, hasMetric(baseline)];
+  const focus = getActiveFocus();
+  const rowAllowedByFocus = {
+    ecommerce: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'Revenue', 'ROAS', 'Conversions', 'CPA'],
+    leadgen: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'Leads', 'Cost per lead', 'SQLs', 'Lead → SQL', 'Closed deals', 'CAC'],
+    creative: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'Reach', 'Video views', 'Engagements', 'Leads', 'Cost per lead', 'Conversions', 'CPA'],
+    awareness: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'Reach', 'Video views', 'Engagements'],
+    fullfunnel: null,
   };
-  const rows = [
-    makeRow('Spend', c.spend, v => fmtCurrency(v, d.currency), c.baseSpend, null),
-    makeRow('Leads', c.leads, v => fmtNumber(v), c.baseLeads, c.leadsLift),
-    makeRow('CPL', c.cpl, v => fmtCurrency(v, d.currency), c.baseCPL, c.cplLift, true),
-    makeRow('Revenue', c.revenue, v => fmtCurrency(v, d.currency), c.baseRevenue, c.revenueLift),
-    makeRow('ROAS', c.roas, v => fmtROAS(v), c.baseROAS, c.roasLift),
-    makeRow('Conversions', c.conversions, v => fmtNumber(v), c.baseConversions, c.conversionsLift),
-    makeRow('CPA', c.cpa, v => fmtCurrency(v, d.currency), c.baseCPA, c.cpaLift, true),
-    makeRow('CTR', c.ctr, v => fmtPct(v, 2), c.baseCTR, c.ctrLift),
-    makeRow('Impressions', c.impressions, v => fmtNumber(v), c.baseImpressions, null),
-    makeRow('CPM', c.cpm, v => fmtCurrency(v, d.currency), null, null),
-    makeRow('Closed deals', c.closedDeals, v => fmtNumber(v), c.baseClosedDeals, c.dealsLift),
-    makeRow('CAC', c.cac, v => fmtCurrency(v, d.currency), c.baseCAC, c.cacLift, true),
-    !d.hideRevenue && makeRow('Pipeline', c.pipelineRevenue, v => fmtCurrency(v, d.currency), null, null),
-  ].filter(Boolean).filter(row => !d.hideRevenue || !['Revenue', 'ROAS', 'Pipeline'].includes(row[0]));
+  const allowedRows = rowAllowedByFocus[focus] || rowAllowedByFocus.leadgen;
+  const allRows = [
+    ['Ad spend', c.spend !== null ? fmtCurrency(c.spend, d.currency) : null, hasValue(d.baseSpend) ? fmtCurrency(Number(d.baseSpend), d.currency) : null, null, false],
+    ['Impressions', c.impressions !== null ? fmtNumber(c.impressions) : null, hasValue(d.baseImpressions) ? fmtNumber(Number(d.baseImpressions)) : null, null, false],
+    ['Clicks', c.clicks !== null ? fmtNumber(c.clicks) : null, hasValue(d.baseClicks) ? fmtNumber(Number(d.baseClicks)) : null, null, false],
+    ['CTR', c.ctr !== null ? fmtPct(c.ctr, 2) : null, c.baseCTR !== null && c.baseCTR !== undefined ? fmtPct(c.baseCTR, 2) : null, c.ctrLift, false],
+    ['Reach', c.reach !== null ? fmtNumber(c.reach) : null, null, null, false],
+    ['Video views', c.videoViews !== null ? fmtNumber(c.videoViews) : null, null, null, false],
+    ['Engagements', c.engagements !== null ? fmtNumber(c.engagements) : null, null, null, false],
+    ['Leads', c.leads !== null ? fmtNumber(c.leads) : null, hasValue(d.baseLeads) ? fmtNumber(Number(d.baseLeads)) : null, c.leadsLift, false],
+    ['Cost per lead', c.cpl !== null ? fmtCurrency(c.cpl, d.currency) : null, c.baseCPL !== null && c.baseCPL !== undefined ? fmtCurrency(c.baseCPL, d.currency) : null, c.cplLift, true],
+    ['SQLs', c.sql !== null ? fmtNumber(c.sql) : null, null, null, false],
+    ['Lead → SQL', c.leadToSQL !== null ? fmtPct(c.leadToSQL) : null, null, null, false],
+    ['Closed deals', c.closedDeals !== null ? fmtNumber(c.closedDeals) : null, hasValue(d.baseClosedDeals) ? fmtNumber(Number(d.baseClosedDeals)) : null, c.dealsLift, false],
+    ['CAC', c.cac !== null ? fmtCurrency(c.cac, d.currency) : null, c.baseCAC !== null && c.baseCAC !== undefined ? fmtCurrency(c.baseCAC, d.currency) : null, c.cacLift, true],
+    !d.hideRevenue && ['Revenue', c.revenue !== null ? fmtCurrency(c.revenue, d.currency) : null, hasValue(d.baseRevenue) ? fmtCurrency(Number(d.baseRevenue), d.currency) : null, c.revenueLift, false],
+    !d.hideRevenue && ['ROAS', c.roas !== null ? fmtROAS(c.roas) : null, c.baseROAS !== null && c.baseROAS !== undefined ? fmtROAS(c.baseROAS) : null, c.roasLift, false],
+    ['Conversions', c.conversions !== null ? fmtNumber(c.conversions) : null, hasValue(d.baseConversions) ? fmtNumber(Number(d.baseConversions)) : null, c.conversionsLift, false],
+    ['CPA', c.cpa !== null ? fmtCurrency(c.cpa, d.currency) : null, c.baseCPA !== null && c.baseCPA !== undefined ? fmtCurrency(c.baseCPA, d.currency) : null, c.cpaLift, true],
+    !d.hideRevenue && ['Pipeline', c.pipelineRevenue !== null ? fmtCurrency(c.pipelineRevenue, d.currency) : null, null, null, false],
+  ].filter(Boolean)
+   .filter(row => row[1] !== null)
+   .filter(row => !allowedRows || allowedRows.includes(row[0]));
 
-  const hasAnyBaseline = rows.some(row => row[5]);
-  const showBaselineColumn = showBaseline && !d.noBaseline && hasAnyBaseline;
-  const showChangeColumn = !d.noBaseline && rows.some(row => row[3] !== null && row[3] !== undefined && !isNaN(row[3]));
+  if (allRows.length === 0) {
+    return `<p style="font-size:11px; opacity: 0.6;">No detailed metrics provided.</p>`;
+  }
 
+  const showBaselineCol = showBaseline && !d.noBaseline;
   return `<table class="results-table">
     <thead><tr class="muted">
       <th>Metric</th>
-      ${showBaselineColumn ? '<th class="num">Baseline</th>' : ''}
+      ${showBaselineCol ? '<th class="num">Baseline</th>' : ''}
       <th class="num">Achieved</th>
-      ${showChangeColumn ? '<th class="num">Change</th>' : ''}
+      ${showBaselineCol ? '<th class="num">Change</th>' : ''}
     </tr></thead>
-    <tbody class="border-c">
-    ${rows.map(([label, val, base, lf, inverted]) => {
-      let chClass = '', chText = '—';
+    <tbody>
+    ${allRows.map(([label, val, base, lf, inverted]) => {
+      let chColor = '', chText = '—';
       if (lf !== null && lf !== undefined && !isNaN(lf)) {
         const isUp = lf > 0;
         const positive = inverted ? !isUp : isUp;
-        chClass = positive ? 'style="color:#0F7A3D;"' : 'style="color:#B33A3A;"';
+        chColor = positive ? 'color:#0F7A3D;' : 'color:#B33A3A;';
         const arrow = inverted ? (isUp ? '↓' : '↑') : (isUp ? '↑' : '↓');
         chText = `${arrow} ${Math.abs(lf).toFixed(0)}%`;
       }
       return `<tr>
         <td style="font-weight: 500;">${label}</td>
-        ${showBaselineColumn ? `<td class="num muted">${base}</td>` : ''}
+        ${showBaselineCol ? `<td class="num muted">${base ?? '—'}</td>` : ''}
         <td class="num" style="font-weight: 600;">${val}</td>
-        ${showChangeColumn ? `<td class="num" ${chClass} style="font-weight:600;${chClass.replace('style="','').replace('"','')}">${chText}</td>` : ''}
+        ${showBaselineCol ? `<td class="num" style="font-weight:600;${chColor}">${chText}</td>` : ''}
       </tr>`;
     }).join('')}
     </tbody>
@@ -904,19 +884,20 @@ function buildResultsTableHTML(d, c, showBaseline) {
 function endorsementHTML(d, style) {
   if (d.endorsement === 'none') return '';
   if (d.endorsement === 'outcome') {
+    if (!d.outcomeCallout.trim()) return '';
     if (style === 'editorial') {
       return `<div style="border-top: 1px solid #E5E5E0; padding-top: 14px; margin-bottom: 14px;">
-        <p style="font-family: 'Fraunces', serif; font-size: 14px; line-height: 1.4; margin: 0; color: inherit;">${escapeHTML(d.outcomeCallout)}</p>
+        <p style="font-family: 'Fraunces', serif; font-size: 14px; line-height: 1.4; margin: 0;">${escapeHTML(d.outcomeCallout)}</p>
       </div>`;
     } else if (style === 'bold') {
       return `<div style="border-left: 3px solid #D4FF3F; padding-left: 14px; margin-bottom: 14px;">
         <p style="font-size: 13px; line-height: 1.45; margin: 0; font-weight: 500;">${escapeHTML(d.outcomeCallout)}</p>
       </div>`;
     } else {
-      return `<div class="surface" style="padding: 10px 14px; border-radius: 6px; font-size: 11px; line-height: 1.5;">${escapeHTML(d.outcomeCallout)}</div>`;
+      return `<div style="background:#F7F8FA; padding: 10px 14px; border-radius: 6px; font-size: 11px; line-height: 1.5;">${escapeHTML(d.outcomeCallout)}</div>`;
     }
   }
-  // testimonial
+  if (!d.testimonial.trim()) return '';
   if (style === 'editorial') {
     return `<div style="border-top: 1px solid #E5E5E0; padding-top: 14px; margin-bottom: 14px;">
       <p style="font-family: 'Fraunces', serif; font-size: 14px; font-style: italic; line-height: 1.4; margin: 0;">"${escapeHTML(d.testimonial)}"</p>
@@ -928,15 +909,11 @@ function endorsementHTML(d, style) {
       <div style="font-size: 10px; color: #999; margin-top: 6px; font-weight: 600;">— ${escapeHTML(d.testimonialAuthor)}</div>
     </div>`;
   } else {
-    return `<div class="surface" style="padding: 10px 14px; border-radius: 6px; font-size: 11px;">
+    return `<div style="background:#F7F8FA; padding: 10px 14px; border-radius: 6px; font-size: 11px;">
       <span style="font-style: italic;">"${escapeHTML(d.testimonial)}"</span>
       <span class="muted" style="margin-left: 8px; font-size: 9px;">— ${escapeHTML(d.testimonialAuthor)}</span>
     </div>`;
   }
-}
-
-function pwpSignatureHTML(color = '#666') {
-  return `<div class="pwp-signature" style="color:${color};">Post With Passion · UGC · Real Voices · Riyadh</div>`;
 }
 
 function escapeHTML(s) {
@@ -944,210 +921,36 @@ function escapeHTML(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function comparisonBarsHTML(d, c) {
-  if (d.noBaseline) return '<p style="font-size:11px; color:#5A6B82;">Built from scratch — no baseline to compare against.</p>';
-  const items = d.type === 'ecommerce'
-    ? [
-        !d.hideRevenue && hasMetric(c.revenue) && hasMetric(c.baseRevenue) && { label: 'Revenue', baseline: c.baseRevenue, current: c.revenue, fmt: v => fmtCurrency(v, d.currency) },
-        !d.hideRevenue && hasMetric(c.roas) && hasMetric(c.baseROAS) && { label: 'ROAS', baseline: c.baseROAS, current: c.roas, fmt: v => fmtROAS(v) },
-        hasMetric(c.conversions) && hasMetric(c.baseConversions) && { label: 'Conversions', baseline: c.baseConversions, current: c.conversions, fmt: v => fmtNumber(v) },
-      ].filter(Boolean)
-    : [
-        hasMetric(c.leads) && hasMetric(c.baseLeads) && { label: 'Leads', baseline: c.baseLeads, current: c.leads, fmt: v => fmtNumber(v) },
-        hasMetric(c.closedDeals) && hasMetric(c.baseClosedDeals) && { label: 'Closed deals', baseline: c.baseClosedDeals, current: c.closedDeals, fmt: v => fmtNumber(v) },
-        !d.hideRevenue && hasMetric(c.pipelineRevenue) && { label: 'Pipeline', baseline: 0, current: c.pipelineRevenue, fmt: v => fmtCurrency(v, d.currency) },
-      ].filter(Boolean);
-  if (!items.length) return '<p style="font-size:11px; color:#5A6B82;">No baseline metrics available for comparison. This story is shown through achieved results only.</p>';
-  return `<div style="display:flex; flex-direction:column; gap:10px;">${
-    items.map(item => {
-      const max = Math.max(item.baseline, item.current, 1);
-      const bP = (item.baseline / max) * 100;
-      const cP = (item.current / max) * 100;
-      return `<div>
-        <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px;">
-          <span class="muted" style="font-weight:600;">${item.label}</span>
-          <span style="font-weight:600;">${item.fmt(item.current)}</span>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:3px;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:8px; width:38px;" class="muted">BEFORE</span>
-            <div style="flex:1; height:8px; background:#E0E5EC; border-radius:2px; overflow:hidden;"><div style="width:${bP}%; height:100%; background:#9CA3AF;"></div></div>
-            <span style="font-size:9px; width:70px; text-align:right;" class="muted">${item.fmt(item.baseline)}</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:8px; width:38px;" class="muted">AFTER</span>
-            <div style="flex:1; height:8px; background:#E0E5EC; border-radius:2px; overflow:hidden;"><div style="width:${cP}%; height:100%; background:#0066FF;"></div></div>
-            <span style="font-size:9px; width:70px; text-align:right; font-weight:600;">${item.fmt(item.current)}</span>
-          </div>
-        </div>
-      </div>`;
-    }).join('')
-  }</div>`;
-}
-
-/* ============================================================
-   SHARE OUTPUTS: LINKEDIN POST + CAROUSEL
-   ============================================================ */
-function mainMetricLine() {
-  const c = calc();
-  const d = state;
-  if (hasMetric(c.leads) && hasMetric(c.cpl)) return `${fmtNumber(c.leads)} leads at ${fmtCurrency(c.cpl, d.currency)} CPL`;
-  if (!d.hideRevenue && hasMetric(c.roas)) return `${fmtROAS(c.roas)} ROAS`;
-  if (hasMetric(c.cpa)) return `${fmtCurrency(c.cpa, d.currency)} CPA`;
-  if (hasMetric(c.cac)) return `${fmtCurrency(c.cac, d.currency)} CAC`;
-  if (hasMetric(c.impressions)) return `${fmtNumber(c.impressions)} impressions`;
-  return 'measurable performance lift';
-}
-
-function buildLinkedInPost() {
-  const c = calc();
-  const d = state;
-  const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
-  const heroMetrics = buildHeroStats(c, d);
-  const metricLines = heroMetrics.map(item => {
-    const liftText = item.lift !== null && item.lift !== undefined && !isNaN(item.lift)
-      ? ` (${Math.abs(item.lift).toFixed(0)}% ${item.liftLabel || 'change'})`
-      : '';
-    return `${item.label}: ${item.value}${liftText}`;
-  });
-
-  return [
-    `${d.headline}`,
-    '',
-    `For ${d.descriptor.toLowerCase()}, the story was ${mainMetricLine()} — not every metric under the sun.`,
-    '',
-    'What shifted:',
-    ...strategyLines.map(line => `• ${line}`),
-    '',
-    'What changed:',
-    ...metricLines.map(line => `• ${line}`),
-    '',
-    `${d.outcomeCallout}`,
-    '',
-    'Real voices. Local context. Performance that can be measured.',
-    '',
-    '— Post With Passion',
-    'Made in Riyadh · بشغف',
-    '',
-    '#PostWithPassion #UGC #PerformanceMarketing #SaudiMarketing #DigitalMarketing'
-  ].join('\n');
-}
-
-async function exportLinkedInPost() {
-  const post = buildLinkedInPost();
-  try {
-    await navigator.clipboard.writeText(post);
-    alert('LinkedIn post copied. Paste it into LinkedIn when you are ready.');
-  } catch (e) {
-    const blob = new Blob([post], { type: 'text/plain;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'linkedin-post.txt';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
-  }
-}
-
-function carouselSlidesHTML() {
-  const c = calc();
-  const d = state;
-  const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
-  const stats = buildHeroStats(c, d).slice(0, 4);
-  const brandFooter = (n) => `<div class="carousel-footer"><span class="pwp-mark">Post With Passion</span><span>${n}/6 · Made in Riyadh · بشغف</span></div>`;
-
-  return `
-    <section class="carousel-slide dark">
-      <div class="kicker">Case Study · Real voices</div>
-      <h1>${escapeHTML(d.headline)}</h1>
-      <div style="position:absolute; left:74px; bottom:170px; max-width:760px; font-size:28px; line-height:1.35; color:#DADADA;">${escapeHTML(d.descriptor)} · ${escapeHTML(d.period)}</div>
-      ${brandFooter(1)}
-    </section>
-    <section class="carousel-slide">
-      <div class="kicker">The challenge</div>
-      <h2>Attention was there. Trust needed a more human voice.</h2>
-      <p>${escapeHTML(d.challenge)}</p>
-      ${brandFooter(2)}
-    </section>
-    <section class="carousel-slide">
-      <div class="kicker">The shift</div>
-      <h2>We built the campaign around audience language, not agency language.</h2>
-      <ul>${strategyLines.map(line => `<li>${escapeHTML(line)}</li>`).join('')}</ul>
-      ${brandFooter(3)}
-    </section>
-    <section class="carousel-slide dark">
-      <div class="kicker">The numbers</div>
-      <h2>Creative with feeling. Performance with proof.</h2>
-      <div class="carousel-stats">
-        ${stats.map(stat => `<div class="carousel-stat"><span>${escapeHTML(stat.label)}</span><strong>${stat.value}</strong></div>`).join('')}
-      </div>
-      ${brandFooter(4)}
-    </section>
-    <section class="carousel-slide">
-      <div class="kicker">The takeaway</div>
-      <h2>When the content sounds real, the media works harder.</h2>
-      <p>${escapeHTML(d.outcomeCallout)}</p>
-      ${brandFooter(5)}
-    </section>
-    <section class="carousel-slide dark">
-      <div class="kicker">Post With Passion</div>
-      <h1>Turn local stories into measurable growth.</h1>
-      <p style="margin-top:36px; max-width:780px; color:#DADADA;">UGC, paid media, social, and brand strategy built for Saudi audiences.</p>
-      ${brandFooter(6)}
-    </section>
-  `;
-}
-
-function exportCarouselPDF() {
-  const slides = carouselSlidesHTML();
-  const win = window.open('', '_blank');
-  if (!win) { alert('Please allow pop-ups to export the carousel.'); return; }
-  const styleTag = document.querySelector('style').outerHTML;
-  const fonts = document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-    <title>${escapeHTML(state.descriptor)} — LinkedIn Carousel</title>
-    ${fonts}
-    ${styleTag}
-    <style>
-      body { margin: 0; background: #F5F5F2; }
-      @page { size: 1080px 1080px; margin: 0; }
-    </style>
-  </head><body class="carousel-export">${slides}
-    <script>window.addEventListener('load', () => { setTimeout(() => window.print(), 600); });<\/script>
-  </body></html>`);
-  win.document.close();
-}
-
-/* ---------- LAYOUTS ---------- */
-function editorialLayout(d, c, heroStats, strategyLines, clientLabel) {
+// === LAYOUTS ===
+function editorialLayout(d, c, heroStats, strategyLines) {
+  const headlineText = d.headline.trim() || draftHeadline();
   return `
     <div style="display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:12px; border-bottom: 1px solid #E5E5E0;">
       <div>
         <div class="eyebrow muted">Case Study · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
-        <div class="display" style="font-size: 22px; font-weight: 500; margin-top: 4px; letter-spacing: -0.02em;">${escapeHTML(clientLabel)}</div>
+        <div class="display" style="font-size: 22px; font-weight: 500; margin-top: 4px; letter-spacing: -0.02em;">${escapeHTML(d.descriptor)}</div>
       </div>
       <div style="text-align:right;">
         <div style="font-size: 11px; font-weight: 600;">${escapeHTML(d.agencyName)}</div>
         <div style="font-size: 9px; color: #666; margin-top: 2px;">${escapeHTML(d.agencyTagline)}</div>
         <div style="font-size: 9px; color: #666; margin-top: 4px;">${escapeHTML(d.period)}</div>
-        <div style="margin-top:8px;">${pwpSignatureHTML('#666')}</div>
       </div>
     </div>
 
     <div style="padding: 20px 0 18px;">
-      <h1 class="display page-h1" style="max-width: 95%;">${escapeHTML(d.headline)}</h1>
+      <h1 class="display page-h1" style="max-width: 95%;">${escapeHTML(headlineText)}</h1>
     </div>
 
+    ${heroStats.length > 0 ? `
     <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:0; border-top:1px solid #E5E5E0; border-bottom:1px solid #E5E5E0; padding: 16px 0; margin-bottom: 18px;">
       ${heroStats.map((h, i) => `
         <div style="padding-left:${i === 0 ? 0 : 16}px; padding-right:${i < heroStats.length-1 ? 16 : 0}px; ${i < heroStats.length-1 ? 'border-right:1px solid #E5E5E0;' : ''}">
-          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.label)}</div>
-          <div class="display stat-value">${h.value}</div>
+          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.k)}</div>
+          <div class="display stat-value">${h.v}</div>
           ${liftHTML(h)}
         </div>
       `).join('')}
-    </div>
+    </div>` : ''}
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:18px;">
       <div>
@@ -1172,39 +975,41 @@ function editorialLayout(d, c, heroStats, strategyLines, clientLabel) {
     ${endorsementHTML(d, 'editorial')}
 
     <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#666; padding-top:8px; border-top:1px solid #E5E5E0;">
-      <div>${escapeHTML(d.agencyName)} · Real voices · Local context</div>
+      <div>${escapeHTML(d.agencyName)} · ${escapeHTML(d.agencyTagline)}</div>
       <div>Prepared ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
     </div>
   `;
 }
 
-function boldLayout(d, c, heroStats, strategyLines, clientLabel) {
+function boldLayout(d, c, heroStats, strategyLines) {
+  const headlineText = d.headline.trim() || draftHeadline();
   return `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
       <div style="display:flex; align-items:center; gap:10px;">
         <div style="width:28px; height:28px; background:#D4FF3F; border-radius:6px;"></div>
         <div>
           <div style="font-size:13px; font-weight:700;">${escapeHTML(d.agencyName)}</div>
-          <div style="font-size:9px; color:#999; text-transform:uppercase; letter-spacing:0.12em;">Real voices · Riyadh</div>
+          <div style="font-size:9px; color:#999; text-transform:uppercase; letter-spacing:0.12em;">${escapeHTML(d.agencyTagline)}</div>
         </div>
       </div>
       <div style="font-size:10px; color:#999; text-transform:uppercase; letter-spacing:0.14em;">${escapeHTML(d.period)}</div>
     </div>
 
     <div style="padding:14px 0 18px; border-top:1px solid #2A2A2A; border-bottom:1px solid #2A2A2A;">
-      <div class="accent-text eyebrow" style="margin-bottom:8px;">${escapeHTML(clientLabel)} · ${escapeHTML(d.industry)}</div>
-      <h1 class="page-h1 display">${escapeHTML(d.headline)}</h1>
+      <div class="accent-text eyebrow" style="margin-bottom:8px;">${escapeHTML(d.descriptor)} · ${escapeHTML(d.industry)}</div>
+      <h1 class="page-h1 display">${escapeHTML(headlineText)}</h1>
     </div>
 
+    ${heroStats.length > 0 ? `
     <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:8px; margin:18px 0;">
       ${heroStats.map((h, i) => `
         <div style="background: ${i === 0 ? '#D4FF3F' : '#1A1A1A'}; color: ${i === 0 ? '#0F0F0F' : '#FFFFFF'}; padding:14px; border-radius:8px;">
-          <div class="stat-label" style="font-weight:700; opacity:0.7; margin-bottom:8px;">${escapeHTML(h.label)}</div>
-          <div class="display" style="font-size:28px; font-weight:700; line-height:1; letter-spacing:-0.02em;">${h.value}</div>
-          ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:9px; font-weight:600; margin-top:6px; opacity:0.85;">${h.inverted ? '↓' : '↑'} ${Math.abs(h.lift).toFixed(0)}% ${escapeHTML(h.liftLabel)}</div>` : ''}
+          <div class="stat-label" style="font-weight:700; opacity:0.7; margin-bottom:8px;">${escapeHTML(h.k)}</div>
+          <div class="display" style="font-size:28px; font-weight:700; line-height:1; letter-spacing:-0.02em;">${h.v}</div>
+          ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:9px; font-weight:600; margin-top:6px; opacity:0.85;">${h.inverted ? '↓' : '↑'} ${Math.abs(h.lift).toFixed(0)}% ${h.inverted ? 'reduction' : 'lift'}</div>` : ''}
         </div>
       `).join('')}
-    </div>
+    </div>` : ''}
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:14px;">
       <div style="background:#1A1A1A; padding:16px; border-radius:8px;">
@@ -1226,48 +1031,46 @@ function boldLayout(d, c, heroStats, strategyLines, clientLabel) {
 
     <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#999; padding-top:10px; border-top:1px solid #2A2A2A;">
       <div>Channels: ${escapeHTML(d.channels)}</div>
-      <div>${escapeHTML(d.agencyName)} · بشغف</div>
+      <div>${escapeHTML(d.agencyName)}</div>
     </div>
   `;
 }
 
-function dataLayout(d, c, heroStats, strategyLines, clientLabel) {
+function dataLayout(d, c, heroStats, strategyLines) {
+  const headlineText = d.headline.trim() || draftHeadline();
   return `
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #0066FF;">
       <div>
         <div class="stat-label muted">Performance Marketing Report</div>
-        <div style="font-size:18px; font-weight:600; margin-top:4px; letter-spacing:-0.01em;">${escapeHTML(clientLabel)} · ${escapeHTML(d.industry)}</div>
-        <div style="font-size:10px; color:#5A6B82; margin-top:2px;">Reporting period: ${escapeHTML(d.period)} · Size: ${escapeHTML(d.size)} · Channels: ${escapeHTML(d.channels)}</div>
+        <div style="font-size:18px; font-weight:600; margin-top:4px; letter-spacing:-0.01em;">${escapeHTML(d.descriptor)}</div>
+        <div style="font-size:10px; color:#5A6B82; margin-top:2px;">Reporting period: ${escapeHTML(d.period)} · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
+        <div style="font-size:10px; color:#5A6B82;">Channels: ${escapeHTML(d.channels)}</div>
       </div>
       <div style="text-align:right;">
         <div style="font-size:12px; font-weight:600;">${escapeHTML(d.agencyName)}</div>
-        <div style="font-size:9px; color:#5A6B82;">Real voices · Local insight · Performance</div>
+        <div style="font-size:9px; color:#5A6B82;">${escapeHTML(d.agencyTagline)}</div>
       </div>
     </div>
 
     <div style="background:#F7F8FA; border-left:4px solid #0066FF; padding:12px 14px; margin-bottom:14px; border-radius:4px;">
       <div class="stat-label muted" style="margin-bottom:4px;">Executive summary</div>
-      <div style="font-size:16px; font-weight:600; line-height:1.3;">${escapeHTML(d.headline)}</div>
+      <div style="font-size:16px; font-weight:600; line-height:1.3;">${escapeHTML(headlineText)}</div>
     </div>
 
+    ${heroStats.length > 0 ? `
     <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:6px; margin-bottom:14px;">
       ${heroStats.map(h => `
         <div style="background:#F7F8FA; padding:12px; border-radius:6px; border-top:2px solid #0066FF;">
-          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.label)}</div>
-          <div style="font-size:22px; font-weight:600; line-height:1; letter-spacing:-0.02em;">${h.value}</div>
-          ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:10px; color:#0F7A3D; margin-top:6px; font-weight:600;">${h.inverted ? '▼' : '▲'} ${Math.abs(h.lift).toFixed(1)}% ${escapeHTML(h.liftLabel)}</div>` : ''}
+          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.k)}</div>
+          <div style="font-size:22px; font-weight:600; line-height:1; letter-spacing:-0.02em;">${h.v}</div>
+          ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:10px; color:#0F7A3D; margin-top:6px; font-weight:600;">${h.inverted ? '▼' : '▲'} ${Math.abs(h.lift).toFixed(1)}% ${h.inverted ? 'reduction' : 'lift'}</div>` : ''}
         </div>
       `).join('')}
-    </div>
+    </div>` : ''}
 
     <div style="margin-bottom:14px;">
       <div class="stat-label muted" style="margin-bottom:8px;">Detailed performance${d.noBaseline ? '' : ' — baseline vs achieved'}</div>
       ${buildResultsTableHTML(d, c, true)}
-    </div>
-
-    <div style="margin-bottom:14px; background:#F7F8FA; padding:12px; border-radius:6px;">
-      <div class="stat-label muted" style="margin-bottom:10px;">${d.noBaseline ? 'Achieved metrics' : 'Key metric lift'}</div>
-      ${comparisonBarsHTML(d, c)}
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;">
@@ -1284,45 +1087,34 @@ function dataLayout(d, c, heroStats, strategyLines, clientLabel) {
     ${endorsementHTML(d, 'data')}
 
     <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#5A6B82; padding-top:8px; border-top:1px solid #E1E5EC;">
-      <div>${escapeHTML(d.agencyName)} · Made in Riyadh · بشغف</div>
+      <div>${escapeHTML(d.agencyName)} · ${escapeHTML(d.agencyTagline)}</div>
       <div>Generated ${new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
     </div>
   `;
 }
 
-/* ============================================================
-   EVENT WIRING
-   ============================================================ */
+// === WIRING ===
 function bindAllInputs() {
-  // Type toggle
-  document.querySelectorAll('[data-type]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      state.type = btn.dataset.type;
-      renderPerfFields();
-      renderBaselineFields();
-      refreshSmartCopy();
-      renderComputed();
-    });
+  document.getElementById('f-focus').addEventListener('change', e => {
+    state.focus = e.target.value;
+    updateDetection();
+    renderComputed();
   });
-  // Style + currency
   document.getElementById('f-style').addEventListener('change', e => { state.style = e.target.value; });
   document.getElementById('f-currency').addEventListener('change', e => {
     state.currency = e.target.value;
-    renderPerfFields(); renderBaselineFields(); refreshSmartCopy(); renderComputed();
+    renderPerfFields(); renderBaselineFields(); renderComputed();
   });
-  // Privacy switches
-  document.getElementById('t-hideName').addEventListener('change', e => { state.hideName = e.target.checked; });
   document.getElementById('t-hideRevenue').addEventListener('change', e => {
     state.hideRevenue = e.target.checked;
-    renderPerfFields(); renderBaselineFields(); refreshSmartCopy(); renderComputed();
+    renderPerfFields(); renderBaselineFields(); renderComputed();
   });
   document.getElementById('t-noBaseline').addEventListener('change', e => {
     state.noBaseline = e.target.checked;
-    renderBaselineFields(); refreshSmartCopy(); renderComputed();
+    renderBaselineFields(); renderComputed();
   });
-  // Endorsement tabs
+  document.getElementById('t-strictAnon').addEventListener('change', e => { state.strictAnon = e.target.checked; });
+
   document.querySelectorAll('.ai-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.ai-tab').forEach(b => b.classList.remove('active'));
@@ -1332,59 +1124,38 @@ function bindAllInputs() {
       document.getElementById('endorsement-testimonial').style.display = state.endorsement === 'testimonial' ? 'block' : 'none';
     });
   });
-  // Text inputs (sync to state)
-  const textFields = [
-    'agencyName','agencyTagline','descriptor','industry','size','period','channels',
-    'headline','challenge','strategy','outcomeCallout','testimonial','testimonialAuthor'
-  ];
-  textFields.forEach(k => {
+
+  ['agencyName','agencyTagline','descriptor','industry','size','period','channels',
+   'headline','challenge','strategy','outcomeCallout','testimonial','testimonialAuthor'].forEach(k => {
     const el = document.getElementById('f-' + k);
-    if (el) el.addEventListener('input', e => {
-      state[k] = e.target.value;
-      if (k === 'headline') headlineTouched = true;
-      if (k === 'outcomeCallout') outcomeTouched = true;
-      renderLinkedInPostPreview();
-    });
+    if (el) el.addEventListener('input', e => { state[k] = e.target.value; });
   });
 
-  // AI drafters
   document.getElementById('ai-headline').addEventListener('click', () => {
     const h = draftHeadline();
     state.headline = h;
-    headlineTouched = false;
     document.getElementById('f-headline').value = h;
-    renderLinkedInPostPreview();
+  });
+  document.getElementById('ai-challenge').addEventListener('click', () => {
+    const ch = draftChallenge();
+    state.challenge = ch;
+    document.getElementById('f-challenge').value = ch;
   });
   document.getElementById('ai-outcome').addEventListener('click', () => {
     const o = draftOutcomeCallout();
     state.outcomeCallout = o;
-    outcomeTouched = false;
     document.getElementById('f-outcomeCallout').value = o;
-    renderLinkedInPostPreview();
   });
   document.getElementById('ai-testimonial').addEventListener('click', () => {
     const t = draftTestimonial();
     state.testimonial = t;
     document.getElementById('f-testimonial').value = t;
-    renderLinkedInPostPreview();
   });
 
-  // Tabs
   document.getElementById('tab-input').addEventListener('click', () => switchView('input'));
   document.getElementById('tab-preview').addEventListener('click', () => switchView('preview'));
-
-  // Export
   document.getElementById('export-btn').addEventListener('click', exportPDF);
-  document.getElementById('export-btn-inline').addEventListener('click', exportPDF);
-  document.getElementById('linkedin-post-btn').addEventListener('click', exportLinkedInPost);
-  document.getElementById('linkedin-post-btn-inline').addEventListener('click', exportLinkedInPost);
-  document.getElementById('carousel-btn').addEventListener('click', exportCarouselPDF);
-  document.getElementById('carousel-btn-inline').addEventListener('click', exportCarouselPDF);
-
-  // Reset
-  document.getElementById('reset-btn').addEventListener('click', () => {
-    if (confirm('Reset all fields to defaults?')) location.reload();
-  });
+  document.getElementById('reset-btn').addEventListener('click', () => { if (confirm('Reset all fields?')) location.reload(); });
 }
 
 function switchView(v) {
@@ -1395,37 +1166,26 @@ function switchView(v) {
   if (v === 'preview') renderPreview();
 }
 
-/* ============================================================
-   EXPORT PDF (opens print dialog in new window with just the page)
-   ============================================================ */
 function exportPDF() {
   renderPreview();
   const pageHTML = document.getElementById('case-page-mount').innerHTML;
   const win = window.open('', '_blank');
   if (!win) { alert('Please allow pop-ups to export the PDF.'); return; }
-
   const styleTag = document.querySelector('style').outerHTML;
   const fonts = document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
-
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
     <title>${escapeHTML(state.descriptor)} — Case Study</title>
-    ${fonts}
-    ${styleTag}
-    <style>
-      body { background: white; }
-      @page { size: A4; margin: 0; }
-      .case-page { box-shadow: none; margin: 0; }
-    </style>
+    ${fonts}${styleTag}
+    <style>body { background: white; } @page { size: A4; margin: 0; } .case-page { box-shadow: none; margin: 0; }</style>
   </head><body>${pageHTML}
     <script>window.addEventListener('load', () => { setTimeout(() => window.print(), 600); });<\/script>
   </body></html>`);
   win.document.close();
 }
 
-/* ============================================================
-   INIT
-   ============================================================ */
+// INIT
 bindAllInputs();
+updateDetection();
 renderPerfFields();
 renderBaselineFields();
 renderComputed();
