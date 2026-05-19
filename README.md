@@ -15,4 +15,4 @@ Single-file, no-build HTML generator for anonymized performance marketing case s
 - No client names or client logo fields.
 - Outcome callout is the safe default; testimonials require client approval.
 - Engagement focus controls fields, metrics, copy, hero stats, and tables.
-- Output remains a one-page A4 PDF via print/export.
+- Outputs include a one-page A4 PDF, LinkedIn post copy, and a square LinkedIn carousel PDF.

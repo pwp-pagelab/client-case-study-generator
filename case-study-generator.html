@@ -24,6 +24,8 @@
   .btn.active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
   .btn-primary { background: #0F7A3D; color: white; border-color: #0F7A3D; font-weight: 600; }
   .btn-primary:hover { background: #0c6432; border-color: #0c6432; }
+  .btn-dark { background: #1A1A1A; color: white; border-color: #1A1A1A; font-weight: 600; }
+  .btn-dark:hover { background: #0F7A3D; border-color: #0F7A3D; }
   .btn-ai { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; border-color: transparent; font-weight: 600; }
   .btn-ai:hover { opacity: 0.9; }
 
@@ -77,6 +79,7 @@
 
   .hint-text { font-size: 11px; color: #888; margin: 4px 0 12px; line-height: 1.5; }
   .warn-text { font-size: 11px; color: #B45309; background: #FEF3C7; padding: 8px; border-radius: 6px; margin: 6px 0; line-height: 1.5; }
+  .share-preview { background: #FAFAF7; border: 1px solid #ECECE7; border-radius: 8px; color: #333; font-size: 12px; line-height: 1.6; max-height: 240px; overflow: auto; padding: 12px; white-space: pre-wrap; }
 
   .detection-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #E0F2FE; color: #075985; border-radius: 12px; font-size: 11px; font-weight: 600; margin-left: 6px; }
 
@@ -117,10 +120,29 @@
   .s-data .results-table tr { border-color: #E1E5EC; }
   .results-table tr:first-child { border-top: none; }
 
+  .carousel-slide { width: 1080px; height: 1080px; background: #FAFAF7; color: #1A1A1A; padding: 74px; page-break-after: always; position: relative; overflow: hidden; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+  .carousel-slide.dark { background: #111; color: white; }
+  .carousel-slide .kicker { color: #0F7A3D; font-size: 18px; font-weight: 700; letter-spacing: 0.18em; margin-bottom: 24px; text-transform: uppercase; }
+  .carousel-slide.dark .kicker { color: #7EFFA0; }
+  .carousel-slide h1 { font-family: 'Fraunces', Georgia, serif; font-size: 78px; font-weight: 600; letter-spacing: -0.04em; line-height: 0.98; max-width: 900px; }
+  .carousel-slide h2 { font-family: 'Fraunces', Georgia, serif; font-size: 58px; font-weight: 600; letter-spacing: -0.035em; line-height: 1.04; margin-bottom: 28px; max-width: 860px; }
+  .carousel-slide p, .carousel-slide li { color: inherit; font-size: 30px; line-height: 1.35; }
+  .carousel-slide ul { display: grid; gap: 18px; margin: 0; padding-left: 34px; }
+  .carousel-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 42px; }
+  .carousel-stat { background: white; border: 1px solid rgba(26,26,26,.16); border-radius: 18px; padding: 28px; }
+  .carousel-slide.dark .carousel-stat { background: #1A1A1A; border-color: rgba(255,255,255,.16); }
+  .carousel-stat span { color: #666; display: block; font-size: 15px; font-weight: 700; letter-spacing: 0.14em; margin-bottom: 12px; text-transform: uppercase; }
+  .carousel-slide.dark .carousel-stat span { color: #AAA; }
+  .carousel-stat strong { display: block; font-size: 54px; letter-spacing: -0.03em; line-height: 1; }
+  .carousel-footer { align-items: center; border-top: 1px solid rgba(26,26,26,.12); bottom: 54px; color: #666; display: flex; font-size: 18px; justify-content: space-between; left: 74px; padding-top: 24px; position: absolute; right: 74px; }
+  .carousel-slide.dark .carousel-footer { border-color: rgba(255,255,255,.16); color: #AAA; }
+  .carousel-footer strong { color: inherit; }
+
   @media print {
     body { background: white; margin: 0; padding: 0; }
     .no-print { display: none !important; }
     .case-page { box-shadow: none; width: 210mm; min-height: 297mm; padding: 14mm; page-break-after: avoid; }
+    .carousel-slide { box-shadow: none; height: 1080px; width: 1080px; }
     @page { size: A4; margin: 0; }
   }
 </style>
@@ -139,6 +161,8 @@
     <button class="btn active" id="tab-input">Inputs</button>
     <button class="btn" id="tab-preview">Preview</button>
     <button class="btn btn-primary" id="export-btn">↓ Export PDF</button>
+    <button class="btn btn-dark" id="linkedin-post-btn">Copy LinkedIn Post</button>
+    <button class="btn btn-dark" id="carousel-btn">Export Carousel</button>
   </div>
 </div>
 
@@ -179,6 +203,18 @@
           <button class="btn" id="reset-btn" style="width:100%;">↺ Reset all</button>
         </div>
       </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">↗ Share outputs</div>
+      <p class="hint-text">Export the one-page PDF, copy a LinkedIn caption, or generate a square carousel PDF. These outputs use only available metrics, so empty fields stay hidden.</p>
+      <div class="grid-3" style="margin-bottom:14px;">
+        <button class="btn btn-primary" id="export-btn-inline" style="justify-content:center;">Export PDF</button>
+        <button class="btn btn-dark" id="linkedin-post-btn-inline" style="justify-content:center;">Copy LinkedIn Post</button>
+        <button class="btn btn-dark" id="carousel-btn-inline" style="justify-content:center;">Export Carousel</button>
+      </div>
+      <label class="label">LinkedIn post preview</label>
+      <div class="share-preview" id="linkedin-post-preview"></div>
     </div>
 
     <div class="card">
@@ -759,6 +795,7 @@ function renderComputed() {
   const metrics = getAvailableMetrics(c);
   if (metrics.length === 0) {
     container.innerHTML = '<div style="grid-column: 1/-1; color: #888; font-size: 12px; padding: 8px 0;">Enter at least one performance metric above to see calculations.</div>';
+    renderLinkedInPreview();
     return;
   }
   container.innerHTML = metrics.slice(0, 12).map(m => {
@@ -772,6 +809,7 @@ function renderComputed() {
     }
     return `<div class="metric-chip"><div class="l">${m.k}</div><div class="v">${m.v}</div>${chHTML}</div>`;
   }).join('');
+  renderLinkedInPreview();
 }
 
 function updateDetection() {
@@ -919,6 +957,137 @@ function endorsementHTML(d, style) {
 function escapeHTML(s) {
   if (!s) return '';
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function primaryMetricLine() {
+  const metrics = getAvailableMetrics(calc());
+  if (!metrics.length) return 'measurable performance gains';
+  const top = metrics[0];
+  const second = metrics.find(m => m.k !== top.k && !['Ad spend'].includes(m.k));
+  return second ? `${top.v} ${top.k.toLowerCase()} with ${second.v} ${second.k.toLowerCase()}` : `${top.v} ${top.k.toLowerCase()}`;
+}
+
+function buildLinkedInPost() {
+  const c = calc();
+  const d = state;
+  const headline = d.headline.trim() || draftHeadline();
+  const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
+  const metrics = getAvailableMetrics(c).filter(m => m.k !== 'Ad spend').slice(0, 5);
+  const focusLabels = { leadgen: 'lead generation', ecommerce: 'ecommerce growth', creative: 'creative and UGC', awareness: 'awareness', fullfunnel: 'full-funnel growth' };
+  const focusLabel = focusLabels[getActiveFocus()] || 'performance marketing';
+
+  return [
+    headline,
+    '',
+    `For ${d.descriptor.toLowerCase()}, the story was ${primaryMetricLine()} — using only the data that was actually tracked.`,
+    '',
+    `Focus: ${focusLabel}`,
+    `Channels: ${d.channels}`,
+    '',
+    'What we did:',
+    ...strategyLines.map(line => `• ${line}`),
+    '',
+    'What changed:',
+    ...(metrics.length ? metrics.map(m => {
+      const liftText = m.lift !== null && m.lift !== undefined && !isNaN(m.lift)
+        ? ` (${Math.abs(m.lift).toFixed(0)}% ${m.inverted ? 'reduction' : 'lift'})`
+        : '';
+      return `• ${m.k}: ${m.v}${liftText}`;
+    }) : ['• Add campaign metrics to generate this section.']),
+    '',
+    d.outcomeCallout.trim() || draftOutcomeCallout(),
+    '',
+    `— ${d.agencyName}`,
+    '',
+    '#PerformanceMarketing #CaseStudy #DigitalMarketing #UGC #LeadGeneration'
+  ].join('\n');
+}
+
+function renderLinkedInPreview() {
+  const box = document.getElementById('linkedin-post-preview');
+  if (box) box.textContent = buildLinkedInPost();
+}
+
+async function exportLinkedInPost() {
+  const post = buildLinkedInPost();
+  try {
+    await navigator.clipboard.writeText(post);
+    alert('LinkedIn post copied. Paste it into LinkedIn when you are ready.');
+  } catch (e) {
+    const blob = new Blob([post], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'linkedin-post.txt';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  }
+}
+
+function buildCarouselSlidesHTML() {
+  const c = calc();
+  const d = state;
+  const headline = d.headline.trim() || draftHeadline();
+  const metrics = buildHeroStats(c);
+  const topMetrics = metrics.length ? metrics.slice(0, 4) : [{ k: 'Metrics', v: 'Add data' }];
+  const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
+  const footer = n => `<div class="carousel-footer"><strong>${escapeHTML(d.agencyName)}</strong><span>${n}/6 · ${escapeHTML(d.period)}</span></div>`;
+
+  return `
+    <section class="carousel-slide dark">
+      <div class="kicker">Case Study</div>
+      <h1>${escapeHTML(headline)}</h1>
+      <p style="bottom:170px; color:#DADADA; font-size:28px; left:74px; line-height:1.35; max-width:760px; position:absolute;">${escapeHTML(d.descriptor)}</p>
+      ${footer(1)}
+    </section>
+    <section class="carousel-slide">
+      <div class="kicker">The challenge</div>
+      <h2>${escapeHTML(d.challenge || draftChallenge())}</h2>
+      <p>${escapeHTML(d.channels)}</p>
+      ${footer(2)}
+    </section>
+    <section class="carousel-slide">
+      <div class="kicker">The approach</div>
+      <h2>We focused the work around the metrics that mattered.</h2>
+      <ul>${strategyLines.map(line => `<li>${escapeHTML(line)}</li>`).join('')}</ul>
+      ${footer(3)}
+    </section>
+    <section class="carousel-slide dark">
+      <div class="kicker">The numbers</div>
+      <h2>No empty metrics. No fake zeros.</h2>
+      <div class="carousel-stats">
+        ${topMetrics.map(m => `<div class="carousel-stat"><span>${escapeHTML(m.k)}</span><strong>${m.v}</strong></div>`).join('')}
+      </div>
+      ${footer(4)}
+    </section>
+    <section class="carousel-slide">
+      <div class="kicker">The outcome</div>
+      <h2>${escapeHTML(d.outcomeCallout.trim() || draftOutcomeCallout())}</h2>
+      ${footer(5)}
+    </section>
+    <section class="carousel-slide dark">
+      <div class="kicker">${escapeHTML(d.agencyName)}</div>
+      <h1>Turn messy campaign data into a clear growth story.</h1>
+      <p style="color:#DADADA; margin-top:36px; max-width:780px;">Anonymized, metric-led case studies for prospect-ready proof.</p>
+      ${footer(6)}
+    </section>
+  `;
+}
+
+function exportCarousel() {
+  const win = window.open('', '_blank');
+  if (!win) { alert('Please allow pop-ups to export the carousel.'); return; }
+  const styleTag = document.querySelector('style').outerHTML;
+  const fonts = document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>${escapeHTML(state.descriptor)} — LinkedIn Carousel</title>
+    ${fonts}${styleTag}
+    <style>body { margin: 0; background: #F5F5F2; } @page { size: 1080px 1080px; margin: 0; }</style>
+  </head><body>${buildCarouselSlidesHTML()}
+    <script>window.addEventListener('load', () => { setTimeout(() => window.print(), 600); });<\/script>
+  </body></html>`);
+  win.document.close();
 }
 
 // === LAYOUTS ===
@@ -1155,6 +1324,11 @@ function bindAllInputs() {
   document.getElementById('tab-input').addEventListener('click', () => switchView('input'));
   document.getElementById('tab-preview').addEventListener('click', () => switchView('preview'));
   document.getElementById('export-btn').addEventListener('click', exportPDF);
+  document.getElementById('export-btn-inline').addEventListener('click', exportPDF);
+  document.getElementById('linkedin-post-btn').addEventListener('click', exportLinkedInPost);
+  document.getElementById('linkedin-post-btn-inline').addEventListener('click', exportLinkedInPost);
+  document.getElementById('carousel-btn').addEventListener('click', exportCarousel);
+  document.getElementById('carousel-btn-inline').addEventListener('click', exportCarousel);
   document.getElementById('reset-btn').addEventListener('click', () => { if (confirm('Reset all fields?')) location.reload(); });
 }
 
