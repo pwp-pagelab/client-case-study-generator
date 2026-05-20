@@ -131,6 +131,9 @@
   .s-data .display { font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; font-weight: 800; }
   .s-data .accent-text { color: var(--green); }
   .s-data .muted { color: var(--muted); }
+  .case-page.rtl, .carousel-slide.rtl { direction: rtl; text-align: right; }
+  .case-page.rtl .num, .case-page.rtl .metric-bar-value, .case-page.rtl .carousel-chart-value { direction: ltr; text-align: left; }
+  .case-page.rtl ul { padding-left: 0 !important; padding-right: 16px !important; }
 
   .page-h1 { font-size: 42px; line-height: 1.12; letter-spacing: 0; margin: 0; font-weight: 800; }
   .s-bold .page-h1 { font-weight: 800; }
@@ -159,6 +162,14 @@
   .carousel-slide { width: 1080px; height: 1080px; background: var(--cream); color: var(--ink); padding: 74px; page-break-after: always; position: relative; overflow: hidden; font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; }
   .carousel-slide:before { content:""; position:absolute; inset:0 auto 0 0; width:18px; background:linear-gradient(180deg,var(--yellow),var(--green)); }
   .carousel-slide.dark { background: radial-gradient(circle at 18% 18%, rgba(231,189,82,.32), transparent 28%), linear-gradient(135deg,var(--green),#05372d 72%); color: white; }
+  .carousel-slide.v-diagonal:after { content:""; position:absolute; inset:auto -120px -140px auto; width:520px; height:520px; background:linear-gradient(135deg,rgba(231,189,82,.3),rgba(10,76,62,.08)); transform:rotate(32deg); z-index:0; }
+  .carousel-slide.v-frame { border:34px solid rgba(231,189,82,.26); }
+  .carousel-slide.v-frame:before { width:0; }
+  .carousel-slide.v-ribbon:before { inset:auto 0 0 0; width:auto; height:24px; background:linear-gradient(90deg,var(--yellow),var(--green)); }
+  .carousel-slide.v-ribbon.dark { background: radial-gradient(circle at 78% 18%, rgba(231,189,82,.28), transparent 30%), linear-gradient(150deg,#05372d,var(--green) 78%); }
+  .carousel-slide.v-split { background: linear-gradient(90deg,var(--cream) 0 58%, #fffdf8 58% 100%); }
+  .carousel-slide.v-split.dark { background: linear-gradient(90deg,var(--green) 0 58%, #05372d 58% 100%); }
+  .carousel-slide.v-diagonal > *, .carousel-slide.v-frame > *, .carousel-slide.v-ribbon > *, .carousel-slide.v-split > * { position:relative; z-index:1; }
   .carousel-slide .kicker { color: var(--green); font-size: 20px; font-weight: 800; margin-bottom: 24px; }
   .carousel-slide.dark .kicker { color: var(--yellow); }
   .carousel-slide h1 { font-family: "Baloo Bhaijaan 2", system-ui, sans-serif; font-size: 82px; font-weight: 800; letter-spacing: 0; line-height: 1.02; max-width: 900px; }
@@ -215,7 +226,7 @@
   @media print {
     body { background: white; margin: 0; padding: 0; }
     .no-print { display: none !important; }
-    .case-page { box-shadow: none; width: 210mm; min-height: 297mm; padding: 14mm; page-break-after: avoid; }
+    .case-page { box-shadow: none; width: 210mm; min-height: 297mm; padding: 14mm; page-break-after: avoid; break-after: avoid; }
     .carousel-slide { box-shadow: none; height: 1080px; width: 1080px; }
     @page { size: A4; margin: 0; }
   }
@@ -270,6 +281,13 @@
           <label class="label">Currency</label>
           <select class="input" id="f-currency">
             <option>USD</option><option>EUR</option><option>GBP</option><option selected>SAR</option><option>AED</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Output Language</label>
+          <select class="input" id="f-language">
+            <option value="en" selected>English</option>
+            <option value="ar">Arabic</option>
           </select>
         </div>
         <div>
@@ -475,7 +493,7 @@ Connected creative learnings back to paid media reporting</textarea>
 const AGENCY_NAME = 'Post With Passion - PWP';
 const state = {
   focus: 'auto', detectedFocus: null,
-  style: 'editorial', currency: 'SAR', xFormat: 'compact', changeFormat: 'percent',
+  style: 'editorial', currency: 'SAR', language: 'en', xFormat: 'compact', changeFormat: 'percent',
   benchmarkDisplay: 'average',
   hideRevenue: false, noBaseline: true, strictAnon: true,
   endorsement: 'outcome',
@@ -663,18 +681,70 @@ function benchmarkRows(c) {
 }
 function benchmarkLabel(m) {
   if (m.benchmarkRatio === null || m.benchmarkRatio === undefined) return '';
-  if (Math.abs(m.benchmarkRatio - 1) < 0.03) return 'In line with benchmark';
-  if (m.benchmarkRatio < 1 && state.benchmarkDisplay === 'average') return 'Within average range';
+  if (Math.abs(m.benchmarkRatio - 1) < 0.03) return outText('In line with benchmark', 'ضمن المعيار');
+  if (m.benchmarkRatio < 1 && state.benchmarkDisplay === 'average') return outText('Within average range', 'ضمن المعدل الطبيعي');
   return m.benchmarkRatio > 1
-    ? `${fmtMultiplier(m.benchmarkRatio)} stronger than benchmark`
-    : `${fmtPct((1 - m.benchmarkRatio) * 100, 0)} behind benchmark`;
+    ? outText(`${fmtMultiplier(m.benchmarkRatio)} stronger than benchmark`, `أقوى من المعيار بـ ${fmtMultiplier(m.benchmarkRatio)}`)
+    : outText(`${fmtPct((1 - m.benchmarkRatio) * 100, 0)} behind benchmark`, `أقل من المعيار بـ ${fmtPct((1 - m.benchmarkRatio) * 100, 0)}`);
 }
 function benchmarkColor(m) {
   if (m.benchmarkRatio >= 1 || state.benchmarkDisplay === 'average') return '#0a4c3e';
   return '#9b3b2f';
 }
 function benchmarkContextLine() {
-  return 'Benchmarked against comparable campaign norms for this category and objective.';
+  return state.language === 'ar'
+    ? 'تمت المقارنة مع متوسطات حملات مشابهة لنفس الفئة والهدف.'
+    : 'Benchmarked against comparable campaign norms for this category and objective.';
+}
+const arMetricLabels = {
+  'Ad spend': 'الإنفاق الإعلاني',
+  'Reach': 'الوصول',
+  'Impressions': 'مرات الظهور',
+  'Clicks': 'النقرات',
+  'Engagements': 'التفاعلات',
+  'Video views': 'مشاهدات الفيديو',
+  'CTR': 'نسبة النقر',
+  'CPC': 'تكلفة النقرة',
+  'CPM': 'تكلفة الألف ظهور',
+  'Qualified leads': 'العملاء المحتملون',
+  'Leads': 'العملاء المحتملون',
+  'Cost per lead': 'تكلفة العميل المحتمل',
+  'Click → Lead': 'النقرات إلى عملاء محتملين',
+  'SQLs': 'العملاء المؤهلون',
+  'Lead → SQL': 'تحويل العميل المحتمل إلى مؤهل',
+  'Closed deals': 'الصفقات المغلقة',
+  'SQL → Close': 'تحويل المؤهل إلى صفقة',
+  'Lead → Close': 'تحويل العميل المحتمل إلى صفقة',
+  'Landing page views': 'زيارات صفحة الهبوط',
+  'Cost / LPV': 'تكلفة زيارة صفحة الهبوط',
+  'ROAS': 'العائد على الإنفاق',
+  'Revenue': 'الإيرادات',
+  'Conversions': 'التحويلات',
+  'Purchases': 'المشتريات',
+  'Average order value': 'متوسط قيمة الطلب',
+  'CVR': 'معدل التحويل',
+  'Add-to-cart rate': 'معدل الإضافة للسلة',
+  'Checkout rate': 'معدل بدء الدفع',
+  'Purchase rate': 'معدل الشراء',
+  'CPA': 'تكلفة التحويل',
+  'CAC': 'تكلفة اكتساب العميل',
+  'Pipeline': 'قيمة الفرص',
+  'Pipeline ROAS': 'عائد الفرص على الإنفاق',
+  'Engagement rate': 'معدل التفاعل',
+  'Frequency': 'التكرار',
+  'View rate': 'معدل المشاهدة',
+  'Saves': 'الحفظ',
+  'Shares': 'المشاركات',
+  'Comments': 'التعليقات',
+  'Cost / view': 'تكلفة المشاهدة',
+  'Cost / engagement': 'تكلفة التفاعل',
+  'Cost / reach': 'تكلفة الوصول',
+};
+function outLabel(label) {
+  return state.language === 'ar' ? (arMetricLabels[label] || label) : label;
+}
+function outText(en, ar) {
+  return state.language === 'ar' ? ar : en;
 }
 
 function calc() {
@@ -863,9 +933,9 @@ function chartHTML(c, title = 'Visual performance snapshot') {
     <div class="chart-title">${title}</div>
     <div class="score-grid">
       ${metrics.map(m => `<div class="score-card">
-        <span class="label">${escapeHTML(m.k)}</span>
+        <span class="label">${escapeHTML(outLabel(m.k))}</span>
         <span class="value">${m.v}</span>
-        ${m.benchmarkValue ? `<span class="benchmark">Benchmark ${m.benchmarkValue}</span><span class="verdict">${benchmarkLabel(m)}</span>` : ''}
+        ${m.benchmarkValue ? `<span class="benchmark">${outText('Benchmark', 'المعيار')} ${m.benchmarkValue}</span><span class="verdict">${benchmarkLabel(m)}</span>` : ''}
       </div>`).join('')}
     </div>
     <div class="chart-ribbon">
@@ -881,9 +951,9 @@ function carouselChartHTML(c) {
   if (!metrics.length) return '';
   return `<div class="carousel-score-grid">
     ${metrics.map(m => `<div class="carousel-score-card">
-      <span>${escapeHTML(m.k)}</span>
+      <span>${escapeHTML(outLabel(m.k))}</span>
       <strong>${m.v}</strong>
-      <small>${m.benchmarkValue ? `${benchmarkLabel(m)} · Benchmark ${m.benchmarkValue}` : 'Tracked metric'}</small>
+      <small>${m.benchmarkValue ? `${benchmarkLabel(m)} · ${outText('Benchmark', 'المعيار')} ${m.benchmarkValue}` : outText('Tracked metric', 'مؤشر متتبع')}</small>
     </div>`).join('')}
   </div>`;
 }
@@ -892,13 +962,13 @@ function benchmarkHTML(c) {
   const rows = benchmarkRows(c).slice(0, 5);
   if (!rows.length) return '';
   return `<div class="visual-panel" style="margin-bottom:14px;">
-    <div class="chart-title">Industry standard context</div>
+    <div class="chart-title">${outText('Industry standard context', 'المقارنة مع معيار القطاع')}</div>
     <div class="field-hint" style="margin-bottom:10px;">${benchmarkContextLine()}</div>
     <table class="results-table">
-      <thead><tr><th>Metric</th><th class="num">Industry standard</th><th class="num">Achieved</th><th class="num">Context</th></tr></thead>
+      <thead><tr><th>${outText('Metric', 'المؤشر')}</th><th class="num">${outText('Industry standard', 'معيار القطاع')}</th><th class="num">${outText('Achieved', 'المحقق')}</th><th class="num">${outText('Context', 'السياق')}</th></tr></thead>
       <tbody>
         ${rows.map(m => `<tr>
-          <td style="font-weight:600;">${escapeHTML(m.k)}</td>
+          <td style="font-weight:600;">${escapeHTML(outLabel(m.k))}</td>
           <td class="num muted">${m.benchmarkValue}</td>
           <td class="num" style="font-weight:800;">${m.v}</td>
           <td class="num" style="font-weight:800; color:${benchmarkColor(m)};">${benchmarkLabel(m)}</td>
@@ -971,6 +1041,34 @@ function draftHeadline() {
   }
   candidates.sort((a, b) => b.score - a.score);
   return candidates[0].text;
+}
+
+function draftArabicHeadline() {
+  const c = calc();
+  const focus = getActiveFocus();
+  if (c.leads !== null && c.cpl !== null) {
+    return `حققنا ${fmtNumber(c.leads)} عميل محتمل بتكلفة ${fmtCurrency(c.cpl, state.currency)} للعميل`;
+  }
+  if (c.leads !== null) {
+    return `حققنا ${fmtNumber(c.leads)} عميل محتمل من حملة أداء قابلة للقياس`;
+  }
+  if (c.roas !== null) {
+    return `حققنا عائد ${fmtROAS(c.roas)} على الإنفاق الإعلاني`;
+  }
+  if (c.revenue !== null && !state.hideRevenue) {
+    return `حققنا ${fmtCurrency(c.revenue, state.currency)} إيرادات من حملة أداء مركزة`;
+  }
+  if (focus === 'awareness' && c.reach !== null) {
+    return `وصلنا إلى ${fmtNumber(c.reach)} شخص ضمن الجمهور المستهدف`;
+  }
+  if (c.videoViews !== null) {
+    return `حققنا ${fmtNumber(c.videoViews)} مشاهدة فيديو بمحتوى موجه للأداء`;
+  }
+  return 'نتائج أداء واضحة مبنية على بيانات فعلية';
+}
+
+function getOutputHeadline() {
+  return state.headline.trim() || (state.language === 'ar' ? draftArabicHeadline() : draftHeadline());
 }
 
 function draftChallenge() {
@@ -1281,7 +1379,7 @@ function renderPreview() {
                    : d.style === 'bold' ? boldLayout(d, c, heroStats, strategyLines)
                    : dataLayout(d, c, heroStats, strategyLines);
 
-  mount.innerHTML = `<div class="case-page s-${d.style}">${layoutHTML}</div>`;
+  mount.innerHTML = `<div class="case-page s-${d.style}${state.language === 'ar' ? ' rtl' : ''}">${layoutHTML}</div>`;
 }
 
 function liftHTML(s) {
@@ -1350,16 +1448,16 @@ function buildResultsTableHTML(d, c, showBaseline) {
    .filter(row => !allowedRows || allowedRows.includes(row[0]));
 
   if (allRows.length === 0) {
-    return `<p style="font-size:11px; opacity: 0.6;">No detailed metrics provided.</p>`;
+    return `<p style="font-size:11px; opacity: 0.6;">${outText('No detailed metrics provided.', 'لم يتم إدخال مؤشرات تفصيلية.')}</p>`;
   }
 
   const showBaselineCol = showBaseline && !d.noBaseline;
   return `<table class="results-table">
     <thead><tr class="muted">
-      <th>Metric</th>
-      ${showBaselineCol ? '<th class="num">Baseline</th>' : ''}
-      <th class="num">Achieved</th>
-      ${showBaselineCol ? '<th class="num">Change</th>' : ''}
+      <th>${outText('Metric', 'المؤشر')}</th>
+      ${showBaselineCol ? `<th class="num">${outText('Baseline', 'قبل')}</th>` : ''}
+      <th class="num">${outText('Achieved', 'النتيجة')}</th>
+      ${showBaselineCol ? `<th class="num">${outText('Change', 'التغير')}</th>` : ''}
     </tr></thead>
     <tbody>
     ${allRows.map(([label, val, base, lf, inverted]) => {
@@ -1372,7 +1470,7 @@ function buildResultsTableHTML(d, c, showBaseline) {
         chText = `${arrow} ${fmtChange(Math.abs(lf), inverted, false)}`;
       }
       return `<tr>
-        <td style="font-weight: 500;">${label}</td>
+        <td style="font-weight: 500;">${escapeHTML(outLabel(label))}</td>
         ${showBaselineCol ? `<td class="num muted">${base ?? '—'}</td>` : ''}
         <td class="num" style="font-weight: 600;">${val}</td>
         ${showBaselineCol ? `<td class="num" style="font-weight:600;${chColor}">${chText}</td>` : ''}
@@ -1424,19 +1522,40 @@ function escapeHTML(s) {
 
 function primaryMetricLine() {
   const metrics = getAvailableMetrics(calc());
-  if (!metrics.length) return 'measurable performance gains';
+  if (!metrics.length) return outText('measurable performance gains', 'نتائج أداء قابلة للقياس');
   const top = metrics[0];
   const second = metrics.find(m => m.k !== top.k && !['Ad spend'].includes(m.k));
-  return second ? `${top.v} ${top.k.toLowerCase()} with ${second.v} ${second.k.toLowerCase()}` : `${top.v} ${top.k.toLowerCase()}`;
+  return second
+    ? outText(`${top.v} ${top.k.toLowerCase()} with ${second.v} ${second.k.toLowerCase()}`, `${top.v} ${outLabel(top.k)} مع ${second.v} ${outLabel(second.k)}`)
+    : outText(`${top.v} ${top.k.toLowerCase()}`, `${top.v} ${outLabel(top.k)}`);
 }
 
 function buildLinkedInPost() {
   const c = calc();
   const d = state;
-  const headline = d.headline.trim() || draftHeadline();
+  const headline = getOutputHeadline();
   const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
   const metrics = getAvailableMetrics(c).filter(m => m.k !== 'Ad spend').slice(0, 5);
   const focusLabels = { leadgen: 'lead generation', ecommerce: 'ecommerce growth', creative: 'creative and UGC', awareness: 'awareness', fullfunnel: 'full-funnel growth' };
+  if (state.language === 'ar') {
+    return [
+      headline,
+      '',
+      `القصة باختصار: ${primaryMetricLine()}.`,
+      '',
+      `القطاع: ${d.industry}`,
+      `القنوات: ${d.channels}`,
+      '',
+      'أبرز ما تغير:',
+      ...(metrics.length ? metrics.map(m => `• ${outLabel(m.k)}: ${m.v}`) : ['• أضف أرقام الحملة لتوليد هذا القسم.']),
+      '',
+      d.outcomeCallout.trim() || draftOutcomeCallout(),
+      '',
+      `— ${AGENCY_NAME}`,
+      '',
+      '#تسويق_رقمي #دراسة_حالة #إعلانات'
+    ].join('\n');
+  }
   const focusLabel = focusLabels[getActiveFocus()] || 'performance marketing';
 
   return [
@@ -1488,50 +1607,58 @@ async function exportLinkedInPost() {
   }
 }
 
-function buildCarouselSlidesHTML() {
+function carouselVariantClasses(seed = Date.now()) {
+  const variants = ['v-diagonal', 'v-frame', 'v-ribbon', 'v-split'];
+  const offset = Math.abs(Math.floor(seed)) % variants.length;
+  return Array.from({ length: 5 }, (_, i) => variants[(offset + i) % variants.length]);
+}
+
+function buildCarouselSlidesHTML(seed = Date.now()) {
   const c = calc();
   const d = state;
-  const headline = d.headline.trim() || draftHeadline();
+  const headline = getOutputHeadline();
   const topMetrics = buildHeroStats(c).slice(0, 3);
   const footer = n => `<div class="carousel-footer"><strong>${escapeHTML(AGENCY_NAME)}</strong><span>${n}/5 · ${escapeHTML(d.period)}</span></div>`;
+  const rtl = state.language === 'ar' ? ' rtl' : '';
+  const v = carouselVariantClasses(seed);
 
   return `
-    <section class="carousel-slide dark">
-      <div class="kicker">Case Study</div>
+    <section class="carousel-slide dark ${v[0]}${rtl}">
+      <div class="kicker">${outText('Case Study', 'دراسة حالة')}</div>
       <h1>${escapeHTML(headline)}</h1>
       <div class="carousel-stats" style="grid-template-columns:repeat(3,1fr);">
-        ${topMetrics.map(m => `<div class="carousel-stat"><span>${escapeHTML(m.k)}</span><strong>${m.v}</strong></div>`).join('')}
+        ${topMetrics.map(m => `<div class="carousel-stat"><span>${escapeHTML(outLabel(m.k))}</span><strong>${m.v}</strong></div>`).join('')}
       </div>
       ${footer(1)}
     </section>
-    <section class="carousel-slide">
-      <div class="kicker">The account</div>
+    <section class="carousel-slide ${v[1]}${rtl}">
+      <div class="kicker">${outText('The account', 'الحساب')}</div>
       <h2>${escapeHTML(d.industry)}</h2>
       <div class="carousel-stats">
-        <div class="carousel-stat"><span>Category</span><strong style="font-size:42px;">${escapeHTML(industryCluster())}</strong></div>
-        <div class="carousel-stat"><span>Objective</span><strong style="font-size:42px;">${escapeHTML(getActiveFocus()).replace('leadgen', 'Lead gen')}</strong></div>
-        <div class="carousel-stat"><span>Channels</span><strong style="font-size:36px;">${escapeHTML(d.channels.split(',').slice(0,2).join(' + '))}</strong></div>
-        <div class="carousel-stat"><span>Period</span><strong style="font-size:42px;">${escapeHTML(d.period)}</strong></div>
+        <div class="carousel-stat"><span>${outText('Category', 'الفئة')}</span><strong style="font-size:42px;">${escapeHTML(industryCluster())}</strong></div>
+        <div class="carousel-stat"><span>${outText('Objective', 'الهدف')}</span><strong style="font-size:42px;">${escapeHTML(getActiveFocus()).replace('leadgen', 'Lead gen')}</strong></div>
+        <div class="carousel-stat"><span>${outText('Channels', 'القنوات')}</span><strong style="font-size:36px;">${escapeHTML(d.channels.split(',').slice(0,2).join(' + '))}</strong></div>
+        <div class="carousel-stat"><span>${outText('Period', 'الفترة')}</span><strong style="font-size:42px;">${escapeHTML(d.period)}</strong></div>
       </div>
       ${footer(2)}
     </section>
-    <section class="carousel-slide dark">
-      <div class="kicker">Performance ranking</div>
-      <h2>Strongest metrics vs benchmark</h2>
+    <section class="carousel-slide dark ${v[2]}${rtl}">
+      <div class="kicker">${outText('Performance ranking', 'ترتيب الأداء')}</div>
+      <h2>${outText('Strongest metrics vs benchmark', 'أقوى المؤشرات مقارنة بالمعيار')}</h2>
       ${carouselChartHTML(c)}
       ${footer(3)}
     </section>
-    <section class="carousel-slide">
-      <div class="kicker">Benchmark context</div>
+    <section class="carousel-slide ${v[3]}${rtl}">
+      <div class="kicker">${outText('Benchmark context', 'سياق المعيار')}</div>
       <h2>${escapeHTML(industryCluster())}</h2>
-      <div style="transform:scale(1.28); transform-origin:top left; width:78%; margin-top:26px;">${benchmarkHTML(c) || chartHTML(c, 'Performance snapshot')}</div>
+      <div style="transform:scale(1.28); transform-origin:top ${state.language === 'ar' ? 'right' : 'left'}; width:78%; margin-top:26px;">${benchmarkHTML(c) || chartHTML(c, outText('Performance snapshot', 'لمحة الأداء'))}</div>
       ${footer(4)}
     </section>
-    <section class="carousel-slide dark">
+    <section class="carousel-slide dark ${v[4]}${rtl}">
       <div class="kicker">${escapeHTML(AGENCY_NAME)}</div>
-      <h1>Proof that fits the numbers.</h1>
+      <h1>${outText('Proof that fits the numbers.', 'إثبات واضح بالأرقام.')}</h1>
       <div class="carousel-stats">
-        ${topMetrics.slice(0, 2).map(m => `<div class="carousel-stat"><span>${escapeHTML(m.k)}</span><strong>${m.v}</strong></div>`).join('')}
+        ${topMetrics.slice(0, 2).map(m => `<div class="carousel-stat"><span>${escapeHTML(outLabel(m.k))}</span><strong>${m.v}</strong></div>`).join('')}
       </div>
       ${footer(5)}
     </section>
@@ -1543,11 +1670,14 @@ function exportCarousel() {
   if (!win) { alert('Please allow pop-ups to export the carousel.'); return; }
   const styleTag = document.querySelector('style').outerHTML;
   const fonts = document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-    <title>${escapeHTML(state.descriptor)} — LinkedIn Carousel</title>
+  const lang = state.language === 'ar' ? 'ar' : 'en';
+  const dir = state.language === 'ar' ? 'rtl' : 'ltr';
+  const seed = Date.now();
+  win.document.write(`<!DOCTYPE html><html lang="${lang}" dir="${dir}"><head><meta charset="UTF-8">
+    <title>${escapeHTML(state.descriptor)} — ${outText('LinkedIn Carousel', 'كاروسيل لينكدإن')}</title>
     ${fonts}${styleTag}
     <style>body { margin: 0; background: #f7f2e7; } @page { size: 1080px 1080px; margin: 0; }</style>
-  </head><body>${buildCarouselSlidesHTML()}
+  </head><body>${buildCarouselSlidesHTML(seed)}
     <script>window.addEventListener('load', () => { setTimeout(() => window.print(), 600); });<\/script>
   </body></html>`);
   win.document.close();
@@ -1555,11 +1685,11 @@ function exportCarousel() {
 
 // === LAYOUTS ===
 function editorialLayout(d, c, heroStats, strategyLines) {
-  const headlineText = d.headline.trim() || draftHeadline();
+  const headlineText = getOutputHeadline();
   return `
     <div style="display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:12px; border-bottom: 1px solid #e7dfcf;">
       <div>
-        <div class="eyebrow muted">Case Study · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
+        <div class="eyebrow muted">${outText('Case Study', 'دراسة حالة')} · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
         <div class="display" style="font-size: 22px; font-weight: 500; margin-top: 4px; letter-spacing: -0.02em;">${escapeHTML(d.descriptor)}</div>
       </div>
       <div style="text-align:right;">
@@ -1577,7 +1707,7 @@ function editorialLayout(d, c, heroStats, strategyLines) {
     <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:0; border-top:1px solid #e7dfcf; border-bottom:1px solid #e7dfcf; padding: 16px 0; margin-bottom: 18px;">
       ${heroStats.map((h, i) => `
         <div style="padding-left:${i === 0 ? 0 : 16}px; padding-right:${i < heroStats.length-1 ? 16 : 0}px; ${i < heroStats.length-1 ? 'border-right:1px solid #e7dfcf;' : ''}">
-          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.k)}</div>
+          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(outLabel(h.k))}</div>
           <div class="display stat-value">${h.v}</div>
           ${liftHTML(h)}
         </div>
@@ -1592,13 +1722,13 @@ function editorialLayout(d, c, heroStats, strategyLines) {
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:18px;">
       <div>
-        <div class="stat-label muted" style="margin-bottom:8px;">The challenge</div>
+        <div class="stat-label muted" style="margin-bottom:8px;">${outText('The challenge', 'التحدي')}</div>
         <p style="font-size:11px; line-height:1.6; margin:0;">${escapeHTML(d.challenge)}</p>
-        <div class="stat-label muted" style="margin-bottom:8px; margin-top:16px;">Channels</div>
+        <div class="stat-label muted" style="margin-bottom:8px; margin-top:16px;">${outText('Channels', 'القنوات')}</div>
         <p style="font-size:11px; line-height:1.6; margin:0;">${escapeHTML(d.channels)}</p>
       </div>
       <div>
-        <div class="stat-label muted" style="margin-bottom:8px;">What we did</div>
+        <div class="stat-label muted" style="margin-bottom:8px;">${outText('What we did', 'ماذا فعلنا')}</div>
         <ul style="margin:0; padding-left:16px; font-size:11px; line-height:1.6;">
           ${strategyLines.map(l => `<li style="margin-bottom:4px;">${escapeHTML(l)}</li>`).join('')}
         </ul>
@@ -1606,7 +1736,7 @@ function editorialLayout(d, c, heroStats, strategyLines) {
     </div>
 
     <div style="margin-bottom:18px;">
-      <div class="stat-label muted" style="margin-bottom:10px;">Detailed results</div>
+      <div class="stat-label muted" style="margin-bottom:10px;">${outText('Detailed results', 'النتائج التفصيلية')}</div>
       ${buildResultsTableHTML(d, c, true)}
     </div>
 
@@ -1614,13 +1744,13 @@ function editorialLayout(d, c, heroStats, strategyLines) {
 
     <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#6b746f; padding-top:8px; border-top:1px solid #e7dfcf;">
       <div>${escapeHTML(d.agencyName)} · ${escapeHTML(d.agencyTagline)}</div>
-      <div>Prepared ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+      <div>${outText('Prepared', 'تم الإعداد')} ${new Date().toLocaleDateString(state.language === 'ar' ? 'ar-SA' : 'en-US', { month: 'long', year: 'numeric' })}</div>
     </div>
   `;
 }
 
 function boldLayout(d, c, heroStats, strategyLines) {
-  const headlineText = d.headline.trim() || draftHeadline();
+  const headlineText = getOutputHeadline();
   return `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
       <div style="display:flex; align-items:center; gap:10px;">
@@ -1642,7 +1772,7 @@ function boldLayout(d, c, heroStats, strategyLines) {
     <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:8px; margin:18px 0;">
       ${heroStats.map((h, i) => `
         <div style="background: ${i === 0 ? '#e7bd52' : 'rgba(255,255,255,.1)'}; color: ${i === 0 ? '#15372f' : '#FFFFFF'}; padding:14px; border-radius:18px; border:1px solid rgba(255,255,255,.14);">
-          <div class="stat-label" style="font-weight:700; opacity:0.7; margin-bottom:8px;">${escapeHTML(h.k)}</div>
+          <div class="stat-label" style="font-weight:700; opacity:0.7; margin-bottom:8px;">${escapeHTML(outLabel(h.k))}</div>
           <div class="display" style="font-size:28px; font-weight:700; line-height:1; letter-spacing:-0.02em;">${h.v}</div>
           ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:9px; font-weight:600; margin-top:6px; opacity:0.85;">${h.inverted ? '↓' : '↑'} ${fmtChange(Math.abs(h.lift), h.inverted, true)}</div>` : ''}
         </div>
@@ -1650,45 +1780,45 @@ function boldLayout(d, c, heroStats, strategyLines) {
     </div>` : ''}
 
     <div style="margin-bottom:14px;">
-      ${chartHTML(c, 'Performance shape')}
+      ${chartHTML(c, outText('Performance shape', 'شكل الأداء'))}
     </div>
 
     ${benchmarkHTML(c)}
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:14px;">
       <div style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.14); padding:16px; border-radius:18px;">
-        <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">Challenge</div>
+        <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">${outText('Challenge', 'التحدي')}</div>
         <p style="font-size:11px; line-height:1.5; margin:0;">${escapeHTML(d.challenge)}</p>
       </div>
       <div style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.14); padding:16px; border-radius:18px;">
-        <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">What we did</div>
+        <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">${outText('What we did', 'ماذا فعلنا')}</div>
         <ul style="margin:0; padding-left:16px; font-size:11px; line-height:1.5;">${strategyLines.map(l => `<li style="margin-bottom:4px;">${escapeHTML(l)}</li>`).join('')}</ul>
       </div>
     </div>
 
     <div style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.14); border-radius:18px; padding:12px 14px; margin-bottom:14px;">
-      <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">Channel metrics</div>
+      <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">${outText('Channel metrics', 'مؤشرات القنوات')}</div>
       ${buildResultsTableHTML(d, c, false)}
     </div>
 
     ${endorsementHTML(d, 'bold')}
 
     <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:rgba(255,255,255,.68); padding-top:10px; border-top:1px solid rgba(255,255,255,.18);">
-      <div>Channels: ${escapeHTML(d.channels)}</div>
+      <div>${outText('Channels', 'القنوات')}: ${escapeHTML(d.channels)}</div>
       <div>${escapeHTML(d.agencyName)}</div>
     </div>
   `;
 }
 
 function dataLayout(d, c, heroStats, strategyLines) {
-  const headlineText = d.headline.trim() || draftHeadline();
+  const headlineText = getOutputHeadline();
   return `
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #e7bd52;">
       <div>
-        <div class="stat-label muted">Performance Marketing Report</div>
+        <div class="stat-label muted">${outText('Performance Marketing Report', 'تقرير أداء تسويقي')}</div>
         <div style="font-size:18px; font-weight:600; margin-top:4px; letter-spacing:-0.01em;">${escapeHTML(d.descriptor)}</div>
-        <div style="font-size:10px; color:#6b746f; margin-top:2px;">Reporting period: ${escapeHTML(d.period)} · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
-        <div style="font-size:10px; color:#6b746f;">Channels: ${escapeHTML(d.channels)}</div>
+        <div style="font-size:10px; color:#6b746f; margin-top:2px;">${outText('Reporting period', 'فترة التقرير')}: ${escapeHTML(d.period)} · ${escapeHTML(d.industry)} · ${escapeHTML(d.size)}</div>
+        <div style="font-size:10px; color:#6b746f;">${outText('Channels', 'القنوات')}: ${escapeHTML(d.channels)}</div>
       </div>
       <div style="text-align:right;">
         <div style="font-size:12px; font-weight:600;">${escapeHTML(d.agencyName)}</div>
@@ -1697,7 +1827,7 @@ function dataLayout(d, c, heroStats, strategyLines) {
     </div>
 
     <div style="background:#fbf8f0; border-left:4px solid #e7bd52; padding:12px 14px; margin-bottom:14px; border-radius:16px;">
-      <div class="stat-label muted" style="margin-bottom:4px;">Executive summary</div>
+      <div class="stat-label muted" style="margin-bottom:4px;">${outText('Executive summary', 'الملخص التنفيذي')}</div>
       <div style="font-size:16px; font-weight:600; line-height:1.3;">${escapeHTML(headlineText)}</div>
     </div>
 
@@ -1705,7 +1835,7 @@ function dataLayout(d, c, heroStats, strategyLines) {
     <div style="display:grid; grid-template-columns: repeat(${heroStats.length}, 1fr); gap:6px; margin-bottom:14px;">
       ${heroStats.map(h => `
         <div style="background:#fbf8f0; padding:12px; border-radius:16px; border-top:2px solid #e7bd52;">
-          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(h.k)}</div>
+          <div class="stat-label muted" style="margin-bottom:6px;">${escapeHTML(outLabel(h.k))}</div>
           <div style="font-size:22px; font-weight:600; line-height:1; letter-spacing:-0.02em;">${h.v}</div>
           ${h.lift !== null && h.lift !== undefined && !isNaN(h.lift) ? `<div style="font-size:10px; color:#0a4c3e; margin-top:6px; font-weight:700;">${h.inverted ? '▼' : '▲'} ${fmtChange(Math.abs(h.lift), h.inverted, true)}</div>` : ''}
         </div>
@@ -1719,17 +1849,17 @@ function dataLayout(d, c, heroStats, strategyLines) {
     ${benchmarkHTML(c)}
 
     <div style="margin-bottom:14px;">
-      <div class="stat-label muted" style="margin-bottom:8px;">Detailed performance${d.noBaseline ? '' : ' — baseline vs achieved'}</div>
+      <div class="stat-label muted" style="margin-bottom:8px;">${outText(d.noBaseline ? 'Detailed performance' : 'Detailed performance — baseline vs achieved', d.noBaseline ? 'الأداء التفصيلي' : 'الأداء التفصيلي — قبل وبعد')}</div>
       ${buildResultsTableHTML(d, c, true)}
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;">
       <div>
-        <div class="stat-label muted" style="margin-bottom:6px;">Challenge</div>
+        <div class="stat-label muted" style="margin-bottom:6px;">${outText('Challenge', 'التحدي')}</div>
         <p style="font-size:10.5px; line-height:1.5; margin:0;">${escapeHTML(d.challenge)}</p>
       </div>
       <div>
-        <div class="stat-label muted" style="margin-bottom:6px;">Approach</div>
+        <div class="stat-label muted" style="margin-bottom:6px;">${outText('Approach', 'المنهجية')}</div>
         <ul style="margin:0; padding-left:14px; font-size:10.5px; line-height:1.5;">${strategyLines.map(l => `<li style="margin-bottom:2px;">${escapeHTML(l)}</li>`).join('')}</ul>
       </div>
     </div>
@@ -1738,7 +1868,7 @@ function dataLayout(d, c, heroStats, strategyLines) {
 
     <div style="position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex; justify-content:space-between; font-size:9px; color:#6b746f; padding-top:8px; border-top:1px solid #e7dfcf;">
       <div>${escapeHTML(d.agencyName)} · ${escapeHTML(d.agencyTagline)}</div>
-      <div>Generated ${new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+      <div>${outText('Generated', 'تم الإنشاء')} ${new Date().toLocaleDateString(state.language === 'ar' ? 'ar-SA' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
     </div>
   `;
 }
@@ -1755,6 +1885,11 @@ function bindAllInputs() {
   document.getElementById('f-currency').addEventListener('change', e => {
     state.currency = e.target.value;
     renderPerfFields(); renderBaselineFields(); renderBenchmarkFields(); renderComputed();
+  });
+  document.getElementById('f-language').addEventListener('change', e => {
+    state.language = e.target.value;
+    renderComputed();
+    renderLinkedInPreview();
   });
   document.getElementById('f-xFormat').addEventListener('change', e => {
     state.xFormat = e.target.value;
@@ -1850,10 +1985,30 @@ function exportPDF() {
   if (!win) { alert('Please allow pop-ups to export the PDF.'); return; }
   const styleTag = document.querySelector('style').outerHTML;
   const fonts = document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-    <title>${escapeHTML(state.descriptor)} — Case Study</title>
+  const lang = state.language === 'ar' ? 'ar' : 'en';
+  const dir = state.language === 'ar' ? 'rtl' : 'ltr';
+  win.document.write(`<!DOCTYPE html><html lang="${lang}" dir="${dir}"><head><meta charset="UTF-8">
+    <title>${escapeHTML(state.descriptor)} — ${outText('Case Study', 'دراسة حالة')}</title>
     ${fonts}${styleTag}
-    <style>body { background: white; } @page { size: A4; margin: 0; } .case-page { box-shadow: none; margin: 0; }</style>
+    <style>
+      html, body { background:white; width:210mm; height:297mm; margin:0; overflow:hidden; }
+      @page { size: A4; margin: 0; }
+      .case-page {
+        border:0 !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        height:297mm !important;
+        margin:0 !important;
+        min-height:0 !important;
+        overflow:hidden !important;
+        padding:12mm !important;
+        page-break-after:avoid !important;
+        break-after:avoid !important;
+        transform:scale(.985);
+        transform-origin:top ${state.language === 'ar' ? 'right' : 'left'};
+        width:210mm !important;
+      }
+    </style>
   </head><body>${pageHTML}
     <script>window.addEventListener('load', () => { setTimeout(() => window.print(), 600); });<\/script>
   </body></html>`);

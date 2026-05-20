@@ -22,3 +22,4 @@ Single-file, no-build HTML generator for anonymized performance marketing case s
 - Common ad-account export columns are supported directly: spend, reach, impressions, clicks, engagements, video views, CTR, and CPC.
 - Below-benchmark metrics can be shown as within average, hidden from benchmark visuals, or shown with the exact gap.
 - Visuals use compact scorecards: achieved value, benchmark value, and verdict.
+- Outputs can be shared in English or Arabic; Arabic exports use RTL layout and Arabic labels.
