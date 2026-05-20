@@ -21,4 +21,4 @@ Single-file, no-build HTML generator for anonymized performance marketing case s
 - Industry-standard benchmarks are suggested from the selected objective and industry/category, with manual override fields when needed.
 - Common ad-account export columns are supported directly: spend, reach, impressions, clicks, engagements, video views, CTR, and CPC.
 - Below-benchmark metrics can be shown as within average, hidden from benchmark visuals, or shown with the exact gap.
-- Visual charts compare achieved performance against benchmark values instead of using generic bars.
+- Visuals use compact scorecards: achieved value, benchmark value, and verdict.

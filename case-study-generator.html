@@ -195,18 +195,22 @@
   .compare-chip .v { display:block; color:var(--ink); font-size:15px; font-weight:800; line-height:1.1; }
   .compare-chip.achieved { background:rgba(10,76,62,.12); }
   .compare-chip.benchmark { background:rgba(231,189,82,.22); }
+  .score-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .score-card { background:#fffdf8; border:1px solid var(--line); border-radius:18px; padding:12px; }
+  .s-bold .score-card { background:#fffdf8; border-color:var(--line); }
+  .score-card .label { color:var(--muted); display:block; font-size:9px; font-weight:800; margin:0 0 6px; text-transform:uppercase; }
+  .score-card .value { color:var(--ink); display:block; font-size:24px; font-weight:800; line-height:1; }
+  .score-card .benchmark { color:var(--muted); display:block; font-size:10px; font-weight:700; margin-top:8px; }
+  .score-card .verdict { background:rgba(10,76,62,.1); border-radius:999px; color:var(--green); display:inline-flex; font-size:10px; font-weight:800; margin-top:10px; padding:4px 8px; }
   .chart-ribbon { display: grid; gap: 8px; grid-template-columns: repeat(3, 1fr); margin-top: 12px; }
   .chart-ribbon div { background: rgba(231,189,82,.18); border-radius: 16px; color: var(--green); font-size: 10px; font-weight: 800; padding: 8px; text-align: center; }
   .s-bold .chart-ribbon div { background: rgba(255,255,255,.12); color: var(--yellow); }
   .carousel-chart { display: grid; gap: 22px; margin-top: 38px; }
-  .carousel-chart-row { display: grid; grid-template-columns: 190px 1fr 160px; gap: 22px; align-items: center; }
-  .carousel-chart-label { color: rgba(255,255,255,.72); font-size: 22px; font-weight: 800; }
-  .carousel-chart-track { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .carousel-compare { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.16); border-radius:22px; padding:16px; }
-  .carousel-compare span { color:rgba(255,255,255,.64); display:block; font-size:14px; font-weight:800; text-transform:uppercase; }
-  .carousel-compare strong { color:white; display:block; font-size:34px; font-weight:800; line-height:1; margin-top:8px; }
-  .carousel-compare.achieved { background:rgba(231,189,82,.24); }
-  .carousel-chart-value { color: white; font-size: 28px; font-weight: 800; text-align: right; }
+  .carousel-score-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:22px; margin-top:42px; }
+  .carousel-score-card { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); border-radius:30px; padding:30px; min-height:230px; }
+  .carousel-score-card span { color:rgba(255,255,255,.68); display:block; font-size:20px; font-weight:800; text-transform:uppercase; }
+  .carousel-score-card strong { color:white; display:block; font-size:72px; font-weight:800; line-height:.95; margin-top:16px; }
+  .carousel-score-card small { color:var(--yellow); display:block; font-size:24px; font-weight:800; margin-top:20px; }
 
   @media print {
     body { background: white; margin: 0; padding: 0; }
@@ -833,9 +837,9 @@ function buildHeroStats(c) {
 function chartMetrics(c, limit = 4) {
   const metrics = getAvailableMetrics(c)
     .filter(m => m.k !== 'Ad spend' && m.raw !== null && m.raw !== undefined && isFinite(m.raw));
-  const benchmarked = metrics
-    .filter(m => m.benchmarkRatio !== null && m.benchmarkRatio !== undefined)
-    .filter(m => state.benchmarkDisplay !== 'hide' || m.benchmarkRatio >= 1);
+  const allBenchmarked = metrics.filter(m => m.benchmarkRatio !== null && m.benchmarkRatio !== undefined);
+  const benchmarked = allBenchmarked.filter(m => state.benchmarkDisplay !== 'hide' || m.benchmarkRatio >= 1);
+  if (allBenchmarked.length && state.benchmarkDisplay === 'hide' && !benchmarked.length) return [];
   return (benchmarked.length ? benchmarked : metrics)
     .sort((a, b) => {
       const aScore = a.benchmarkRatio ?? Math.abs(Number(a.raw));
@@ -855,17 +859,13 @@ function metricWidth(m, maxRaw) {
 function chartHTML(c, title = 'Visual performance snapshot') {
   const metrics = chartMetrics(c, 4);
   if (!metrics.length) return '';
-  const maxRaw = Math.max(...metrics.map(m => m.benchmarkRatio ?? Math.abs(Number(m.raw))));
   return `<div class="visual-panel">
     <div class="chart-title">${title}</div>
-    <div class="metric-bars">
-      ${metrics.map(m => `<div class="metric-bar-row">
-        <div class="metric-bar-label">${escapeHTML(m.k)}</div>
-        ${m.benchmarkValue ? `<div class="compare-track">
-          <div class="compare-chip achieved"><span class="k">Achieved</span><span class="v">${m.v}</span></div>
-          <div class="compare-chip benchmark"><span class="k">Benchmark</span><span class="v">${m.benchmarkValue}</span></div>
-        </div>` : `<div class="metric-bar-track"><div class="metric-bar-fill" style="width:${metricWidth(m, maxRaw)}%;"></div></div>`}
-        <div class="metric-bar-value">${m.v}</div>
+    <div class="score-grid">
+      ${metrics.map(m => `<div class="score-card">
+        <span class="label">${escapeHTML(m.k)}</span>
+        <span class="value">${m.v}</span>
+        ${m.benchmarkValue ? `<span class="benchmark">Benchmark ${m.benchmarkValue}</span><span class="verdict">${benchmarkLabel(m)}</span>` : ''}
       </div>`).join('')}
     </div>
     <div class="chart-ribbon">
@@ -879,14 +879,11 @@ function chartHTML(c, title = 'Visual performance snapshot') {
 function carouselChartHTML(c) {
   const metrics = chartMetrics(c, 4);
   if (!metrics.length) return '';
-  return `<div class="carousel-chart">
-    ${metrics.map(m => `<div class="carousel-chart-row">
-      <div class="carousel-chart-label">${escapeHTML(m.k)}</div>
-      <div class="carousel-chart-track">
-        <div class="carousel-compare achieved"><span>Achieved</span><strong>${m.v}</strong></div>
-        <div class="carousel-compare"><span>Benchmark</span><strong>${m.benchmarkValue || 'Tracked'}</strong></div>
-      </div>
-      <div class="carousel-chart-value">${m.benchmarkRatio ? benchmarkLabel(m) : m.v}</div>
+  return `<div class="carousel-score-grid">
+    ${metrics.map(m => `<div class="carousel-score-card">
+      <span>${escapeHTML(m.k)}</span>
+      <strong>${m.v}</strong>
+      <small>${m.benchmarkValue ? `${benchmarkLabel(m)} · Benchmark ${m.benchmarkValue}` : 'Tracked metric'}</small>
     </div>`).join('')}
   </div>`;
 }
