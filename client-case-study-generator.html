@@ -428,6 +428,12 @@ Connected creative learnings back to paid media reporting</textarea>
         <div id="baseline-fields"></div>
       </div>
 
+      <div class="card full">
+        <div class="card-title">🏁 Industry standards</div>
+        <p class="hint-text">Optional. Add the benchmarks you trust for this industry, market, channel, or objective. The report compares only filled benchmark fields.</p>
+        <div id="benchmark-fields"></div>
+      </div>
+
       <div class="card card-dark full">
         <div class="card-title" style="color:white;">⚡ Auto-calculated metrics <span style="font-weight:500; color:rgba(255,255,255,.68); margin-left:8px;">(only ones with usable data)</span></div>
         <div class="grid-6" id="computed-chips"></div>
@@ -461,21 +467,32 @@ const state = {
   testimonial: '', testimonialAuthor: 'Head of Marketing, client',
   spend: 14000, impressions: '', clicks: '', conversions: '', revenue: '', aov: '',
   leads: 5258, sql: '', closedDeals: '', avgDealValue: '',
-  videoViews: '', reach: '', engagements: '',
+  videoViews: '', reach: '', engagements: '', landingPageViews: '', addToCart: '', checkouts: '',
+  purchases: '', saves: '', shares: '', comments: '',
   baseSpend: '', baseImpressions: '', baseClicks: '', baseConversions: '', baseRevenue: '',
   baseLeads: '', baseSql: '', baseClosedDeals: '',
+  benchmarkCTR: '', benchmarkCPC: '', benchmarkCPM: '', benchmarkCVR: '', benchmarkROAS: '',
+  benchmarkCPL: '', benchmarkCPA: '', benchmarkCAC: '', benchmarkEngagementRate: '',
+  benchmarkCostPerView: '', benchmarkFrequency: '',
 };
 
 // === HELPERS — distinguish empty from zero ===
 const hasValue = (v) => v !== '' && v !== null && v !== undefined && !isNaN(Number(v)) && Number(v) > 0;
 const num = (k) => hasValue(state[k]) ? Number(state[k]) : null;
 const numOrZero = (k) => hasValue(state[k]) ? Number(state[k]) : 0;
+const safeDiv = (a, b) => (a !== null && b !== null && b > 0) ? a / b : null;
 
 const fmtCurrency = (n, c = 'USD') => {
   if (n === null || n === undefined || isNaN(n)) return null;
   if (c === 'SAR') return 'SAR ' + Math.round(n).toLocaleString('en-US');
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(n);
 };
+function fmtBenchmarkValue(n, unit) {
+  if (unit === 'currency') return fmtCurrency(n, state.currency);
+  if (unit === '%') return fmtPct(n, 2);
+  if (unit === 'x') return fmtMultiplier(n);
+  return fmtNumber(n, 2);
+}
 const fmtNumber = (n, d = 0) => {
   if (n === null || n === undefined || isNaN(n)) return null;
   return Number(n).toLocaleString('en-US', { maximumFractionDigits: d });
@@ -492,6 +509,19 @@ const fmtMultiplier = (n) => {
   return Number.isInteger(rounded) ? rounded.toFixed(0) + 'X' : rounded.toFixed(1) + 'X';
 };
 const fmtROAS = fmtMultiplier;
+const metricBenchmarkMap = {
+  'CTR': { key: 'benchmarkCTR', unit: '%' },
+  'CPC': { key: 'benchmarkCPC', unit: 'currency', inverted: true },
+  'CPM': { key: 'benchmarkCPM', unit: 'currency', inverted: true },
+  'CVR': { key: 'benchmarkCVR', unit: '%' },
+  'ROAS': { key: 'benchmarkROAS', unit: 'x' },
+  'Cost per lead': { key: 'benchmarkCPL', unit: 'currency', inverted: true },
+  'CPA': { key: 'benchmarkCPA', unit: 'currency', inverted: true },
+  'CAC': { key: 'benchmarkCAC', unit: 'currency', inverted: true },
+  'Engagement rate': { key: 'benchmarkEngagementRate', unit: '%' },
+  'Cost / view': { key: 'benchmarkCostPerView', unit: 'currency', inverted: true },
+  'Frequency': { key: 'benchmarkFrequency', unit: 'number' },
+};
 const fmtChange = (liftValue, inverted = false, includeWord = true) => {
   if (liftValue === null || liftValue === undefined || isNaN(liftValue)) return '';
   const word = inverted ? 'reduction' : 'lift';
@@ -512,6 +542,33 @@ const liftInverse = (current, baseline) => {
   if (!hasValue(baseline) || current === null || current === undefined || isNaN(current)) return null;
   return ((Number(baseline) - current) / Number(baseline)) * 100;
 };
+function attachBenchmark(metric) {
+  const meta = metricBenchmarkMap[metric.k];
+  if (!meta || !hasValue(state[meta.key])) return metric;
+  const benchmark = Number(state[meta.key]);
+  const inverted = meta.inverted ?? metric.inverted;
+  const ratio = inverted ? benchmark / metric.raw : metric.raw / benchmark;
+  return {
+    ...metric,
+    benchmark,
+    benchmarkUnit: meta.unit,
+    benchmarkValue: fmtBenchmarkValue(benchmark, meta.unit),
+    benchmarkRatio: isFinite(ratio) ? ratio : null,
+    benchmarkInverted: inverted,
+  };
+}
+function benchmarkRows(c) {
+  return getAvailableMetrics(c)
+    .filter(m => m.benchmark !== undefined && m.benchmarkRatio !== null)
+    .sort((a, b) => b.benchmarkRatio - a.benchmarkRatio);
+}
+function benchmarkLabel(m) {
+  if (m.benchmarkRatio === null || m.benchmarkRatio === undefined) return '';
+  if (Math.abs(m.benchmarkRatio - 1) < 0.03) return 'In line with benchmark';
+  return m.benchmarkRatio > 1
+    ? `${fmtMultiplier(m.benchmarkRatio)} stronger than benchmark`
+    : `${fmtPct((1 - m.benchmarkRatio) * 100, 0)} behind benchmark`;
+}
 
 function calc() {
   const d = state;
@@ -519,26 +576,45 @@ function calc() {
         conversions = num('conversions'), revenue = num('revenue'),
         leads = num('leads'), sql = num('sql'),
         closedDeals = num('closedDeals'), avgDealValue = num('avgDealValue'),
-        videoViews = num('videoViews'), reach = num('reach'), engagements = num('engagements');
+        videoViews = num('videoViews'), reach = num('reach'), engagements = num('engagements'),
+        landingPageViews = num('landingPageViews'), addToCart = num('addToCart'),
+        checkouts = num('checkouts'), purchases = num('purchases'),
+        saves = num('saves'), shares = num('shares'), comments = num('comments');
+
+  const finalConversions = conversions ?? purchases;
+  const finalAOV = num('aov') ?? safeDiv(revenue, finalConversions);
 
   const out = {
-    spend, impressions, clicks, conversions, revenue,
+    spend, impressions, clicks, conversions: finalConversions, revenue,
     leads, sql, closedDeals, avgDealValue, videoViews, reach, engagements,
+    landingPageViews, addToCart, checkouts, purchases, saves, shares, comments,
+    aov: finalAOV,
     pipelineRevenue: (closedDeals !== null && avgDealValue !== null) ? closedDeals * avgDealValue : null,
     ctr: (impressions && clicks) ? (clicks / impressions) * 100 : null,
+    frequency: (impressions && reach) ? impressions / reach : null,
     cpc: (spend && clicks) ? spend / clicks : null,
     cpm: (spend && impressions) ? (spend / impressions) * 1000 : null,
-    cvr: (clicks && conversions) ? (conversions / clicks) * 100 : null,
-    cpa: (spend && conversions) ? spend / conversions : null,
+    cvr: (clicks && finalConversions) ? (finalConversions / clicks) * 100 : null,
+    cpa: (spend && finalConversions) ? spend / finalConversions : null,
     roas: (spend && revenue) ? revenue / spend : null,
     netROI: (spend && revenue) ? ((revenue - spend) / spend) * 100 : null,
     cpl: (spend && leads) ? spend / leads : null,
+    clickToLead: (clicks && leads) ? (leads / clicks) * 100 : null,
     leadToSQL: (leads && sql) ? (sql / leads) * 100 : null,
     sqlToClose: (sql && closedDeals) ? (closedDeals / sql) * 100 : null,
+    leadToClose: (leads && closedDeals) ? (closedDeals / leads) * 100 : null,
     cac: (spend && closedDeals) ? spend / closedDeals : null,
     pipelineROAS: null,
     costPerView: (spend && videoViews) ? spend / videoViews : null,
     costPerEngagement: (spend && engagements) ? spend / engagements : null,
+    costPerReach: (spend && reach) ? spend / reach : null,
+    costPerLandingPageView: (spend && landingPageViews) ? spend / landingPageViews : null,
+    landingPageRate: (clicks && landingPageViews) ? (landingPageViews / clicks) * 100 : null,
+    addToCartRate: (landingPageViews && addToCart) ? (addToCart / landingPageViews) * 100 : null,
+    checkoutRate: (addToCart && checkouts) ? (checkouts / addToCart) * 100 : null,
+    purchaseRate: (checkouts && finalConversions) ? (finalConversions / checkouts) * 100 : null,
+    engagementRate: ((engagements || (saves || shares || comments)) && reach) ? ((engagements || (saves + shares + comments)) / reach) * 100 : null,
+    viewRate: (impressions && videoViews) ? (videoViews / impressions) * 100 : null,
   };
   if (out.pipelineRevenue !== null && spend) out.pipelineROAS = out.pipelineRevenue / spend;
 
@@ -558,7 +634,7 @@ function calc() {
     out.cacLift = liftInverse(out.cac, out.baseCAC);
     out.leadsLift = lift(leads, num('baseLeads'));
     out.dealsLift = lift(closedDeals, num('baseClosedDeals'));
-    out.conversionsLift = lift(conversions, num('baseConversions'));
+    out.conversionsLift = lift(finalConversions, num('baseConversions'));
   }
   return out;
 }
@@ -571,11 +647,11 @@ function detectFocus() {
 
   if (has('closedDeals') && has('leads')) return 'fullfunnel';
   if (has('closedDeals') && has('avgDealValue')) return 'leadgen';
-  if (has('revenue') && has('conversions')) return 'ecommerce';
+  if (has('revenue') && (has('conversions') || has('purchases'))) return 'ecommerce';
   if (has('leads') && creativeChannels) return 'creative';
   if (has('leads')) return 'leadgen';
   if (has('conversions') && has('aov')) return 'ecommerce';
-  if (has('videoViews') || has('engagements')) return 'creative';
+  if (has('videoViews') || has('engagements') || has('saves') || has('shares') || has('comments')) return 'creative';
   if (has('reach') || has('impressions')) return 'awareness';
   return 'leadgen';
 }
@@ -588,10 +664,10 @@ function getActiveFocus() {
 function getAvailableMetrics(c) {
   const focus = getActiveFocus();
   const allowedByFocus = {
-    ecommerce: ['ROAS', 'Pipeline ROAS', 'Net ROI', 'Revenue', 'Conversions', 'CPA', 'CTR', 'CVR', 'CPC', 'CPM', 'Impressions', 'Ad spend'],
-    leadgen: ['Qualified leads', 'Cost per lead', 'SQLs', 'Lead → SQL', 'Closed deals', 'CAC', 'SQL → Close', 'Pipeline', 'Pipeline ROAS', 'CTR', 'CPC', 'CPM', 'Impressions', 'Ad spend'],
-    creative: ['Video views', 'Engagements', 'Cost / view', 'Cost / engagement', 'Reach', 'Impressions', 'CTR', 'CPM', 'CPC', 'Qualified leads', 'Cost per lead', 'Conversions', 'CPA', 'Ad spend'],
-    awareness: ['Reach', 'Impressions', 'CPM', 'CTR', 'CPC', 'Video views', 'Engagements', 'Cost / view', 'Cost / engagement', 'Ad spend'],
+    ecommerce: ['ROAS', 'Pipeline ROAS', 'Net ROI', 'Revenue', 'Average order value', 'Purchases', 'Conversions', 'CPA', 'CTR', 'CVR', 'CPC', 'CPM', 'Landing page views', 'Cost / LPV', 'Add-to-cart rate', 'Checkout rate', 'Purchase rate', 'Impressions', 'Ad spend'],
+    leadgen: ['Qualified leads', 'Cost per lead', 'Click → Lead', 'SQLs', 'Lead → SQL', 'Closed deals', 'CAC', 'SQL → Close', 'Lead → Close', 'Pipeline', 'Pipeline ROAS', 'CTR', 'CPC', 'CPM', 'Landing page views', 'Cost / LPV', 'Impressions', 'Ad spend'],
+    creative: ['Video views', 'View rate', 'Engagements', 'Engagement rate', 'Saves', 'Shares', 'Comments', 'Cost / view', 'Cost / engagement', 'Reach', 'Frequency', 'Impressions', 'CTR', 'CPM', 'CPC', 'Qualified leads', 'Cost per lead', 'Conversions', 'CPA', 'Ad spend'],
+    awareness: ['Reach', 'Frequency', 'Impressions', 'CPM', 'CTR', 'CPC', 'Video views', 'View rate', 'Engagements', 'Engagement rate', 'Cost / view', 'Cost / engagement', 'Cost / reach', 'Ad spend'],
     fullfunnel: null,
   };
   const allowed = allowedByFocus[focus] || allowedByFocus.leadgen;
@@ -600,28 +676,46 @@ function getAvailableMetrics(c) {
   if (c.pipelineROAS !== null && !state.hideRevenue) m.push({ k: 'Pipeline ROAS', v: fmtMultiplier(c.pipelineROAS), raw: c.pipelineROAS, importance: 9 });
   if (c.netROI !== null) m.push({ k: 'Net ROI', v: fmtPct(c.netROI, 0), raw: c.netROI, importance: 7 });
   if (c.revenue !== null && !state.hideRevenue) m.push({ k: 'Revenue', v: fmtCurrency(c.revenue, state.currency), raw: c.revenue, lift: c.revenueLift, importance: 9 });
+  if (c.aov !== null && !state.hideRevenue) m.push({ k: 'Average order value', v: fmtCurrency(c.aov, state.currency), raw: c.aov, importance: 5 });
+  if (c.purchases !== null) m.push({ k: 'Purchases', v: fmtNumber(c.purchases), raw: c.purchases, lift: c.conversionsLift, importance: 8 });
   if (c.conversions !== null) m.push({ k: 'Conversions', v: fmtNumber(c.conversions), raw: c.conversions, lift: c.conversionsLift, importance: 7 });
   if (c.cpa !== null) m.push({ k: 'CPA', v: fmtCurrency(c.cpa, state.currency), raw: c.cpa, lift: c.cpaLift, inverted: true, importance: 7 });
   if (c.leads !== null) m.push({ k: 'Qualified leads', v: fmtNumber(c.leads), raw: c.leads, lift: c.leadsLift, importance: 9 });
   if (c.cpl !== null) m.push({ k: 'Cost per lead', v: fmtCurrency(c.cpl, state.currency), raw: c.cpl, lift: c.cplLift, inverted: true, importance: 9 });
+  if (c.clickToLead !== null) m.push({ k: 'Click → Lead', v: fmtPct(c.clickToLead), raw: c.clickToLead, importance: 6 });
   if (c.sql !== null) m.push({ k: 'SQLs', v: fmtNumber(c.sql), raw: c.sql, importance: 6 });
   if (c.leadToSQL !== null) m.push({ k: 'Lead → SQL', v: fmtPct(c.leadToSQL), raw: c.leadToSQL, importance: 5 });
   if (c.closedDeals !== null) m.push({ k: 'Closed deals', v: fmtNumber(c.closedDeals), raw: c.closedDeals, lift: c.dealsLift, importance: 10 });
   if (c.cac !== null) m.push({ k: 'CAC', v: fmtCurrency(c.cac, state.currency), raw: c.cac, lift: c.cacLift, inverted: true, importance: 8 });
   if (c.sqlToClose !== null) m.push({ k: 'SQL → Close', v: fmtPct(c.sqlToClose), raw: c.sqlToClose, importance: 5 });
+  if (c.leadToClose !== null) m.push({ k: 'Lead → Close', v: fmtPct(c.leadToClose), raw: c.leadToClose, importance: 5 });
   if (c.pipelineRevenue !== null && !state.hideRevenue) m.push({ k: 'Pipeline', v: fmtCurrency(c.pipelineRevenue, state.currency), raw: c.pipelineRevenue, importance: 8 });
+  if (c.landingPageViews !== null) m.push({ k: 'Landing page views', v: fmtNumber(c.landingPageViews), raw: c.landingPageViews, importance: 4 });
+  if (c.costPerLandingPageView !== null) m.push({ k: 'Cost / LPV', v: fmtCurrency(c.costPerLandingPageView, state.currency), raw: c.costPerLandingPageView, inverted: true, importance: 4 });
+  if (c.addToCartRate !== null) m.push({ k: 'Add-to-cart rate', v: fmtPct(c.addToCartRate), raw: c.addToCartRate, importance: 5 });
+  if (c.checkoutRate !== null) m.push({ k: 'Checkout rate', v: fmtPct(c.checkoutRate), raw: c.checkoutRate, importance: 5 });
+  if (c.purchaseRate !== null) m.push({ k: 'Purchase rate', v: fmtPct(c.purchaseRate), raw: c.purchaseRate, importance: 5 });
   if (c.ctr !== null) m.push({ k: 'CTR', v: fmtPct(c.ctr, 2), raw: c.ctr, lift: c.ctrLift, importance: 4 });
   if (c.cvr !== null) m.push({ k: 'CVR', v: fmtPct(c.cvr, 2), raw: c.cvr, importance: 4 });
   if (c.cpc !== null) m.push({ k: 'CPC', v: fmtCurrency(c.cpc, state.currency), raw: c.cpc, importance: 3 });
   if (c.cpm !== null) m.push({ k: 'CPM', v: fmtCurrency(c.cpm, state.currency), raw: c.cpm, importance: 3 });
   if (c.impressions !== null) m.push({ k: 'Impressions', v: fmtNumber(c.impressions), raw: c.impressions, importance: 4 });
   if (c.reach !== null) m.push({ k: 'Reach', v: fmtNumber(c.reach), raw: c.reach, importance: 5 });
+  if (c.frequency !== null) m.push({ k: 'Frequency', v: fmtNumber(c.frequency, 2), raw: c.frequency, importance: 4 });
   if (c.videoViews !== null) m.push({ k: 'Video views', v: fmtNumber(c.videoViews), raw: c.videoViews, importance: 5 });
+  if (c.viewRate !== null) m.push({ k: 'View rate', v: fmtPct(c.viewRate), raw: c.viewRate, importance: 4 });
   if (c.engagements !== null) m.push({ k: 'Engagements', v: fmtNumber(c.engagements), raw: c.engagements, importance: 4 });
+  if (c.engagementRate !== null) m.push({ k: 'Engagement rate', v: fmtPct(c.engagementRate), raw: c.engagementRate, importance: 5 });
+  if (c.saves !== null) m.push({ k: 'Saves', v: fmtNumber(c.saves), raw: c.saves, importance: 3 });
+  if (c.shares !== null) m.push({ k: 'Shares', v: fmtNumber(c.shares), raw: c.shares, importance: 3 });
+  if (c.comments !== null) m.push({ k: 'Comments', v: fmtNumber(c.comments), raw: c.comments, importance: 3 });
   if (c.costPerView !== null) m.push({ k: 'Cost / view', v: fmtCurrency(c.costPerView, state.currency), raw: c.costPerView, importance: 4 });
+  if (c.costPerEngagement !== null) m.push({ k: 'Cost / engagement', v: fmtCurrency(c.costPerEngagement, state.currency), raw: c.costPerEngagement, inverted: true, importance: 4 });
+  if (c.costPerReach !== null) m.push({ k: 'Cost / reach', v: fmtCurrency(c.costPerReach, state.currency), raw: c.costPerReach, inverted: true, importance: 3 });
   if (c.spend !== null) m.push({ k: 'Ad spend', v: fmtCurrency(c.spend, state.currency), raw: c.spend, importance: 2 });
   return m
     .filter(metric => !allowed || allowed.includes(metric.k))
+    .map(attachBenchmark)
     .sort((a, b) => b.importance - a.importance);
 }
 
@@ -632,22 +726,29 @@ function buildHeroStats(c) {
 }
 
 function chartMetrics(c, limit = 4) {
-  return getAvailableMetrics(c)
-    .filter(m => m.k !== 'Ad spend' && m.raw !== null && m.raw !== undefined && isFinite(m.raw))
+  const metrics = getAvailableMetrics(c)
+    .filter(m => m.k !== 'Ad spend' && m.raw !== null && m.raw !== undefined && isFinite(m.raw));
+  const benchmarked = metrics.filter(m => m.benchmarkRatio !== null && m.benchmarkRatio !== undefined);
+  return (benchmarked.length ? benchmarked : metrics)
+    .sort((a, b) => {
+      const aScore = a.benchmarkRatio ?? Math.abs(Number(a.raw));
+      const bScore = b.benchmarkRatio ?? Math.abs(Number(b.raw));
+      return bScore - aScore;
+    })
     .slice(0, limit);
 }
 
 function metricWidth(m, maxRaw) {
   if (!maxRaw || !isFinite(maxRaw)) return 60;
-  const raw = Math.abs(Number(m.raw));
-  if (m.inverted) return Math.max(22, Math.min(100, 100 - (raw / maxRaw) * 64));
+  const raw = m.benchmarkRatio ?? Math.abs(Number(m.raw));
+  if (m.inverted && !m.benchmarkRatio) return Math.max(22, Math.min(100, 100 - (raw / maxRaw) * 64));
   return Math.max(22, Math.min(100, (raw / maxRaw) * 100));
 }
 
 function chartHTML(c, title = 'Visual performance snapshot') {
   const metrics = chartMetrics(c, 4);
   if (!metrics.length) return '';
-  const maxRaw = Math.max(...metrics.map(m => Math.abs(Number(m.raw))));
+  const maxRaw = Math.max(...metrics.map(m => m.benchmarkRatio ?? Math.abs(Number(m.raw))));
   return `<div class="visual-panel">
     <div class="chart-title">${title}</div>
     <div class="metric-bars">
@@ -655,6 +756,7 @@ function chartHTML(c, title = 'Visual performance snapshot') {
         <div class="metric-bar-label">${escapeHTML(m.k)}</div>
         <div class="metric-bar-track"><div class="metric-bar-fill" style="width:${metricWidth(m, maxRaw)}%;"></div></div>
         <div class="metric-bar-value">${m.v}</div>
+        ${m.benchmarkValue ? `<div class="field-hint" style="grid-column:1/-1; margin-top:-4px;">Industry standard: ${m.benchmarkValue} · ${benchmarkLabel(m)}</div>` : ''}
       </div>`).join('')}
     </div>
     <div class="chart-ribbon">
@@ -668,13 +770,32 @@ function chartHTML(c, title = 'Visual performance snapshot') {
 function carouselChartHTML(c) {
   const metrics = chartMetrics(c, 4);
   if (!metrics.length) return '';
-  const maxRaw = Math.max(...metrics.map(m => Math.abs(Number(m.raw))));
+  const maxRaw = Math.max(...metrics.map(m => m.benchmarkRatio ?? Math.abs(Number(m.raw))));
   return `<div class="carousel-chart">
     ${metrics.map(m => `<div class="carousel-chart-row">
       <div class="carousel-chart-label">${escapeHTML(m.k)}</div>
       <div class="carousel-chart-track"><div class="carousel-chart-fill" style="width:${metricWidth(m, maxRaw)}%;"></div></div>
       <div class="carousel-chart-value">${m.v}</div>
     </div>`).join('')}
+  </div>`;
+}
+
+function benchmarkHTML(c) {
+  const rows = benchmarkRows(c).slice(0, 5);
+  if (!rows.length) return '';
+  return `<div class="visual-panel" style="margin-bottom:14px;">
+    <div class="chart-title">Industry standard context</div>
+    <table class="results-table">
+      <thead><tr><th>Metric</th><th class="num">Industry standard</th><th class="num">Achieved</th><th class="num">Context</th></tr></thead>
+      <tbody>
+        ${rows.map(m => `<tr>
+          <td style="font-weight:600;">${escapeHTML(m.k)}</td>
+          <td class="num muted">${m.benchmarkValue}</td>
+          <td class="num" style="font-weight:800;">${m.v}</td>
+          <td class="num" style="font-weight:800; color:${m.benchmarkRatio >= 1 ? '#0a4c3e' : '#9b3b2f'};">${benchmarkLabel(m)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
   </div>`;
 }
 
@@ -854,10 +975,14 @@ function renderPerfFields() {
   const fields = [['spend', 'Ad spend', true, 'how much you spent total']];
   fields.push(['impressions', 'Impressions', false, 'optional']);
   fields.push(['clicks', 'Clicks', false, 'optional']);
+  fields.push(['landingPageViews', 'Landing page views', false, 'optional, for LPV and page rate']);
 
   if (focus === 'ecommerce' || focus === 'fullfunnel') {
     if (!d.hideRevenue) fields.push(['revenue', 'Revenue generated', true, 'leave empty if not shared']);
-    fields.push(['conversions', 'Conversions / purchases', false, 'leave empty if N/A']);
+    fields.push(['purchases', 'Purchases', false, 'preferred for ecommerce']);
+    fields.push(['conversions', 'Other conversions', false, 'leave empty if purchases are filled']);
+    fields.push(['addToCart', 'Add to cart', false, 'optional funnel step']);
+    fields.push(['checkouts', 'Checkouts initiated', false, 'optional funnel step']);
     if (!d.hideRevenue) fields.push(['aov', 'Average order value', true, 'optional']);
   }
   if (focus === 'leadgen' || focus === 'fullfunnel') {
@@ -870,6 +995,9 @@ function renderPerfFields() {
     fields.push(['videoViews', 'Video views', false, 'for video-led campaigns']);
     fields.push(['reach', 'Unique reach', false, 'optional']);
     fields.push(['engagements', 'Engagements', false, 'reactions, comments, shares, saves']);
+    fields.push(['saves', 'Saves', false, 'optional']);
+    fields.push(['shares', 'Shares', false, 'optional']);
+    fields.push(['comments', 'Comments', false, 'optional']);
     if (focus === 'creative') {
       fields.push(['leads', 'Leads (if any)', false, 'optional secondary KPI']);
       fields.push(['conversions', 'Conversions (if any)', false, 'optional secondary KPI']);
@@ -889,6 +1017,67 @@ function renderPerfFields() {
     input.addEventListener('input', e => {
       state[e.target.dataset.key] = e.target.value;
       updateDetection();
+      renderComputed();
+    });
+  });
+}
+
+function renderBenchmarkFields() {
+  const container = document.getElementById('benchmark-fields');
+  const d = state;
+  const focus = getActiveFocus();
+  const fieldsByFocus = {
+    ecommerce: [
+      ['benchmarkROAS', 'Industry ROAS', 'x', 'e.g. 2.5 for 2.5X'],
+      ['benchmarkCVR', 'Industry CVR %', '%', 'purchase conversion rate'],
+      ['benchmarkCPA', 'Industry CPA', 'currency', 'average cost per purchase'],
+      ['benchmarkCTR', 'Industry CTR %', '%', 'click-through rate'],
+      ['benchmarkCPC', 'Industry CPC', 'currency', 'average cost per click'],
+      ['benchmarkCPM', 'Industry CPM', 'currency', 'average cost per 1,000 impressions'],
+    ],
+    leadgen: [
+      ['benchmarkCPL', 'Industry CPL', 'currency', 'average cost per lead'],
+      ['benchmarkCAC', 'Industry CAC', 'currency', 'average cost per customer'],
+      ['benchmarkCTR', 'Industry CTR %', '%', 'click-through rate'],
+      ['benchmarkCPC', 'Industry CPC', 'currency', 'average cost per click'],
+      ['benchmarkCPM', 'Industry CPM', 'currency', 'average cost per 1,000 impressions'],
+    ],
+    creative: [
+      ['benchmarkEngagementRate', 'Industry engagement rate %', '%', 'engagements divided by reach'],
+      ['benchmarkCostPerView', 'Industry cost / view', 'currency', 'average CPV'],
+      ['benchmarkCTR', 'Industry CTR %', '%', 'click-through rate'],
+      ['benchmarkCPM', 'Industry CPM', 'currency', 'average cost per 1,000 impressions'],
+      ['benchmarkFrequency', 'Industry frequency', 'number', 'average exposure frequency'],
+    ],
+    awareness: [
+      ['benchmarkCPM', 'Industry CPM', 'currency', 'average cost per 1,000 impressions'],
+      ['benchmarkCTR', 'Industry CTR %', '%', 'click-through rate'],
+      ['benchmarkCostPerView', 'Industry cost / view', 'currency', 'average CPV'],
+      ['benchmarkEngagementRate', 'Industry engagement rate %', '%', 'engagements divided by reach'],
+      ['benchmarkFrequency', 'Industry frequency', 'number', 'average exposure frequency'],
+    ],
+    fullfunnel: [
+      ['benchmarkCPL', 'Industry CPL', 'currency', 'average cost per lead'],
+      ['benchmarkCAC', 'Industry CAC', 'currency', 'average cost per customer'],
+      ['benchmarkROAS', 'Industry ROAS', 'x', 'e.g. 2.5 for 2.5X'],
+      ['benchmarkCVR', 'Industry CVR %', '%', 'conversion rate'],
+      ['benchmarkCTR', 'Industry CTR %', '%', 'click-through rate'],
+      ['benchmarkCPM', 'Industry CPM', 'currency', 'average cost per 1,000 impressions'],
+    ],
+  };
+  const fields = fieldsByFocus[focus] || fieldsByFocus.leadgen;
+  container.innerHTML = `<div class="grid-3">${fields.map(([k, l, unit, hint]) => `
+    <div class="numfield" style="grid-template-columns:1fr 130px;">
+      <div>
+        <label>${l}${unit === 'currency' ? `<span class="currency">(${d.currency})</span>` : ''}</label>
+        <div class="field-hint">${hint}</div>
+      </div>
+      <input type="number" class="input benchmark-input" data-key="${k}" value="${d[k] ?? ''}" placeholder="optional">
+    </div>
+  `).join('')}</div>`;
+  container.querySelectorAll('.benchmark-input').forEach(input => {
+    input.addEventListener('input', e => {
+      state[e.target.dataset.key] = e.target.value;
       renderComputed();
     });
   });
@@ -966,6 +1155,7 @@ function updateDetection() {
   }
   renderPerfFields();
   if (!state.noBaseline) renderBaselineFields();
+  renderBenchmarkFields();
 }
 
 // === PREVIEW ===
@@ -995,10 +1185,10 @@ function liftHTML(s) {
 function buildResultsTableHTML(d, c, showBaseline) {
   const focus = getActiveFocus();
   const rowAllowedByFocus = {
-    ecommerce: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'Revenue', 'ROAS', 'Conversions', 'CPA'],
-    leadgen: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'Leads', 'Cost per lead', 'SQLs', 'Lead → SQL', 'Closed deals', 'CAC'],
-    creative: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'Reach', 'Video views', 'Engagements', 'Leads', 'Cost per lead', 'Conversions', 'CPA'],
-    awareness: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'Reach', 'Video views', 'Engagements'],
+    ecommerce: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'CPM', 'CPC', 'Revenue', 'ROAS', 'Average order value', 'Purchases', 'Conversions', 'CPA', 'CVR', 'Landing page views', 'Cost / LPV', 'Add-to-cart rate', 'Checkout rate', 'Purchase rate'],
+    leadgen: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'CPM', 'CPC', 'Landing page views', 'Cost / LPV', 'Leads', 'Cost per lead', 'Click → Lead', 'SQLs', 'Lead → SQL', 'Closed deals', 'CAC', 'SQL → Close', 'Lead → Close', 'Pipeline', 'Pipeline ROAS'],
+    creative: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'CPM', 'CPC', 'Reach', 'Frequency', 'Video views', 'View rate', 'Engagements', 'Engagement rate', 'Saves', 'Shares', 'Comments', 'Leads', 'Cost per lead', 'Conversions', 'CPA'],
+    awareness: ['Ad spend', 'Impressions', 'Clicks', 'CTR', 'CPM', 'CPC', 'Reach', 'Frequency', 'Video views', 'View rate', 'Engagements', 'Engagement rate', 'Cost / view', 'Cost / engagement', 'Cost / reach'],
     fullfunnel: null,
   };
   const allowedRows = rowAllowedByFocus[focus] || rowAllowedByFocus.leadgen;
@@ -1007,20 +1197,43 @@ function buildResultsTableHTML(d, c, showBaseline) {
     ['Impressions', c.impressions !== null ? fmtNumber(c.impressions) : null, hasValue(d.baseImpressions) ? fmtNumber(Number(d.baseImpressions)) : null, null, false],
     ['Clicks', c.clicks !== null ? fmtNumber(c.clicks) : null, hasValue(d.baseClicks) ? fmtNumber(Number(d.baseClicks)) : null, null, false],
     ['CTR', c.ctr !== null ? fmtPct(c.ctr, 2) : null, c.baseCTR !== null && c.baseCTR !== undefined ? fmtPct(c.baseCTR, 2) : null, c.ctrLift, false],
+    ['CPM', c.cpm !== null ? fmtCurrency(c.cpm, d.currency) : null, null, null, true],
+    ['CPC', c.cpc !== null ? fmtCurrency(c.cpc, d.currency) : null, null, null, true],
     ['Reach', c.reach !== null ? fmtNumber(c.reach) : null, null, null, false],
+    ['Frequency', c.frequency !== null ? fmtNumber(c.frequency, 2) : null, null, null, false],
     ['Video views', c.videoViews !== null ? fmtNumber(c.videoViews) : null, null, null, false],
+    ['View rate', c.viewRate !== null ? fmtPct(c.viewRate) : null, null, null, false],
     ['Engagements', c.engagements !== null ? fmtNumber(c.engagements) : null, null, null, false],
+    ['Engagement rate', c.engagementRate !== null ? fmtPct(c.engagementRate) : null, null, null, false],
+    ['Saves', c.saves !== null ? fmtNumber(c.saves) : null, null, null, false],
+    ['Shares', c.shares !== null ? fmtNumber(c.shares) : null, null, null, false],
+    ['Comments', c.comments !== null ? fmtNumber(c.comments) : null, null, null, false],
+    ['Landing page views', c.landingPageViews !== null ? fmtNumber(c.landingPageViews) : null, null, null, false],
+    ['Cost / LPV', c.costPerLandingPageView !== null ? fmtCurrency(c.costPerLandingPageView, d.currency) : null, null, null, true],
     ['Leads', c.leads !== null ? fmtNumber(c.leads) : null, hasValue(d.baseLeads) ? fmtNumber(Number(d.baseLeads)) : null, c.leadsLift, false],
     ['Cost per lead', c.cpl !== null ? fmtCurrency(c.cpl, d.currency) : null, c.baseCPL !== null && c.baseCPL !== undefined ? fmtCurrency(c.baseCPL, d.currency) : null, c.cplLift, true],
+    ['Click → Lead', c.clickToLead !== null ? fmtPct(c.clickToLead) : null, null, null, false],
     ['SQLs', c.sql !== null ? fmtNumber(c.sql) : null, null, null, false],
     ['Lead → SQL', c.leadToSQL !== null ? fmtPct(c.leadToSQL) : null, null, null, false],
     ['Closed deals', c.closedDeals !== null ? fmtNumber(c.closedDeals) : null, hasValue(d.baseClosedDeals) ? fmtNumber(Number(d.baseClosedDeals)) : null, c.dealsLift, false],
     ['CAC', c.cac !== null ? fmtCurrency(c.cac, d.currency) : null, c.baseCAC !== null && c.baseCAC !== undefined ? fmtCurrency(c.baseCAC, d.currency) : null, c.cacLift, true],
+    ['SQL → Close', c.sqlToClose !== null ? fmtPct(c.sqlToClose) : null, null, null, false],
+    ['Lead → Close', c.leadToClose !== null ? fmtPct(c.leadToClose) : null, null, null, false],
     !d.hideRevenue && ['Revenue', c.revenue !== null ? fmtCurrency(c.revenue, d.currency) : null, hasValue(d.baseRevenue) ? fmtCurrency(Number(d.baseRevenue), d.currency) : null, c.revenueLift, false],
     !d.hideRevenue && ['ROAS', c.roas !== null ? fmtROAS(c.roas) : null, c.baseROAS !== null && c.baseROAS !== undefined ? fmtROAS(c.baseROAS) : null, c.roasLift, false],
+    !d.hideRevenue && ['Average order value', c.aov !== null ? fmtCurrency(c.aov, d.currency) : null, null, null, false],
+    ['Purchases', c.purchases !== null ? fmtNumber(c.purchases) : null, hasValue(d.baseConversions) ? fmtNumber(Number(d.baseConversions)) : null, c.conversionsLift, false],
     ['Conversions', c.conversions !== null ? fmtNumber(c.conversions) : null, hasValue(d.baseConversions) ? fmtNumber(Number(d.baseConversions)) : null, c.conversionsLift, false],
+    ['CVR', c.cvr !== null ? fmtPct(c.cvr, 2) : null, null, null, false],
+    ['Add-to-cart rate', c.addToCartRate !== null ? fmtPct(c.addToCartRate) : null, null, null, false],
+    ['Checkout rate', c.checkoutRate !== null ? fmtPct(c.checkoutRate) : null, null, null, false],
+    ['Purchase rate', c.purchaseRate !== null ? fmtPct(c.purchaseRate) : null, null, null, false],
     ['CPA', c.cpa !== null ? fmtCurrency(c.cpa, d.currency) : null, c.baseCPA !== null && c.baseCPA !== undefined ? fmtCurrency(c.baseCPA, d.currency) : null, c.cpaLift, true],
     !d.hideRevenue && ['Pipeline', c.pipelineRevenue !== null ? fmtCurrency(c.pipelineRevenue, d.currency) : null, null, null, false],
+    !d.hideRevenue && ['Pipeline ROAS', c.pipelineROAS !== null ? fmtMultiplier(c.pipelineROAS) : null, null, null, false],
+    ['Cost / view', c.costPerView !== null ? fmtCurrency(c.costPerView, d.currency) : null, null, null, true],
+    ['Cost / engagement', c.costPerEngagement !== null ? fmtCurrency(c.costPerEngagement, d.currency) : null, null, null, true],
+    ['Cost / reach', c.costPerReach !== null ? fmtCurrency(c.costPerReach, d.currency) : null, null, null, true],
   ].filter(Boolean)
    .filter(row => row[1] !== null)
    .filter(row => !allowedRows || allowedRows.includes(row[0]));
@@ -1262,6 +1475,8 @@ function editorialLayout(d, c, heroStats, strategyLines) {
       ${chartHTML(c)}
     </div>
 
+    ${benchmarkHTML(c)}
+
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:18px;">
       <div>
         <div class="stat-label muted" style="margin-bottom:8px;">The challenge</div>
@@ -1325,6 +1540,8 @@ function boldLayout(d, c, heroStats, strategyLines) {
       ${chartHTML(c, 'Performance shape')}
     </div>
 
+    ${benchmarkHTML(c)}
+
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:14px;">
       <div style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.14); padding:16px; border-radius:18px;">
         <div class="accent-text stat-label" style="font-weight:700; margin-bottom:8px;">Challenge</div>
@@ -1386,6 +1603,8 @@ function dataLayout(d, c, heroStats, strategyLines) {
       ${chartHTML(c)}
     </div>
 
+    ${benchmarkHTML(c)}
+
     <div style="margin-bottom:14px;">
       <div class="stat-label muted" style="margin-bottom:8px;">Detailed performance${d.noBaseline ? '' : ' — baseline vs achieved'}</div>
       ${buildResultsTableHTML(d, c, true)}
@@ -1421,7 +1640,7 @@ function bindAllInputs() {
   document.getElementById('f-style').addEventListener('change', e => { state.style = e.target.value; });
   document.getElementById('f-currency').addEventListener('change', e => {
     state.currency = e.target.value;
-    renderPerfFields(); renderBaselineFields(); renderComputed();
+    renderPerfFields(); renderBaselineFields(); renderBenchmarkFields(); renderComputed();
   });
   document.getElementById('f-xFormat').addEventListener('change', e => {
     state.xFormat = e.target.value;
@@ -1435,7 +1654,7 @@ function bindAllInputs() {
   });
   document.getElementById('t-hideRevenue').addEventListener('change', e => {
     state.hideRevenue = e.target.checked;
-    renderPerfFields(); renderBaselineFields(); renderComputed();
+    renderPerfFields(); renderBaselineFields(); renderBenchmarkFields(); renderComputed();
   });
   document.getElementById('t-noBaseline').addEventListener('change', e => {
     state.noBaseline = e.target.checked;
@@ -1521,6 +1740,7 @@ bindAllInputs();
 updateDetection();
 renderPerfFields();
 renderBaselineFields();
+renderBenchmarkFields();
 renderComputed();
 </script>
 </body>
