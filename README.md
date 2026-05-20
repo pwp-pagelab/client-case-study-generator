@@ -20,3 +20,5 @@ Single-file, no-build HTML generator for anonymized performance marketing case s
 - Multiplier metrics can be reported as compact X values such as `3X`, and generated outputs include simple visual chart blocks.
 - Industry-standard benchmarks are suggested from the selected objective and industry/category, with manual override fields when needed.
 - Common ad-account export columns are supported directly: spend, reach, impressions, clicks, engagements, video views, CTR, and CPC.
+- Below-benchmark metrics can be shown as within average, hidden from benchmark visuals, or shown with the exact gap.
+- Visual charts compare achieved performance against benchmark values instead of using generic bars.
