@@ -325,8 +325,8 @@
         <p class="hint-text">No client names. Build a descriptor sharp enough that similar prospects recognize themselves.</p>
 
         <div class="field">
-          <label class="label">Your Agency Name</label>
-          <input class="input" id="f-agencyName" value="Your Agency">
+          <label class="label">Agency Name</label>
+          <input class="input" id="f-agencyName" value="Post With Passion - PWP" readonly>
         </div>
         <div class="field">
           <label class="label">Agency Tagline</label>
@@ -451,12 +451,13 @@ Connected creative learnings back to paid media reporting</textarea>
 </div>
 
 <script>
+const AGENCY_NAME = 'Post With Passion - PWP';
 const state = {
   focus: 'auto', detectedFocus: null,
   style: 'editorial', currency: 'SAR', xFormat: 'compact', changeFormat: 'percent',
   hideRevenue: false, noBaseline: true, strictAnon: true,
   endorsement: 'outcome',
-  agencyName: 'Your Agency', agencyTagline: 'Performance Marketing',
+  agencyName: AGENCY_NAME, agencyTagline: 'Performance Marketing',
   descriptor: 'A 40-year-old Saudi construction material manufacturer',
   industry: 'Construction materials', size: '$1M – $10M revenue',
   period: 'May – Dec 2025', channels: 'Meta Ads, TikTok, UGC creators',
@@ -496,6 +497,13 @@ function fmtBenchmarkValue(n, unit) {
 }
 const fmtNumber = (n, d = 0) => {
   if (n === null || n === undefined || isNaN(n)) return null;
+  if (d === 0 && Math.abs(n) >= 1000) {
+    const units = [['B', 1e9], ['M', 1e6], ['K', 1e3]];
+    const [suffix, value] = units.find(([, value]) => Math.abs(n) >= value);
+    const scaled = n / value;
+    const digits = Math.abs(scaled) >= 10 || Number.isInteger(scaled) ? 0 : 1;
+    return scaled.toFixed(digits).replace(/\.0$/, '') + suffix;
+  }
   return Number(n).toLocaleString('en-US', { maximumFractionDigits: d });
 };
 const fmtPct = (n, d = 1) => {
@@ -587,7 +595,7 @@ function benchmarkForKey(key) {
 }
 function benchmarkSourceText() {
   const labels = { leadgen: 'lead generation', ecommerce: 'ecommerce', creative: 'creative/UGC', awareness: 'awareness', fullfunnel: 'full-funnel' };
-  return `Suggested for ${industryCluster()} · ${labels[getActiveFocus()] || 'performance'} objective`;
+  return `${industryCluster()} benchmark · ${labels[getActiveFocus()] || 'performance'} objective`;
 }
 const fmtChange = (liftValue, inverted = false, includeWord = true) => {
   if (liftValue === null || liftValue === undefined || isNaN(liftValue)) return '';
@@ -826,13 +834,12 @@ function chartHTML(c, title = 'Visual performance snapshot') {
         <div class="metric-bar-label">${escapeHTML(m.k)}</div>
         <div class="metric-bar-track"><div class="metric-bar-fill" style="width:${metricWidth(m, maxRaw)}%;"></div></div>
         <div class="metric-bar-value">${m.v}</div>
-        ${m.benchmarkValue ? `<div class="field-hint" style="grid-column:1/-1; margin-top:-4px;">${benchmarkSourceText()}: ${m.benchmarkValue} · ${benchmarkLabel(m)}</div>` : ''}
       </div>`).join('')}
     </div>
     <div class="chart-ribbon">
-      <div>${escapeHTML(getActiveFocus()).replace('leadgen', 'lead gen')}</div>
       <div>${metrics.length} live metrics</div>
-      <div>No fake zeros</div>
+      <div>${industryCluster()}</div>
+      <div>${escapeHTML(getActiveFocus()).replace('leadgen', 'lead gen')}</div>
     </div>
   </div>`;
 }
@@ -855,7 +862,7 @@ function benchmarkHTML(c) {
   if (!rows.length) return '';
   return `<div class="visual-panel" style="margin-bottom:14px;">
     <div class="chart-title">Industry standard context</div>
-    <div class="field-hint" style="margin-bottom:10px;">${benchmarkSourceText()}. You can override any suggested standard in the inputs.</div>
+    <div class="field-hint" style="margin-bottom:10px;">Benchmarks are estimated from the case industry and objective; override them only when you have a stronger source.</div>
     <table class="results-table">
       <thead><tr><th>Metric</th><th class="num">Industry standard</th><th class="num">Achieved</th><th class="num">Context</th></tr></thead>
       <tbody>
@@ -1147,7 +1154,7 @@ function renderBenchmarkFields() {
       </div>
       <input type="number" class="input benchmark-input" data-key="${k}" value="${d[k] ?? ''}" placeholder="${fmtBenchmarkValue(benchmarkForKey(k), unit)}">
     </div>
-  `).join('')}</div><p class="hint-text" style="margin-top:12px;">${benchmarkSourceText()}. Leave fields blank to use the suggested standard, or type your own benchmark to override it.</p>`;
+  `).join('')}</div><p class="hint-text" style="margin-top:12px;">Benchmarks are estimated from the case industry and objective. Override only when you have a stronger source.</p>`;
   container.querySelectorAll('.benchmark-input').forEach(input => {
     input.addEventListener('input', e => {
       state[e.target.dataset.key] = e.target.value;
@@ -1454,46 +1461,48 @@ function buildCarouselSlidesHTML() {
   const c = calc();
   const d = state;
   const headline = d.headline.trim() || draftHeadline();
-  const metrics = buildHeroStats(c);
-  const topMetrics = metrics.length ? metrics.slice(0, 4) : [{ k: 'Metrics', v: 'Add data' }];
-  const strategyLines = d.strategy.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
-  const footer = n => `<div class="carousel-footer"><strong>${escapeHTML(d.agencyName)}</strong><span>${n}/6 · ${escapeHTML(d.period)}</span></div>`;
+  const topMetrics = buildHeroStats(c).slice(0, 3);
+  const footer = n => `<div class="carousel-footer"><strong>${escapeHTML(AGENCY_NAME)}</strong><span>${n}/5 · ${escapeHTML(d.period)}</span></div>`;
 
   return `
     <section class="carousel-slide dark">
       <div class="kicker">Case Study</div>
       <h1>${escapeHTML(headline)}</h1>
-      <p style="bottom:170px; color:rgba(255,255,255,.78); font-size:28px; left:74px; line-height:1.35; max-width:760px; position:absolute;">${escapeHTML(d.descriptor)}</p>
+      <div class="carousel-stats" style="grid-template-columns:repeat(3,1fr);">
+        ${topMetrics.map(m => `<div class="carousel-stat"><span>${escapeHTML(m.k)}</span><strong>${m.v}</strong></div>`).join('')}
+      </div>
       ${footer(1)}
     </section>
     <section class="carousel-slide">
-      <div class="kicker">The challenge</div>
-      <h2>${escapeHTML(d.challenge || draftChallenge())}</h2>
-      <p>${escapeHTML(d.channels)}</p>
+      <div class="kicker">The account</div>
+      <h2>${escapeHTML(d.industry)}</h2>
+      <div class="carousel-stats">
+        <div class="carousel-stat"><span>Category</span><strong style="font-size:42px;">${escapeHTML(industryCluster())}</strong></div>
+        <div class="carousel-stat"><span>Objective</span><strong style="font-size:42px;">${escapeHTML(getActiveFocus()).replace('leadgen', 'Lead gen')}</strong></div>
+        <div class="carousel-stat"><span>Channels</span><strong style="font-size:36px;">${escapeHTML(d.channels.split(',').slice(0,2).join(' + '))}</strong></div>
+        <div class="carousel-stat"><span>Period</span><strong style="font-size:42px;">${escapeHTML(d.period)}</strong></div>
+      </div>
       ${footer(2)}
     </section>
-    <section class="carousel-slide">
-      <div class="kicker">The approach</div>
-      <h2>We focused the work around the metrics that mattered.</h2>
-      <ul>${strategyLines.map(line => `<li>${escapeHTML(line)}</li>`).join('')}</ul>
+    <section class="carousel-slide dark">
+      <div class="kicker">Performance ranking</div>
+      <h2>Strongest metrics vs benchmark</h2>
+      ${carouselChartHTML(c)}
       ${footer(3)}
     </section>
-    <section class="carousel-slide dark">
-      <div class="kicker">The numbers</div>
-      <h2>No empty metrics. No fake zeros.</h2>
-      ${carouselChartHTML(c)}
+    <section class="carousel-slide">
+      <div class="kicker">Benchmark context</div>
+      <h2>${escapeHTML(industryCluster())}</h2>
+      <div style="transform:scale(1.28); transform-origin:top left; width:78%; margin-top:26px;">${benchmarkHTML(c) || chartHTML(c, 'Performance snapshot')}</div>
       ${footer(4)}
     </section>
-    <section class="carousel-slide">
-      <div class="kicker">The outcome</div>
-      <h2>${escapeHTML(d.outcomeCallout.trim() || draftOutcomeCallout())}</h2>
-      ${footer(5)}
-    </section>
     <section class="carousel-slide dark">
-      <div class="kicker">${escapeHTML(d.agencyName)}</div>
-      <h1>Turn messy campaign data into a clear growth story.</h1>
-      <p style="color:rgba(255,255,255,.78); margin-top:36px; max-width:780px;">Anonymized, metric-led case studies for prospect-ready proof.</p>
-      ${footer(6)}
+      <div class="kicker">${escapeHTML(AGENCY_NAME)}</div>
+      <h1>Proof that fits the numbers.</h1>
+      <div class="carousel-stats">
+        ${topMetrics.slice(0, 2).map(m => `<div class="carousel-stat"><span>${escapeHTML(m.k)}</span><strong>${m.v}</strong></div>`).join('')}
+      </div>
+      ${footer(5)}
     </section>
   `;
 }
@@ -1707,6 +1716,7 @@ function dataLayout(d, c, heroStats, strategyLines) {
 function bindAllInputs() {
   document.getElementById('f-focus').addEventListener('change', e => {
     state.focus = e.target.value;
+    state.agencyName = AGENCY_NAME;
     updateDetection();
     renderComputed();
   });
