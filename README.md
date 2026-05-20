@@ -17,3 +17,4 @@ Single-file, no-build HTML generator for anonymized performance marketing case s
 - Engagement focus controls fields, metrics, copy, hero stats, and tables.
 - Outputs include a one-page A4 PDF, LinkedIn post copy, and a square LinkedIn carousel PDF.
 - The editor, PDF page, LinkedIn post preview, and carousel output should all keep the PWP look and feel.
+- Multiplier metrics can be reported as compact X values such as `3X`, and generated outputs include simple visual chart blocks.
